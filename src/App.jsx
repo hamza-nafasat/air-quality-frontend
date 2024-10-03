@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 import Loader from "./components/shared/small/Loader";
 import { Navigate, Route, Routes } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
 import "slick-carousel/slick/slick.css";
@@ -22,11 +23,9 @@ const SensorDetail = lazy(() => import("./pages/dashboard/sensors/SensorDetail")
 const Settings = lazy(() => import("./pages/dashboard/settings/Settings"));
 const Login = lazy(() => import("./pages/auth/Login"));
 const ForgetPassword = lazy(() => import("./pages/auth/ForgetPassword"));
-const Signup = lazy(() => import("./pages/auth/Signup"));
+const SignUp = lazy(() => import("./pages/auth/SignUp"));
 const ResetPassword = lazy(() => import("./pages/auth/ResetPassword"));
-const BuildingStepper = lazy(() =>
-  import("./components/buildings/BuildingStepper")
-);
+const BuildingStepper = lazy(() => import("./components/buildings/BuildingStepper"));
 
 function App() {
   return (
@@ -35,15 +34,9 @@ function App() {
       <Routes>
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/login" element={<AuthBg Form={Login} />} />
-        <Route
-          path="/forget-password"
-          element={<AuthBg Form={ForgetPassword} />}
-        />
-        <Route
-          path="/reset-password"
-          element={<AuthBg Form={ResetPassword} />}
-        />
-        <Route path="/signup" element={<AuthBg Form={Signup} />} />
+        <Route path="/forget-password" element={<AuthBg Form={ForgetPassword} />} />
+        <Route path="/reset-password" element={<AuthBg Form={ResetPassword} />} />
+        <Route path="/signup" element={<AuthBg Form={SignUp} />} />
         <Route path="/dashboard" element={<Dashboard />}>
           <Route path="building-view/:id" element={<BuildingView />} />
           <Route path="floor-view/:id" element={<FloorView />} />
@@ -57,14 +50,12 @@ function App() {
           <Route path="add-building" element={<BuildingStepper />} />
 
           <Route path="subscription" element={<Subscription />} />
-          <Route
-            path="subscription-history"
-            element={<SubscriptionHistory />}
-          />
+          <Route path="subscription-history" element={<SubscriptionHistory />} />
           <Route path="change-password" element={<ChangePassword />} />
           <Route path="profile" element={<Profile />} />
         </Route>
       </Routes>
+      <Toaster position="top-right" />
     </Suspense>
   );
 }

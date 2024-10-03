@@ -46,5 +46,5 @@ const authApis = createApi({
   }),
 });
 
-export const { useLoginMutation, useGetMyProfileQuery, useLogoutQuery } = authApis;
+export const { useRegisterMutation, useLoginMutation, useGetMyProfileQuery, useLogoutQuery } = authApis;
 export default authApis;

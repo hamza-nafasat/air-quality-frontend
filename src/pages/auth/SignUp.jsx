@@ -1,38 +1,50 @@
 import { useState } from "react";
-import { SlLock } from "react-icons/sl";
-import TextField from "../../components/shared/small/TextField";
-import { Link } from "react-router-dom";
-import Button from "../../components/shared/small/Button";
-import User from "../../assets/svgs/auth/User";
-import Mail from "../../assets/svgs/auth/Mail";
+import { Link, useNavigate } from "react-router-dom";
 import Lock from "../../assets/svgs/auth/Lock";
+import Mail from "../../assets/svgs/auth/Mail";
+import User from "../../assets/svgs/auth/User";
+import Button from "../../components/shared/small/Button";
+import TextField from "../../components/shared/small/TextField";
+import { useRegisterMutation } from "../../redux/apis/authApis";
+import toast from "react-hot-toast";
 
-const Signup = () => {
+const SignUp = () => {
+  const navigate = useNavigate();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-
   const [checked, setChecked] = useState(true);
 
-  const formSubmitHandler = (e) => {
+  const [registerUser, { isLoading }] = useRegisterMutation("");
+
+  const formSubmitHandler = async (e) => {
     e.preventDefault();
-    console.log(firstName, lastName, email, password, confirmPassword);
-    setEmail("");
-    setPassword("");
-    setConfirmPassword("");
-    setFirstName("");
-    setLastName("");
+    if (!firstName || !lastName || !email || !password || !confirmPassword)
+      return toast.error("Please fill all the fields");
+    if (password !== confirmPassword) return toast.error("Passwords do not match");
+    try {
+      const response = await registerUser({
+        firstName,
+        lastName,
+        email,
+        password,
+      }).unwrap();
+      if (response?.success) {
+        console.log("response while signUp ", response);
+        toast.success(response?.message);
+        return navigate("/dashboard");
+      }
+    } catch (error) {
+      console.log(" Error While Signing Up", error);
+    }
   };
 
   return (
     <article className="w-full flex flex-col gap-4">
-      <h2 className="text-center text-2xl xl:text-4xl  font-[700] ">Signup</h2>
-      <form
-        className="flex flex-col w-full gap-5 "
-        onSubmit={formSubmitHandler}
-      >
+      <h2 className="text-center text-2xl xl:text-4xl  font-[700] ">SignUp</h2>
+      <form className="flex flex-col w-full gap-5 " onSubmit={formSubmitHandler}>
         <div className="flex flex-col xl:flex-row gap-4 min-w-full">
           <TextField
             Icon={<User />}
@@ -97,7 +109,7 @@ const Signup = () => {
             </p>
           </div>
         </section>
-        <Button height="h-[48px]" text="Signup" bg="bg-primary-lightBlue" />
+        <Button height="h-[48px]" text="SignUp" bg="bg-primary-lightBlue" />
       </form>
 
       <section className="flex w-full items-center justify-center gap-4 text-[12px] xl:text-[1rem]">
@@ -110,4 +122,4 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+export default SignUp;
