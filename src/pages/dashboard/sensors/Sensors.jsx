@@ -1,12 +1,12 @@
 import DataTable from "react-data-table-component";
-// import DeleteIcon from "../../../assets/svgs/sensors/DeleteIcon";
-// import AddIcon from "../../../assets/svgs/AddIcon";
-// import Modal from "../../../components/shared/modal/Modal";
+import DeleteIcon from "../../../assets/svgs/sensors/DeleteIcon";
+import AddIcon from "../../../assets/svgs/pages/AddIcon";
+import Modal from "../../../components/shared/modal/Modal";
 import { useState } from "react";
-// import EditIcon from "../../../assets/svgs/EditIcon";
+import EditIcon from "../../../assets/svgs/stepper/EditIcon";
 import { sensorData } from "../../../data/data";
-// import AddSensor from "./AddSensor";
-// import EditSensor from "./EditSensor";
+import AddSensor from "./AddSensor";
+import EditSensor from "./EditSensor";
 import ToggleButton from "../../../components/shared/small/ToggleButton";
 import { confirmAlert } from "react-confirm-alert";
 import { IoEyeOutline } from "react-icons/io5";
@@ -47,7 +47,10 @@ const columns = (modalOpenHandler, navigate, sensorStatus, statusToggleHandler, 
     name: "Action",
     selector: (row) => (
       <div className="flex items-center gap-2">
-        {/* <div
+        <div className="cursor-pointer" onClick={() => navigate(`sensor-detail/${row._id}`)}>
+          <IoEyeOutline fontSize={20} />
+        </div>
+        <div
           className="cursor-pointer"
           onClick={() => modalOpenHandler("edit")}
         >
@@ -55,9 +58,6 @@ const columns = (modalOpenHandler, navigate, sensorStatus, statusToggleHandler, 
         </div>
         <div className="cursor-pointer" onClick={() => deleteHandler()}>
           <DeleteIcon />
-        </div> */}
-        <div className="cursor-pointer" onClick={() => navigate(`sensor-detail/${row._id}`)}>
-          <IoEyeOutline fontSize={20} />
         </div>
       </div>
     ),
@@ -98,7 +98,7 @@ const Sensors = () => {
   }
   return (
     <div className="bg-white rounded-[15px] p-4 lg:p-6 h-[calc(100vh-80px)] overflow-hidden">
-      {/* <div className="flex justify-between">
+      <div className="flex justify-end">
         <div className="flex items-center gap-2">
           <div
             className="cursor-pointer"
@@ -110,7 +110,7 @@ const Sensors = () => {
             <DeleteIcon />
           </div>
         </div>
-      </div>  */}
+      </div> 
       <div className="mt-5">
         <DataTable
           columns={columns(modalOpenHandler, navigate, sensorStatus, statusToggleHandler, deleteHandler)}
@@ -123,7 +123,7 @@ const Sensors = () => {
           fixedHeaderScrollHeight="70vh"
         />
       </div>
-      {/* {modal === "add" && (
+      {modal === "add" && (
         <Modal title="Add Sensor" width='w-[300px] md:w-[650px]' onClose={modalCloseHandler}>
           <AddSensor onClose={modalCloseHandler} />
         </Modal>
@@ -132,7 +132,7 @@ const Sensors = () => {
         <Modal title="Edit Sensor" width='w-[300px] md:w-[650px]' onClose={modalCloseHandler}>
           <EditSensor onClose={modalCloseHandler} />
         </Modal>
-      )} */}
+      )}
     </div>
   );
 };

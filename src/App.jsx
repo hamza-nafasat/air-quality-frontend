@@ -3,6 +3,7 @@ import "leaflet/dist/leaflet.css";
 import { lazy, Suspense } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import "slick-carousel/slick/slick-theme.css";
+import "react-confirm-alert/src/react-confirm-alert.css";
 import "slick-carousel/slick/slick.css";
 import BuildingView from "./components/buildingsData/buildingView/BuildingView";
 import FloorView from "./components/buildingsData/floorView/FloorView";
