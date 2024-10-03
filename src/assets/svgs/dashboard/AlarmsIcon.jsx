@@ -2,17 +2,11 @@ import React from "react";
 
 const AlarmsIcon = () => {
   return (
-    <svg
-      width="39"
-      height="39"
-      viewBox="0 0 39 39"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
+    <svg width="39" height="39" viewBox="0 0 39 39" fill="none" xmlns="http://www.w3.org/2000/svg">
       <g filter="url(#filter0_b_926_6050)">
         <circle cx="19.5" cy="19" r="19" fill="#03A5E0" />
       </g>
-      <g clip-path="url(#clip0_926_6050)">
+      <g clipPath="url(#clip0_926_6050)">
         <path
           d="M22.5071 21.2355C22.1666 21.2352 21.8907 21.5113 21.8907 21.8516V21.5437C21.8907 21.2032 21.6149 20.9274 21.2744 20.9274C20.9339 20.9274 20.6581 21.2032 20.6581 21.5437V21.2355C20.6581 20.895 20.3823 20.6192 20.0417 20.6192C19.7012 20.6192 19.4254 20.895 19.4254 21.2355V18.462C19.4254 18.1215 19.1496 17.8457 18.8091 17.8457C18.4686 17.8457 18.1927 18.1215 18.1927 18.462V22.8941C18.1927 22.1483 17.5881 21.5437 16.8424 21.5437C16.5669 21.5437 16.3438 21.7671 16.3438 22.0423C16.3438 22.1197 16.3616 22.1961 16.3964 22.2654C16.7672 23.0069 16.9601 23.8244 16.9598 24.6531V25.3998C16.9598 25.8904 17.1545 26.361 17.5015 26.708L17.8846 27.0907C17.5441 27.0907 17.2682 27.3665 17.2682 27.707V28.9397H22.8152V27.707C22.8152 27.3665 22.5394 27.0907 22.1989 27.0907L22.582 26.7076C22.9287 26.361 23.1234 25.8907 23.1234 25.4004V21.8522C23.1234 21.5117 22.8476 21.2358 22.5071 21.2355Z"
           fill="white"
@@ -29,18 +23,9 @@ const AlarmsIcon = () => {
           d="M14.8038 22.4114V10.8145C14.4461 10.942 14.1875 11.281 14.1875 11.6822V21.5436C14.1875 21.9448 14.4461 22.2838 14.8038 22.4114Z"
           fill="white"
         />
-        <path
-          d="M17.8859 12.6074H17.2695V13.8401H17.8859V12.6074Z"
-          fill="white"
-        />
-        <path
-          d="M19.1202 12.6074H18.5039V13.8401H19.1202V12.6074Z"
-          fill="white"
-        />
-        <path
-          d="M20.3507 12.6074H19.7344V13.8401H20.3507V12.6074Z"
-          fill="white"
-        />
+        <path d="M17.8859 12.6074H17.2695V13.8401H17.8859V12.6074Z" fill="white" />
+        <path d="M19.1202 12.6074H18.5039V13.8401H19.1202V12.6074Z" fill="white" />
+        <path d="M20.3507 12.6074H19.7344V13.8401H20.3507V12.6074Z" fill="white" />
         <path
           d="M24.4844 25.1135C24.6009 25.23 24.665 25.3847 24.665 25.5492C24.665 25.7138 24.6009 25.8685 24.4844 25.985L24.9201 26.4207C25.1531 26.1881 25.2813 25.8784 25.2813 25.5492C25.2813 25.2201 25.1531 24.9104 24.9201 24.6777L24.4844 25.1135Z"
           fill="white"
@@ -82,29 +67,15 @@ const AlarmsIcon = () => {
           width="60"
           height="60"
           filterUnits="userSpaceOnUse"
-          color-interpolation-filters="sRGB"
+          colorInterpolationFilters="sRGB"
         >
-          <feFlood flood-opacity="0" result="BackgroundImageFix" />
+          <feFlood floodOpacity="0" result="BackgroundImageFix" />
           <feGaussianBlur in="BackgroundImageFix" stdDeviation="5.5" />
-          <feComposite
-            in2="SourceAlpha"
-            operator="in"
-            result="effect1_backgroundBlur_926_6050"
-          />
-          <feBlend
-            mode="normal"
-            in="SourceGraphic"
-            in2="effect1_backgroundBlur_926_6050"
-            result="shape"
-          />
+          <feComposite in2="SourceAlpha" operator="in" result="effect1_backgroundBlur_926_6050" />
+          <feBlend mode="normal" in="SourceGraphic" in2="effect1_backgroundBlur_926_6050" result="shape" />
         </filter>
         <clipPath id="clip0_926_6050">
-          <rect
-            width="20"
-            height="20"
-            fill="white"
-            transform="translate(8.5 10)"
-          />
+          <rect width="20" height="20" fill="white" transform="translate(8.5 10)" />
         </clipPath>
       </defs>
     </svg>

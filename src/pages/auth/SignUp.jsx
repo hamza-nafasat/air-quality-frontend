@@ -6,7 +6,7 @@ import User from "../../assets/svgs/auth/User";
 import Button from "../../components/shared/small/Button";
 import TextField from "../../components/shared/small/TextField";
 import { useRegisterMutation } from "../../redux/apis/authApis";
-import toast from "react-hot-toast";
+import { toast } from "react-toastify";
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -31,8 +31,8 @@ const SignUp = () => {
         email,
         password,
       }).unwrap();
+      console.log("response while signUp ", response);
       if (response?.success) {
-        console.log("response while signUp ", response);
         toast.success(response?.message);
         return navigate("/dashboard");
       }
@@ -109,7 +109,7 @@ const SignUp = () => {
             </p>
           </div>
         </section>
-        <Button height="h-[48px]" text="SignUp" bg="bg-primary-lightBlue" />
+        <Button disabled={isLoading} height="h-[48px]" text="SignUp" bg="bg-primary-lightBlue" />
       </form>
 
       <section className="flex w-full items-center justify-center gap-4 text-[12px] xl:text-[1rem]">

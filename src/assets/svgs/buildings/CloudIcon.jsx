@@ -2,17 +2,11 @@ import React from "react";
 
 const CloudIcon = () => {
   return (
-    <svg
-      width="24"
-      height="25"
-      viewBox="0 0 24 25"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
+    <svg width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
       <g filter="url(#filter0_b_708_6622)">
         <circle cx="12" cy="12.666" r="12" fill="#03A5E0" />
       </g>
-      <g clip-path="url(#clip0_708_6622)">
+      <g clipPath="url(#clip0_708_6622)">
         <path
           fillRule="evenodd"
           clipRule="evenodd"
@@ -28,29 +22,15 @@ const CloudIcon = () => {
           width="46"
           height="46"
           filterUnits="userSpaceOnUse"
-          color-interpolation-filters="sRGB"
+          colorInterpolationFilters="sRGB"
         >
-          <feFlood flood-opacity="0" result="BackgroundImageFix" />
+          <feFlood floodOpacity="0" result="BackgroundImageFix" />
           <feGaussianBlur in="BackgroundImageFix" stdDeviation="5.5" />
-          <feComposite
-            in2="SourceAlpha"
-            operator="in"
-            result="effect1_backgroundBlur_708_6622"
-          />
-          <feBlend
-            mode="normal"
-            in="SourceGraphic"
-            in2="effect1_backgroundBlur_708_6622"
-            result="shape"
-          />
+          <feComposite in2="SourceAlpha" operator="in" result="effect1_backgroundBlur_708_6622" />
+          <feBlend mode="normal" in="SourceGraphic" in2="effect1_backgroundBlur_708_6622" result="shape" />
         </filter>
         <clipPath id="clip0_708_6622">
-          <rect
-            width="12"
-            height="14"
-            fill="white"
-            transform="translate(6 6)"
-          />
+          <rect width="12" height="14" fill="white" transform="translate(6 6)" />
         </clipPath>
       </defs>
     </svg>

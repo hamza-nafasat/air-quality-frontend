@@ -2,14 +2,8 @@ import React from "react";
 
 const GreenEye = () => {
   return (
-    <svg
-      width="19"
-      height="18"
-      viewBox="0 0 19 18"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <g clip-path="url(#clip0_671_10752)">
+    <svg width="19" height="18" viewBox="0 0 19 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <g clipPath="url(#clip0_671_10752)">
         <path
           d="M9.14999 2.5C2.75106 2.63339 0.277768 7.93842 0.250108 8.39923C0.230255 8.72876 2.94676 14.6975 9.14999 14.495C15.3532 14.6975 18.0697 8.72876 18.0499 8.39923C18.0222 7.93842 15.5489 2.63339 9.14999 2.5ZM9.14999 13.8388C6.49892 13.8388 4.34977 11.4485 4.34977 8.5C4.34977 5.55146 6.49892 3.16119 9.14999 3.16119C11.801 3.16119 13.9502 5.55146 13.9502 8.5C13.9502 11.4485 11.801 13.8388 9.14999 13.8388Z"
           fill="#50D450"
@@ -21,12 +15,7 @@ const GreenEye = () => {
       </g>
       <defs>
         <clipPath id="clip0_671_10752">
-          <rect
-            width="18"
-            height="18"
-            fill="white"
-            transform="translate(0.25)"
-          />
+          <rect width="18" height="18" fill="white" transform="translate(0.25)" />
         </clipPath>
       </defs>
     </svg>

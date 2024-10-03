@@ -2,14 +2,8 @@ import React from "react";
 
 const DeleteIcon = () => {
   return (
-    <svg
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <rect width="24" height="24" rx="12" fill="#FF0000" fill-opacity="0.7" />
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="24" height="24" rx="12" fill="#FF0000" fillOpacity="0.7" />
       <path
         d="M11.8086 11.3161V16.7669C11.8086 16.9249 11.9139 17.0302 12.0719 17.0302C12.2299 17.0302 12.3352 16.9249 12.3352 16.7669V11.3161C12.3352 11.1581 12.2299 11.0527 12.0719 11.0527C11.9139 11.0527 11.8086 11.1581 11.8086 11.3161Z"
         fill="white"

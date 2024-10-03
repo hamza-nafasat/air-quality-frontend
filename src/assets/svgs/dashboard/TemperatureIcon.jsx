@@ -2,13 +2,7 @@ import React from "react";
 
 const TemperatureIcon = () => {
   return (
-    <svg
-      width="39"
-      height="38"
-      viewBox="0 0 39 38"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
+    <svg width="39" height="38" viewBox="0 0 39 38" fill="none" xmlns="http://www.w3.org/2000/svg">
       <g filter="url(#filter0_b_655_9436)">
         <circle cx="19.5" cy="19" r="19" fill="#03A5E0" />
       </g>
@@ -24,21 +18,12 @@ const TemperatureIcon = () => {
           width="60"
           height="60"
           filterUnits="userSpaceOnUse"
-          color-interpolation-filters="sRGB"
+          colorInterpolationFilters="sRGB"
         >
-          <feFlood flood-opacity="0" result="BackgroundImageFix" />
+          <feFlood floodOpacity="0" result="BackgroundImageFix" />
           <feGaussianBlur in="BackgroundImageFix" stdDeviation="5.5" />
-          <feComposite
-            in2="SourceAlpha"
-            operator="in"
-            result="effect1_backgroundBlur_655_9436"
-          />
-          <feBlend
-            mode="normal"
-            in="SourceGraphic"
-            in2="effect1_backgroundBlur_655_9436"
-            result="shape"
-          />
+          <feComposite in2="SourceAlpha" operator="in" result="effect1_backgroundBlur_655_9436" />
+          <feBlend mode="normal" in="SourceGraphic" in2="effect1_backgroundBlur_655_9436" result="shape" />
         </filter>
       </defs>
     </svg>

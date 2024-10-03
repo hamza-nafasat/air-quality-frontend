@@ -1,22 +1,33 @@
 import { useState } from "react";
-import { HiOutlineMail } from "react-icons/hi";
-import { SlLock } from "react-icons/sl";
-import TextField from "../../components/shared/small/TextField";
-import { Link } from "react-router-dom";
-import Button from "../../components/shared/small/Button";
-import Mail from "../../assets/svgs/auth/Mail";
+import { Link, useNavigate } from "react-router-dom";
 import Lock from "../../assets/svgs/auth/Lock";
+import Mail from "../../assets/svgs/auth/Mail";
+import Button from "../../components/shared/small/Button";
+import TextField from "../../components/shared/small/TextField";
+import { useLoginMutation } from "../../redux/apis/authApis";
+import { toast } from "react-toastify";
 
 const Login = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [checked, setChecked] = useState(true);
+  const [loginUser, { isLoading }] = useLoginMutation("");
 
-  const formSubmitHandler = (e) => {
+  const formSubmitHandler = async (e) => {
     e.preventDefault();
-    console.log(email, password);
-    setEmail("");
-    setPassword("");
+    if (!email || !password) return toast.error("Please fill all the fields");
+    try {
+      const response = await loginUser({ email, password }).unwrap();
+      console.log("response while login ", response);
+      if (response?.success) {
+        toast.success(response?.message);
+        return navigate("/dashboard");
+      }
+    } catch (error) {
+      console.log(" Error While Logging In", error);
+      toast.error(error?.data?.message || "Error ocurred while logging in");
+    }
   };
 
   return (
@@ -50,10 +61,7 @@ const Login = () => {
               onChange={() => setChecked(!checked)}
               id="check"
             />
-            <p
-              className="select-none text-[12px] xl:text-[1rem]"
-              onClick={() => setChecked(!checked)}
-            >
+            <p className="select-none text-[12px] xl:text-[1rem]" onClick={() => setChecked(!checked)}>
               Remember Me
             </p>
           </div>
@@ -65,7 +73,7 @@ const Login = () => {
             Forget Password?
           </Link>
         </section>
-        <Button height="h-[4 8px]" text="Login" bg="bg-primary-lightBlue" />
+        <Button disabled={isLoading} height="h-[4 8px]" text="Login" bg="bg-primary-lightBlue" />
       </form>
 
       <section className="flex w-full items-center justify-center gap-4 text-[12px] xl:text-[1rem]">

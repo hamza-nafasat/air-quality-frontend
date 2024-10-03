@@ -1,4 +1,4 @@
-import React from "react";
+/* eslint-disable react/prop-types */
 
 const Button = ({
   bg,
@@ -27,11 +27,15 @@ const Button = ({
       style={style}
       className={`flex items-center justify-center text-nowrap px-7 py-5 transition-all duration-300 hover:bg-[#3dc5ff] ${
         width ? width : "w-full"
-      } ${height ? height : "h-[36px]"} ${
-        size ? size : "text-xs sm:text-sm md:text-base"
-      } ${cursor ? cursor : "pointer"}
+      }
+      ${height ? height : "h-[36px]"} 
+      ${size ? size : "text-xs sm:text-sm md:text-base"} 
+      ${cursor ? cursor : "pointer"}
       ${bg ? bg : "bg-primary-lightBlue"}
       ${radius ? radius : "rounded-[8px]"}
+      disabled:cursor-not-allowed
+      disabled:opacity-50
+      
       `}
       {...rest}
     >

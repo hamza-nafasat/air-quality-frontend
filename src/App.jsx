@@ -1,19 +1,18 @@
-import { lazy, Suspense } from "react";
-import Loader from "./components/shared/small/Loader";
-import { Navigate, Route, Routes } from "react-router-dom";
-import { Toaster } from "react-hot-toast";
-import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
-import "slick-carousel/slick/slick.css";
+import "leaflet/dist/leaflet.css";
+import { lazy, Suspense } from "react";
+import { Navigate, Route, Routes } from "react-router-dom";
 import "slick-carousel/slick/slick-theme.css";
-import AuthBg from "./components/shared/large/AuthBg";
+import "slick-carousel/slick/slick.css";
 import BuildingView from "./components/buildingsData/buildingView/BuildingView";
 import FloorView from "./components/buildingsData/floorView/FloorView";
-import Subscription from "./pages/dashboard/subscription/Subscription";
+import ChangePassword from "./components/settings/ChangePassword";
+import SubscriptionHistory from "./components/settings/SubscriptionHistory";
+import AuthBg from "./components/shared/large/AuthBg";
+import Loader from "./components/shared/small/Loader";
 import ScrollToTop from "./components/shared/small/ScrollToTop";
 import Profile from "./pages/dashboard/profile/Profile";
-import SubscriptionHistory from "./components/settings/SubscriptionHistory";
-import ChangePassword from "./components/settings/ChangePassword";
+import Subscription from "./pages/dashboard/subscription/Subscription";
 const Dashboard = lazy(() => import("./pages/dashboard/index"));
 const Buildings = lazy(() => import("./pages/dashboard/buildings/Buildings"));
 const Devices = lazy(() => import("./pages/dashboard/devices/Devices"));
@@ -55,7 +54,6 @@ function App() {
           <Route path="profile" element={<Profile />} />
         </Route>
       </Routes>
-      <Toaster position="top-right" />
     </Suspense>
   );
 }
