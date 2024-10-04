@@ -1,4 +1,4 @@
-import React from "react";
+/* eslint-disable react/prop-types */
 import { IoClose } from "react-icons/io5";
 
 const Modal = ({ title, children, onClose, width }) => {
@@ -14,9 +14,7 @@ const Modal = ({ title, children, onClose, width }) => {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between">
-          <h2 className="text-[#111111] font-semibold md:font-bold text-base md:text-xl">
-            {title}
-          </h2>
+          <h2 className="text-[#111111] font-semibold md:font-bold text-base md:text-xl">{title}</h2>
           <div className="cursor-pointer" onClick={onClose}>
             <IoClose fontSize={25} />
           </div>

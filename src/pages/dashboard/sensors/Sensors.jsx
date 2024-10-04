@@ -2,21 +2,28 @@ import DataTable from "react-data-table-component";
 import DeleteIcon from "../../../assets/svgs/sensors/DeleteIcon";
 import AddIcon from "../../../assets/svgs/pages/AddIcon";
 import Modal from "../../../components/shared/modal/Modal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import EditIcon from "../../../assets/svgs/stepper/EditIcon";
-import { sensorData } from "../../../data/data";
+// import { sensorData } from "../../../data/data";
 import AddSensor from "./AddSensor";
 import EditSensor from "./EditSensor";
 import ToggleButton from "../../../components/shared/small/ToggleButton";
 import { confirmAlert } from "react-confirm-alert";
 import { IoEyeOutline } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
+import {
+  useDeleteSensorMutation,
+  useGetAllSensorsQuery,
+  useUpdateSensorMutation,
+} from "../../../redux/apis/sensorApis";
+import { toast } from "react-toastify";
+import Loader from "../../../components/shared/small/Loader";
 
-const columns = (modalOpenHandler, navigate, sensorStatus, statusToggleHandler, deleteHandler) => [
+const columns = (modalOpenHandler, navigate, statusToggleHandler, deleteHandler) => [
   {
-    name: "Sensor Name",
-    selector: (row) => row.sensorName,
-    width: '15%'
+    name: "Name",
+    selector: (row) => row.name,
+    // width: "10%",
   },
   {
     name: "IP",
@@ -29,6 +36,11 @@ const columns = (modalOpenHandler, navigate, sensorStatus, statusToggleHandler, 
   {
     name: "Port",
     selector: (row) => row.port,
+    width: "7%",
+  },
+  {
+    name: "Type",
+    selector: (row) => row.type,
   },
   {
     name: "Location",
@@ -37,10 +49,7 @@ const columns = (modalOpenHandler, navigate, sensorStatus, statusToggleHandler, 
   {
     name: "Status",
     selector: (row) => (
-      <ToggleButton
-        isChecked={sensorStatus[row._id] || false}
-        onToggle={() => statusToggleHandler(row._id)}
-      />
+      <ToggleButton isChecked={row.status} onToggle={() => statusToggleHandler(row._id, row?.status)} />
     ),
   },
   {
@@ -50,13 +59,10 @@ const columns = (modalOpenHandler, navigate, sensorStatus, statusToggleHandler, 
         <div className="cursor-pointer" onClick={() => navigate(`sensor-detail/${row._id}`)}>
           <IoEyeOutline fontSize={20} />
         </div>
-        <div
-          className="cursor-pointer"
-          onClick={() => modalOpenHandler("edit")}
-        >
+        <div className="cursor-pointer" onClick={() => modalOpenHandler("edit", row)}>
           <EditIcon />
         </div>
-        <div className="cursor-pointer" onClick={() => deleteHandler()}>
+        <div className="cursor-pointer" onClick={() => deleteHandler(row?._id)}>
           <DeleteIcon />
         </div>
       </div>
@@ -65,56 +71,89 @@ const columns = (modalOpenHandler, navigate, sensorStatus, statusToggleHandler, 
 ];
 
 const Sensors = () => {
+  const { data, isLoading, isSuccess, refetch } = useGetAllSensorsQuery("");
+  const [updateSensor] = useUpdateSensorMutation("");
+  const [deleteSensor] = useDeleteSensorMutation("");
   const [modal, setModal] = useState(false);
-  const [sensorStatus, setSensorStatus] = useState({});
-  const navigate = useNavigate()
+  const [sensorsData, setSensorsData] = useState([]);
+  const [selectedSensor, setSelectedSensor] = useState(null);
+  const navigate = useNavigate();
 
-  const modalOpenHandler = (modalType) => setModal(modalType);
   const modalCloseHandler = () => setModal(false);
-  
-  const statusToggleHandler = (sensorId) => {
-    setSensorStatus((prevState) => ({
-      ...prevState,
-      [sensorId]: !prevState[sensorId],
-    }));
+  const modalOpenHandler = (modalType, row) => {
+    setModal(modalType);
+    if (row) setSelectedSensor(row);
   };
 
-  const deleteHandler = () => {
+  const statusToggleHandler = async (id, status) => {
+    try {
+      console.log(id, status);
+      const response = await updateSensor({
+        sensorId: id,
+        data: { status: status ? "false" : "true" },
+      }).unwrap();
+      if (response?.success) {
+        await refetch();
+        toast.success(response?.message);
+      }
+    } catch (error) {
+      console.log("Error while toggling sensor status", error);
+      toast.error(error?.data?.message || "Error while updating sensor status");
+    }
+  };
+
+  const deleteHandler = (id) => {
     confirmAlert({
-      title: 'Delete Sensor',
-      message: 'Are you sure, you want to delete the sensor?',
+      title: "Delete Sensor",
+      message: "Are you sure, you want to delete the sensor?",
       buttons: [
         {
-          label: 'Yes',
-          onClick: () => {
-            console.log("project deleted")
-          }
+          label: "Yes",
+          onClick: async () => {
+            if (!id) return toast.error("Error while deleting sensor");
+            try {
+              const response = await deleteSensor(id).unwrap();
+              if (response?.success) {
+                await refetch();
+                toast.success(response?.message);
+              }
+            } catch (error) {
+              console.log("Error while deleting sensor", error);
+              toast.error(error?.data?.message || "Error while deleting sensor");
+            }
+          },
         },
         {
-          label: 'No'
-        }
-      ]
-    })
-  }
-  return (
+          label: "No",
+        },
+      ],
+    });
+  };
+
+  useEffect(() => {
+    if (isSuccess) {
+      const sensors = data?.data;
+      setSensorsData(sensors);
+    }
+  }, [data, isSuccess, refetch]);
+  return isLoading ? (
+    <Loader />
+  ) : (
     <div className="bg-white rounded-[15px] p-4 lg:p-6 h-[calc(100vh-80px)] overflow-hidden">
       <div className="flex justify-end">
         <div className="flex items-center gap-2">
-          <div
-            className="cursor-pointer"
-            onClick={() => modalOpenHandler("add")}
-          >
+          <div className="cursor-pointer" onClick={() => modalOpenHandler("add")}>
             <AddIcon />
           </div>
           <div className="cursor-pointer">
             <DeleteIcon />
           </div>
         </div>
-      </div> 
+      </div>
       <div className="mt-5">
         <DataTable
-          columns={columns(modalOpenHandler, navigate, sensorStatus, statusToggleHandler, deleteHandler)}
-          data={sensorData}
+          columns={columns(modalOpenHandler, navigate, statusToggleHandler, deleteHandler)}
+          data={sensorsData}
           selectableRows
           selectableRowsHighlight
           customStyles={tableStyles}
@@ -124,13 +163,13 @@ const Sensors = () => {
         />
       </div>
       {modal === "add" && (
-        <Modal title="Add Sensor" width='w-[300px] md:w-[650px]' onClose={modalCloseHandler}>
-          <AddSensor onClose={modalCloseHandler} />
+        <Modal title="Add Sensor" width="w-[300px] md:w-[750px]" onClose={modalCloseHandler}>
+          <AddSensor refetch={refetch} onClose={modalCloseHandler} />
         </Modal>
       )}
       {modal === "edit" && (
-        <Modal title="Edit Sensor" width='w-[300px] md:w-[650px]' onClose={modalCloseHandler}>
-          <EditSensor onClose={modalCloseHandler} />
+        <Modal title="Edit Sensor" width="w-[300px] md:w-[650px]" onClose={modalCloseHandler}>
+          <EditSensor refetch={refetch} selectedSensor={selectedSensor} onClose={modalCloseHandler} />
         </Modal>
       )}
     </div>

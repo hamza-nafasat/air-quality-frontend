@@ -1,17 +1,9 @@
-import React from "react";
+/* eslint-disable react/prop-types */
 
 const ToggleButton = ({ isChecked, onToggle, isTable = false }) => {
   return (
-    <div
-      className="relative inline-flex items-center cursor-pointer"
-      onClick={onToggle}
-    >
-      <input
-        type="checkbox"
-        checked={isChecked}
-        onChange={() => {}}
-        className="sr-only"
-      />
+    <div className="relative inline-flex items-center cursor-pointer" onClick={onToggle}>
+      <input type="checkbox" checked={isChecked} onChange={() => {}} className="sr-only" />
       <div
         className={`block w-[45px] h-6 rounded-full ${
           isChecked ? (isTable ? "bg-[#03A5E040]" : "bg-white") : "bg-gray-300"
@@ -19,9 +11,7 @@ const ToggleButton = ({ isChecked, onToggle, isTable = false }) => {
       >
         <div
           className={`dot absolute top-1 left-1 w-4 h-4 rounded-full transition-transform ${
-            isChecked
-              ? "transform translate-x-5 bg-primary-lightBlue"
-              : "bg-white"
+            isChecked ? "transform translate-x-5 bg-primary-lightBlue" : "bg-white"
           }`}
           style={{ transition: "transform 0.3s" }}
         ></div>

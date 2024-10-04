@@ -38,7 +38,7 @@ const sensorApis = createApi({
     // -------------
     updateSensor: builder.mutation({
       query: ({ sensorId, data }) => ({
-        url: `/update/${sensorId}`,
+        url: `/single/${sensorId}`,
         method: "PUT",
         body: data,
       }),
