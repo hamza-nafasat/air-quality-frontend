@@ -29,9 +29,9 @@ const Aside = () => {
       icon: <HomeIcon activeLink={url === "dashboard"} />,
     },
     {
-      title: url.includes('add-building') ? "add-building" : "buildings",
+      title: url.includes("add-building") ? "add-building" : "buildings",
       link: "/dashboard/buildings",
-      icon: <BuildingIcon activeLink={url.includes('buildings') || url.includes('add-building')} />,
+      icon: <BuildingIcon activeLink={url.includes("buildings") || url.includes("add-building")} />,
     },
     {
       title: "devices",
@@ -66,14 +66,9 @@ const Aside = () => {
         isNavOpen ? "w-[200px]" : "w-[65px]"
       }`}
     >
-      <div
-        className="absolute top-[6%] right-[-11px] cursor-pointer z-10"
-        onClick={handleNavOpen}
-      >
+      <div className="absolute top-[6%] right-[-11px] cursor-pointer z-10" onClick={handleNavOpen}>
         <div
-          className={`hidden lg:block transition-all duration-500 ${
-            isNavOpen ? "rotate-0" : "rotate-180"
-          }`}
+          className={`hidden lg:block transition-all duration-500 ${isNavOpen ? "rotate-0" : "rotate-180"}`}
         >
           <ArrowbackIcon />
         </div>
@@ -89,12 +84,8 @@ const Aside = () => {
             Air Quality
           </p>
         </div>
-        <div
-          className={`flex flex-col justify-center gap-2 ${
-            isNavOpen ? "items-start" : "items-center"
-          }`}
-        >
-          {pages.map((page, i) => (
+        <div className={`flex flex-col justify-center gap-2 ${isNavOpen ? "items-start" : "items-center"}`}>
+          {pages?.map((page, i) => (
             <Link
               key={i}
               to={page.link}
@@ -103,9 +94,7 @@ const Aside = () => {
               } ${page.title === url ? "bg-primary-lightBlue rounded-md" : ""}`}
             >
               <div
-                className={`text-[20px] ${
-                  page.title === url ? "text-primary-lightBlue" : "text-white"
-                }`}
+                className={`text-[20px] ${page.title === url ? "text-primary-lightBlue" : "text-white"}`}
               >
                 {page.icon}
               </div>

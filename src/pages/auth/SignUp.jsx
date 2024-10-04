@@ -7,8 +7,11 @@ import Button from "../../components/shared/small/Button";
 import TextField from "../../components/shared/small/TextField";
 import { useRegisterMutation } from "../../redux/apis/authApis";
 import { toast } from "react-toastify";
+import { userExist } from "../../redux/slices/authSlices";
+import { useDispatch } from "react-redux";
 
 const SignUp = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -33,6 +36,7 @@ const SignUp = () => {
       }).unwrap();
       console.log("response while signUp ", response);
       if (response?.success) {
+        dispatch(userExist(response?.data));
         toast.success(response?.message);
         return navigate("/dashboard");
       }

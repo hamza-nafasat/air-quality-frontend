@@ -1,18 +1,14 @@
-import React from "react";
+import React, { Fragment } from "react";
 
 const AirQualityIndex = () => {
   return (
     <div className="overflow-x-scroll lg:overflow-hidden no-scrollbar">
-      <h2 className="text-sm md:text-base font-semibold pl-4 pt-4">
-        Air Quality Index
-      </h2>
+      <h2 className="text-sm md:text-base font-semibold pl-4 pt-4">Air Quality Index</h2>
       {/* table */}
       <table className="w-full mt-3">
         <thead className="bg-[#0222130d] border-l-[12px] border-[#c9ffe663]">
           <tr>
-            <td className="p-3 leading-none text-xs font-semibold">
-              AQI
-            </td>
+            <td className="p-3 leading-none text-xs font-semibold">AQI</td>
             <td className="p-3 leading-none text-xs font-semibold">
               PM 2.5 <p className="text-[8px]">(Ug/M3)</p>
             </td>
@@ -25,74 +21,66 @@ const AirQualityIndex = () => {
             <td className="p-3 leading-none text-xs font-semibold">
               CO<sup>2</sup> <p className="text-[8px]">(ppm)</p>
             </td>
-            <td className="p-3 leading-none text-xs font-semibold">
-              Formaidhyde
-            </td>
+            <td className="p-3 leading-none text-xs font-semibold">Formaidhyde</td>
           </tr>
         </thead>
         <tbody>
           {tableRowsData.map((rowData, i) => (
-            <>
-            <tr key={i} style={{borderLeft: `12px solid ${rowData[0].color}`}}>
-              {rowData.map((tdData, i) => (
-                <>
-                  <td
-                    className="text-[12px] font-semibold px-2 py-4"
-                    style={{ borderBottom: `0.5px solid ${tdData.color}` }}
-                    key={i}
-                  >
-                    {tdData.aqi}
-                  </td>
-                  <td
-                    className="text-[12px] font-semibold px-2 py-4"
-                    style={{ borderBottom: `0.5px solid ${tdData.color}` }}
-                    key={i}
-                  >
-                    {tdData.pm2}
-                  </td>
-                  <td
-                    className="text-[12px] font-semibold px-2 py-4"
-                    style={{ borderBottom: `0.5px solid ${tdData.color}` }}
-                    key={i}
-                  >
-                    {tdData.pm3}
-                  </td>
-                  <td
-                    className="text-[12px] font-semibold px-2 py-4"
-                    style={{ borderBottom: `0.5px solid ${tdData.color}` }}
-                    key={i}
-                  >
-                    {tdData.voc}
-                  </td>
-                  <td
-                    className="text-[12px] font-semibold px-2 py-4"
-                    style={{ borderBottom: `0.5px solid ${tdData.color}` }}
-                    key={i}
-                  >
-                    {tdData.co2}
-                  </td>
-                  <td
-                    className="text-[12px] font-semibold px-2 py-4"
-                    style={{ borderBottom: `0.5px solid ${tdData.color}` }}
-                    key={i}
-                  >
-                    {tdData.formaidhyde}
-                  </td>
-                </>
-              ))}
-            </tr>
-            <tr style={{height: '10px'}}></tr>
-            </>
+            <Fragment key={i}>
+              <tr key={i} style={{ borderLeft: `12px solid ${rowData[0].color}` }}>
+                {rowData?.map((tdData, i) => (
+                  <Fragment key={i}>
+                    <td
+                      className="text-[12px] font-semibold px-2 py-4"
+                      style={{ borderBottom: `0.5px solid ${tdData.color}` }}
+                    >
+                      {tdData.aqi}
+                    </td>
+                    <td
+                      className="text-[12px] font-semibold px-2 py-4"
+                      style={{ borderBottom: `0.5px solid ${tdData.color}` }}
+                    >
+                      {tdData.pm2}
+                    </td>
+                    <td
+                      className="text-[12px] font-semibold px-2 py-4"
+                      style={{ borderBottom: `0.5px solid ${tdData.color}` }}
+                    >
+                      {tdData.pm3}
+                    </td>
+                    <td
+                      className="text-[12px] font-semibold px-2 py-4"
+                      style={{ borderBottom: `0.5px solid ${tdData.color}` }}
+                    >
+                      {tdData.voc}
+                    </td>
+                    <td
+                      className="text-[12px] font-semibold px-2 py-4"
+                      style={{ borderBottom: `0.5px solid ${tdData.color}` }}
+                    >
+                      {tdData.co2}
+                    </td>
+                    <td
+                      className="text-[12px] font-semibold px-2 py-4"
+                      style={{ borderBottom: `0.5px solid ${tdData.color}` }}
+                    >
+                      {tdData.formaidhyde}
+                    </td>
+                  </Fragment>
+                ))}
+              </tr>
+              <tr style={{ height: "10px" }}></tr>
+            </Fragment>
           ))}
         </tbody>
       </table>
-      <div className="px-4 py-2 flex items-center justify-center flex-wrap gap-3" style={{rowGap:'4px'}}>
-        <TablePoints title='Good' color='rgba(135, 255, 169, 1)' />
-        <TablePoints title='Moderate' color='rgba(255, 239, 125, 1)' />
-        <TablePoints title='Unhealthy' color='rgba(255, 193, 192, 1)' />
-        <TablePoints title='Very Unhealthy' color='rgba(255, 187, 215, 1)' />
-        <TablePoints title='Unhealthy for sensitive groups' color='rgba(255, 197, 151, 1)' />
-        <TablePoints title='Hazardous' color='rgba(233, 169, 47, 1)' />
+      <div className="px-4 py-2 flex items-center justify-center flex-wrap gap-3" style={{ rowGap: "4px" }}>
+        <TablePoints title="Good" color="rgba(135, 255, 169, 1)" />
+        <TablePoints title="Moderate" color="rgba(255, 239, 125, 1)" />
+        <TablePoints title="Unhealthy" color="rgba(255, 193, 192, 1)" />
+        <TablePoints title="Very Unhealthy" color="rgba(255, 187, 215, 1)" />
+        <TablePoints title="Unhealthy for sensitive groups" color="rgba(255, 197, 151, 1)" />
+        <TablePoints title="Hazardous" color="rgba(233, 169, 47, 1)" />
       </div>
     </div>
   );
@@ -100,14 +88,14 @@ const AirQualityIndex = () => {
 
 export default AirQualityIndex;
 
-const TablePoints = ({title, color}) => {
+const TablePoints = ({ title, color }) => {
   return (
     <div className="flex items-center gap-1">
-      <div className="size-[11px] rounded-sm block" style={{background: `${color}`}}></div>
+      <div className="size-[11px] rounded-sm block" style={{ background: `${color}` }}></div>
       <p className="text-xs font-medium text-[rgba(70,78,95,1)]">{title}</p>
     </div>
-  )
-}
+  );
+};
 
 var tableRowsData = [
   [

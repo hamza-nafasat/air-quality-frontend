@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React, { useState } from "react";
 import ReactApexChart from "react-apexcharts";
 import ChevronIcon from "../../../assets/svgs/buildings/ChevronIcon";
@@ -120,12 +121,7 @@ const DoubleAreaChart = () => {
           </select>
         </div> */}
       </div>
-      <ReactApexChart
-        options={options}
-        series={series}
-        type="area"
-        height={350}
-      />
+      <ReactApexChart options={options} series={series} type="area" height={350} />
     </div>
   );
 };
@@ -147,17 +143,13 @@ const CustomDropDown = ({ lists }) => {
         onClick={() => optionsHandler()}
       >
         {selectedOption}
-        <div
-          className={`transition-all duration-300 ${
-            isOptionOpen ? "rotate-180" : "rotate-0"
-          }`}
-        >
+        <div className={`transition-all duration-300 ${isOptionOpen ? "rotate-180" : "rotate-0"}`}>
           <ChevronIcon />
         </div>
       </div>
       {isOptionOpen && (
         <ul className="flex flex-col bg-white rounded-lg shadow-md absolute top-[30px] left-0 w-full">
-          {lists.map((list, i) => (
+          {lists?.map((list, i) => (
             <li
               key={i}
               className="py-1 px-2 border-b text-sm font-semibold cursor-pointer text-[#060606f7] hover:bg-gray-100"

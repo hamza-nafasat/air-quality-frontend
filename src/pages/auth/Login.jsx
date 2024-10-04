@@ -6,8 +6,11 @@ import Button from "../../components/shared/small/Button";
 import TextField from "../../components/shared/small/TextField";
 import { useLoginMutation } from "../../redux/apis/authApis";
 import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
+import { userExist } from "../../redux/slices/authSlices";
 
 const Login = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -21,6 +24,7 @@ const Login = () => {
       const response = await loginUser({ email, password }).unwrap();
       console.log("response while login ", response);
       if (response?.success) {
+        dispatch(userExist(response?.data));
         toast.success(response?.message);
         return navigate("/dashboard");
       }

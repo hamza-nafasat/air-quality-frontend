@@ -17,7 +17,7 @@ const Header = () => {
   const location = useLocation();
   const pathname = location.pathname.split("/");
   const path = pathname[pathname.length - 1].replaceAll("-", " ");
-  console.log(pathname)
+  console.log(pathname);
 
   const mobileNavHander = () => setMobileNav(!mobileNav);
 
@@ -53,20 +53,13 @@ const Header = () => {
     <>
       <div className="px-2 sm:px-6 py-3 sm:py-4 flex flex-col justify-between gap-3 bg-[url('assets/images/header/header-bg.png')] bg-no-repeat bg-cover bg-center h-[202px]">
         <div className="flex items-center justify-between">
-          <div
-            className="opacity-100 lg:opacity-0 cursor-pointer"
-            onClick={mobileNavHander}
-          >
+          <div className="opacity-100 lg:opacity-0 cursor-pointer" onClick={mobileNavHander}>
             <IoMenuOutline color="#fff" size={30} />
           </div>
           {/* profile and notification */}
           <div className="flex items-center gap-2 md:gap-4">
             <div className="relative">
-              <div
-                className="cursor-pointer"
-                onClick={() => handleNotification()}
-                ref={notificationRef}
-              >
+              <div className="cursor-pointer" onClick={() => handleNotification()} ref={notificationRef}>
                 <NotificationIcon />
               </div>
               <div className="absolute top-[0px] right-[0px] bg-primary-lightBlue rounded-full w-[18px] h-[18px] text-white grid place-items-center text-[10px] font-medium border-2 border-white">
@@ -118,7 +111,7 @@ const Header = () => {
         </div>
         {pathname[2] === "building-view" ? (
           <p></p>
-        ):(
+        ) : (
           <h2 className="text-sm sm:text-md md:text-lg font-medium sm:font-semibold md:font-bold text-white uppercase truncate">
             {path}
           </h2>
@@ -209,7 +202,7 @@ const Notifications = () => {
       </h3>
       <div className="mt-1">
         {notificationLists.length > 0 ? (
-          notificationLists.map((notification, i) => (
+          notificationLists?.map((notification, i) => (
             <div
               key={i}
               className="border-b py-1 px-2 flex items-center justify-between gap-1 cursor-pointer"
@@ -222,15 +215,11 @@ const Notifications = () => {
                 />
                 <div>
                   <h3 className="text-xs font-medium">{notification.title}</h3>
-                  <p className="text-[10px] text-[#00000099]">
-                    {notification.message}
-                  </p>
+                  <p className="text-[10px] text-[#00000099]">{notification.message}</p>
                 </div>
               </div>
-              <p className="text-[#00000099] text-[10px]">
-                {notification.time}
-              </p>
-            </div> 
+              <p className="text-[#00000099] text-[10px]">{notification.time}</p>
+            </div>
           ))
         ) : (
           <p className="p-3 text-sm text-center">No notifications yet!</p>
