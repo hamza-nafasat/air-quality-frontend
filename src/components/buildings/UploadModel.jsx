@@ -11,15 +11,14 @@ import { setBuildingData } from "../../redux/slices/buildingSlice";
 const UploadModel = ({ setCurrentStep }) => {
   const dispatch = useDispatch();
   const { buildingData } = useSelector((state) => state.building);
-
   const [twoDModel, setTwoDModel] = useState(null);
   const [twoDModelPreview, setTwoDModelPreview] = useState(null);
 
   // console.log("twoDModel", twoDModel, twoDModelPreview);
 
   const submitHandler = () => {
-    if (!twoDModel && !twoDModelPreview) return toast.error("Please Upload 2D Model");
-    dispatch(setBuildingData({ twoDModel, twoDModelPreview }));
+    // if (!twoDModel && !twoDModelPreview) return toast.error("Please Upload 2D Model");
+    // dispatch(setBuildingData({ twoDModel, twoDModelPreview }));
     setCurrentStep((prevStep) => prevStep + 1);
   };
 
@@ -44,7 +43,6 @@ const UploadModel = ({ setCurrentStep }) => {
         </div>
       </div>
       <BrowseFile
-        file={buildingData?.twoDModel}
         setFile={setTwoDModel}
         previewValue={twoDModelPreview}
         setPreviewValue={setTwoDModelPreview}

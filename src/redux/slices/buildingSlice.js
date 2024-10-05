@@ -9,6 +9,7 @@ const buildingSlice = createSlice({
       area: "",
       address: "",
       thumbnail: "",
+      thumbnailPreview: "",
       twoDModel: "",
       twoDModelPreview: "",
       position: "",
@@ -22,6 +23,7 @@ const buildingSlice = createSlice({
       state.buildingData.area = action.payload.area;
       state.buildingData.address = action.payload.address;
       state.buildingData.thumbnail = action.payload.thumbnail;
+      state.buildingData.thumbnailPreview = action.payload.thumbnailPreview;
       state.buildingData.twoDModel = action.payload.twoDModel;
       state.buildingData.twoDModelPreview = action.payload.twoDModelPreview;
       state.buildingData.position = action.payload.position;
