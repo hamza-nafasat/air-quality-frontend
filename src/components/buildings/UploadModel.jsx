@@ -18,10 +18,7 @@ const UploadModel = ({ setCurrentStep }) => {
   console.log("twoDModel", twoDModel, twoDModelPreview);
 
   const submitHandler = () => {
-    if (!twoDModel && !twoDModelPreview) {
-      console.log("Please Upload 2D Model");
-      return toast.error("Please Upload 2D Model");
-    }
+    if (!twoDModel && !twoDModelPreview) return toast.error("Please Upload 2D Model");
     dispatch(setBuildingData({ twoDModel, twoDModelPreview }));
     setCurrentStep((prevStep) => prevStep + 1);
   };
@@ -53,7 +50,7 @@ const UploadModel = ({ setCurrentStep }) => {
         setPreviewValue={setTwoDModelPreview}
       />
       <div className="mt-4 flex justify-end">
-        <Button disabled={!twoDModel} text="Next" width="w-[128px]" onClick={submitHandler} />
+        <Button text="Next" width="w-[128px]" onClick={submitHandler} />
       </div>
     </div>
   );
