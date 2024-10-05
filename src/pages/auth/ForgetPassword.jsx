@@ -9,18 +9,15 @@ const ForgetPassword = () => {
 
   const formSubmitHandler = (e) => {
     e.preventDefault();
-    console.log(email);
+    // console.log(email);
     setEmail("");
   };
 
   return (
     <article className=" flex flex-col gap-4 p-1">
-      <h2 className="text-center text-2xl xl:text-4xl  font-[700] ">
-        Forget Password
-      </h2>
+      <h2 className="text-center text-2xl xl:text-4xl  font-[700] ">Forget Password</h2>
       <p className="text-center  text-md xl:text-xl px-5">
-        Enter your email for the verification process, we will send 4 a digit
-        code to your email
+        Enter your email for the verification process, we will send 4 a digit code to your email
       </p>
       <form className="flex flex-col gap-10 p-1" onSubmit={formSubmitHandler}>
         <TextField

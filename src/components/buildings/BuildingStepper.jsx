@@ -1,11 +1,11 @@
-import React, { useState } from "react";
-import TwoDIcon from "../../assets/svgs/stepper/TwoDIcon";
-import GeneralInfoIcon from "../../assets/svgs/stepper/GeneralInfoIcon";
+import { useState } from "react";
 import AddfloorsIcon from "../../assets/svgs/stepper/AddfloorsIcon";
+import GeneralInfoIcon from "../../assets/svgs/stepper/GeneralInfoIcon";
 import MappingIcon from "../../assets/svgs/stepper/MappingIcon";
+import TwoDIcon from "../../assets/svgs/stepper/TwoDIcon";
+import AddFloors from "./AddFloors";
 import GeneralInfo from "./GeneralInfo";
 import Mapping from "./Mapping";
-import AddFloors from "./AddFloors";
 import UploadModel from "./UploadModel";
 
 const BuildingStepper = () => {
@@ -72,13 +72,7 @@ export default BuildingStepper;
 const Arrow = () => {
   return (
     <div className="ml-[-1px] flex items-center flex-1">
-      <svg
-        width="17"
-        height="24"
-        viewBox="0 0 17 24"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
+      <svg width="17" height="24" viewBox="0 0 17 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path
           d="M16.5 10.9991L16.0696 10.7713C10.7073 7.93297 5.68524 4.49387 1.10036 0.520311L0.5 0L0.5 23.5L1.42178 22.5168C5.77715 17.871 10.8722 13.9791 16.5 10.9991Z"
           fill="#03A5E0"
@@ -86,19 +80,8 @@ const Arrow = () => {
       </svg>
       <div className="border border-t border-primary-lightBlue flex-1 ml-[-4px] mt-[-2px]"></div>
       <div className="ml-[-6px] mt-[-0.5px]">
-        <svg
-          width="9"
-          height="14"
-          viewBox="0 0 9 14"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M1.5 1L7.5 6.53846L1.5 13"
-            stroke="#03A5E0"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
+        <svg width="9" height="14" viewBox="0 0 9 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M1.5 1L7.5 6.53846L1.5 13" stroke="#03A5E0" strokeWidth="2" strokeLinecap="round" />
         </svg>
       </div>
     </div>

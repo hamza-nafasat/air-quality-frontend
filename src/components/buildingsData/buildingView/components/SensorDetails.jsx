@@ -5,13 +5,9 @@ import GreenEye from "../../../../assets/svgs/dashboard/GreenEye";
 import BluePen from "../../../../assets/svgs/dashboard/BluePen";
 import RedBin from "../../../../assets/svgs/dashboard/RedBin";
 import { sensorData } from "../../../../data/data";
+import { confirmAlert } from "react-confirm-alert";
 
-const columns = (
-  modalOpenHandler,
-  sensorStatus,
-  statusToggleHandler,
-  deleteHandler
-) => [
+const columns = (modalOpenHandler, sensorStatus, statusToggleHandler, deleteHandler) => [
   {
     name: "Sensor Name",
     selector: (row) => row.sensorName,
@@ -119,12 +115,7 @@ const SensorDetails = () => {
       </div>
       <div className="mt-5 h-[300px] overflow-auto custom-scrollbar">
         <DataTable
-          columns={columns(
-            modalOpenHandler,
-            sensorStatus,
-            statusToggleHandler,
-            deleteHandler
-          )}
+          columns={columns(modalOpenHandler, sensorStatus, statusToggleHandler, deleteHandler)}
           data={sensorData}
           selectableRows
           selectableRowsHighlight

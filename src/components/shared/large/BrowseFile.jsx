@@ -1,50 +1,41 @@
 /* eslint-disable react/prop-types */
-import React, { useState } from "react";
-// import { handleFileChange } from "../../../utils/feature";
+import { useState } from "react";
 import ImageIcon from "../../../assets/svgs/stepper/ImageIcon";
 
-const BrowseFile = ({ setFile }) => {
-  const [imagePreview, setImagePreview] = useState(null);
+const BrowseFile = ({ setFile, previewValue, setPreviewValue }) => {
   const [dragActive, setDragActive] = useState(false);
 
-  // Handle drag over event
   const handleDragOver = (event) => {
     event.preventDefault();
     setDragActive(true);
   };
-  // Handle drop event
   const handleDrop = (event) => {
     event.preventDefault();
     setDragActive(false);
     const droppedFile = event.dataTransfer.files[0];
     if (droppedFile) {
-      convertToBase64(droppedFile, setFile);
+      convertToBase64(droppedFile, setPreviewValue);
       previewImage(droppedFile);
     }
   };
-
-  const handleFileChange = ({ event, setFile, previewImage }) => {
+  const handleFileChange = ({ event, setPreviewValue, previewImage, setFile }) => {
     const selectedFile = event.target.files[0];
+    setFile(selectedFile);
     if (selectedFile) {
-      convertToBase64(selectedFile, setFile);
+      convertToBase64(selectedFile, setPreviewValue);
       previewImage(selectedFile);
     }
   };
-
-  const convertToBase64 = (file, setFile) => {
+  const convertToBase64 = (file, setPreviewValue) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
-    reader.onloadend = () => {
-      setFile(reader.result); // Set Base64 string here
-    };
+    reader.onloadend = () => setPreviewValue(reader.result);
   };
-
-  // Preview image function
   const previewImage = (file) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onloadend = () => {
-      setImagePreview(reader.result);
+      setPreviewValue(reader.result);
     };
   };
 
@@ -60,9 +51,9 @@ const BrowseFile = ({ setFile }) => {
       onDrop={handleDrop}
     >
       <div className="flex flex-col items-center gap-2">
-        {imagePreview ? (
+        {previewValue ? (
           <img
-            src={imagePreview}
+            src={previewValue}
             alt="Uploaded preview"
             className="w-full h-[165px] md:h-[250px] object-cover rounded-lg"
           />
@@ -72,15 +63,14 @@ const BrowseFile = ({ setFile }) => {
             <p className="text-primary-lightBlue text-sm font-semibold leading-none">
               Drag and Drop Files here
             </p>
-            <p className="text-primary-lightBlue text-sm font-semibold leading-none">
-              Or
-            </p>
+            <p className="text-primary-lightBlue text-sm font-semibold leading-none">Or</p>
             <BrowseFileBtn
               onFileChange={(e) =>
                 handleFileChange({
                   event: e,
-                  setFile,
+                  setPreviewValue,
                   previewImage,
+                  setFile,
                 })
               }
             />

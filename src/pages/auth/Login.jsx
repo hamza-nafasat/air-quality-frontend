@@ -7,7 +7,7 @@ import TextField from "../../components/shared/small/TextField";
 import { useLoginMutation } from "../../redux/apis/authApis";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
-import { userExist } from "../../redux/slices/authSlices";
+import { userExist } from "../../redux/slices/authSlice";
 
 const Login = () => {
   const dispatch = useDispatch();

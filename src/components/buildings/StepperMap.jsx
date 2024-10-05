@@ -1,13 +1,6 @@
-import React, { useEffect, useState } from "react";
-import {
-    FeatureGroup,
-  MapContainer,
-  Marker,
-  Popup,
-  TileLayer,
-  useMap,
-  useMapEvents,
-} from "react-leaflet";
+/* eslint-disable react/prop-types */
+import { useEffect, useState } from "react";
+import { FeatureGroup, MapContainer, Marker, Popup, TileLayer, useMap, useMapEvents } from "react-leaflet";
 import { EditControl } from "react-leaflet-draw";
 
 const StepperMap = ({ lat, lng }) => {

@@ -13,12 +13,7 @@ const Mapping = ({ setCurrentStep }) => {
   };
   const lngHandler = (e) => setLng(e.target.value);
 
-  const latLng = {
-    lat,
-    lng,
-  };
-
-  // console.log(latLng);
+  // authSliceLng);
   return (
     <div>
       <div className="flex items-center justify-between gap-4">
@@ -31,18 +26,10 @@ const Mapping = ({ setCurrentStep }) => {
       </div>
       <form className="grid grid-cols-1 lg:grid-cols-12 gap-4 mt-4">
         <div className="lg:col-span-6">
-          <TextField
-            type="number"
-            placeholder="Latitude"
-            onChange={(e) => latHandler(e)}
-          />
+          <TextField type="number" placeholder="Latitude" onChange={(e) => latHandler(e)} />
         </div>
         <div className="lg:col-span-6">
-          <TextField
-            type="number"
-            placeholder="Longitude"
-            onChange={(e) => lngHandler(e)}
-          />
+          <TextField type="number" placeholder="Longitude" onChange={(e) => lngHandler(e)} />
         </div>
         <div className="lg:col-span-12">
           <div className="h-[325px] rounded-lg shadow-md">

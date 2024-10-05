@@ -4,7 +4,7 @@ const config = Object.freeze({
 
 const getEnv = (key) => {
   const value = config[key];
-  console.log("key", key, "value", value);
+  // console.log("key", key, "value", value);
   if (!value) throw new Error(`Config ${key} not found`);
   return value;
 };

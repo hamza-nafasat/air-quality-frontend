@@ -17,7 +17,6 @@ const Header = () => {
   const location = useLocation();
   const pathname = location.pathname.split("/");
   const path = pathname[pathname.length - 1].replaceAll("-", " ");
-  console.log(pathname);
 
   const mobileNavHander = () => setMobileNav(!mobileNav);
 

@@ -16,7 +16,7 @@ import Profile from "./pages/dashboard/profile/Profile";
 import Subscription from "./pages/dashboard/subscription/Subscription";
 import { useDispatch, useSelector } from "react-redux";
 import { useGetMyProfileQuery } from "./redux/apis/authApis";
-import { userExist, userNotExist } from "./redux/slices/authSlices";
+import { userExist, userNotExist } from "./redux/slices/authSlice";
 import ProtectedRoute from "./components/ProtectedRoutes";
 
 const Dashboard = lazy(() => import("./pages/dashboard/index"));
@@ -36,8 +36,6 @@ function App() {
   const dispatch = useDispatch();
   const { isLoading, data, isSuccess, isError } = useGetMyProfileQuery("");
   const { user } = useSelector((state) => state.auth);
-
-  console.log("user", user, data);
 
   useEffect(() => {
     if (isSuccess) dispatch(userExist(data?.data));

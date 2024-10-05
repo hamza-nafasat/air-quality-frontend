@@ -7,7 +7,7 @@ import Button from "../../components/shared/small/Button";
 import TextField from "../../components/shared/small/TextField";
 import { useRegisterMutation } from "../../redux/apis/authApis";
 import { toast } from "react-toastify";
-import { userExist } from "../../redux/slices/authSlices";
+import { userExist } from "../../redux/slices/authSlice";
 import { useDispatch } from "react-redux";
 
 const SignUp = () => {
