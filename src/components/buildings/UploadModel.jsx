@@ -15,7 +15,7 @@ const UploadModel = ({ setCurrentStep }) => {
   const [twoDModel, setTwoDModel] = useState(null);
   const [twoDModelPreview, setTwoDModelPreview] = useState(null);
 
-  console.log("twoDModel", twoDModel, twoDModelPreview);
+  // console.log("twoDModel", twoDModel, twoDModelPreview);
 
   const submitHandler = () => {
     if (!twoDModel && !twoDModelPreview) return toast.error("Please Upload 2D Model");
