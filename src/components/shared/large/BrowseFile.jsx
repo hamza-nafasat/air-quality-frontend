@@ -1,14 +1,16 @@
 /* eslint-disable react/prop-types */
-import { useState } from "react";
+import { useState, useRef } from "react";
 import ImageIcon from "../../../assets/svgs/stepper/ImageIcon";
 
 const BrowseFile = ({ setFile, previewValue, setPreviewValue }) => {
   const [dragActive, setDragActive] = useState(false);
+  const inputRef = useRef(null); // Create a reference for the file input
 
   const handleDragOver = (event) => {
     event.preventDefault();
     setDragActive(true);
   };
+
   const handleDrop = (event) => {
     event.preventDefault();
     setDragActive(false);
@@ -18,7 +20,8 @@ const BrowseFile = ({ setFile, previewValue, setPreviewValue }) => {
       previewImage(droppedFile);
     }
   };
-  const handleFileChange = ({ event, setPreviewValue, previewImage, setFile }) => {
+
+  const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];
     setFile(selectedFile);
     if (selectedFile) {
@@ -26,17 +29,24 @@ const BrowseFile = ({ setFile, previewValue, setPreviewValue }) => {
       previewImage(selectedFile);
     }
   };
+
   const convertToBase64 = (file, setPreviewValue) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onloadend = () => setPreviewValue(reader.result);
   };
+
   const previewImage = (file) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onloadend = () => {
       setPreviewValue(reader.result);
     };
+  };
+
+  // Simulate clicking the hidden file input when the div is clicked
+  const handleDivClick = () => {
+    inputRef.current.click(); // Trigger the file input click
   };
 
   return (
@@ -46,10 +56,18 @@ const BrowseFile = ({ setFile, previewValue, setPreviewValue }) => {
           ? "border-primary-lightBlue bg-[rgba(200,240,255)]"
           : "border-primary-lightBlue bg-[rgba(235,250,255)]"
       }`}
+      onClick={handleDivClick} // Trigger file input click when div is clicked
       onDragOver={handleDragOver}
       onDragLeave={() => setDragActive(false)}
       onDrop={handleDrop}
     >
+      <input
+        type="file"
+        id="fileInput"
+        ref={inputRef} // Set reference to the file input
+        className="hidden" // Keep the file input hidden
+        onChange={handleFileChange}
+      />
       <div className="flex flex-col items-center gap-2">
         {previewValue ? (
           <img
@@ -64,16 +82,7 @@ const BrowseFile = ({ setFile, previewValue, setPreviewValue }) => {
               Drag and Drop Files here
             </p>
             <p className="text-primary-lightBlue text-sm font-semibold leading-none">Or</p>
-            <BrowseFileBtn
-              onFileChange={(e) =>
-                handleFileChange({
-                  event: e,
-                  setPreviewValue,
-                  previewImage,
-                  setFile,
-                })
-              }
-            />
+            <BrowseFileBtn />
           </>
         )}
       </div>
@@ -83,16 +92,10 @@ const BrowseFile = ({ setFile, previewValue, setPreviewValue }) => {
 
 export default BrowseFile;
 
-const BrowseFileBtn = ({ onFileChange }) => {
+const BrowseFileBtn = () => {
   return (
     <button className="relative px-4 py-2 cursor-pointer rounded-lg bg-primary-lightBlue text-white font-semibold">
       Browse File
-      <input
-        type="file"
-        id="fileInput"
-        className="absolute inset-0 cursor-pointer opacity-0"
-        onChange={onFileChange}
-      />
     </button>
   );
 };

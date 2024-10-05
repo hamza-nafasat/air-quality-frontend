@@ -1,19 +1,33 @@
-import React, { useState } from "react";
-import EditIcon from "../../assets/svgs/stepper/EditIcon";
+/* eslint-disable react/prop-types */
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
 import DeleteIcon from "../../assets/svgs/stepper/DeleteIcon";
-import TextField from "../shared/small/TextField";
+import { setBuildingData } from "../../redux/slices/buildingSlice";
 import Button from "../shared/small/Button";
+import TextField from "../shared/small/TextField";
 import StepperMap from "./StepperMap";
 
 const Mapping = ({ setCurrentStep }) => {
-  const [lat, setLat] = useState("");
-  const [lng, setLng] = useState("");
-  const latHandler = (e) => {
-    setLat(e.target.value);
-  };
+  const dispatch = useDispatch();
+  const { buildingData } = useSelector((state) => state.building);
+  const [lat, setLat] = useState();
+  const [lng, setLng] = useState();
+  const latHandler = (e) => setLat(e.target.value);
   const lngHandler = (e) => setLng(e.target.value);
 
-  // authSliceLng);
+  const submitHandler = () => {
+    if (!lat || !lng) return toast.error("Please Enter lat and lng both");
+    dispatch(setBuildingData({ ...buildingData, position: [String(lat), String(lng)] }));
+    setCurrentStep((prevStep) => prevStep + 1);
+  };
+
+  useEffect(() => {
+    if (buildingData?.position) {
+      setLat(parseFloat(buildingData?.position?.[0]));
+      setLng(parseFloat(buildingData?.position?.[1]));
+    }
+  }, [buildingData]);
   return (
     <div>
       <div className="flex items-center justify-between gap-4">
@@ -26,10 +40,10 @@ const Mapping = ({ setCurrentStep }) => {
       </div>
       <form className="grid grid-cols-1 lg:grid-cols-12 gap-4 mt-4">
         <div className="lg:col-span-6">
-          <TextField type="number" placeholder="Latitude" onChange={(e) => latHandler(e)} />
+          <TextField value={lat} type="number" placeholder="Latitude" onChange={(e) => latHandler(e)} />
         </div>
         <div className="lg:col-span-6">
-          <TextField type="number" placeholder="Longitude" onChange={(e) => lngHandler(e)} />
+          <TextField value={lng} type="number" placeholder="Longitude" onChange={(e) => lngHandler(e)} />
         </div>
         <div className="lg:col-span-12">
           <div className="h-[325px] rounded-lg shadow-md">
@@ -45,12 +59,7 @@ const Mapping = ({ setCurrentStep }) => {
               bg="bg-[#9caabe]"
               onClick={() => setCurrentStep((prevStep) => prevStep - 1)}
             />
-            <Button
-              type="button"
-              text="Next"
-              width="w-[128px]"
-              onClick={() => setCurrentStep((prevStep) => prevStep + 1)}
-            />
+            <Button type="button" text="Next" width="w-[128px]" onClick={submitHandler} />
           </div>
         </div>
       </form>

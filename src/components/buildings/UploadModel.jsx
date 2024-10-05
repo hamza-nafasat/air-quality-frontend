@@ -17,15 +17,15 @@ const UploadModel = ({ setCurrentStep }) => {
   // console.log("twoDModel", twoDModel, twoDModelPreview);
 
   const submitHandler = () => {
-    // if (!twoDModel && !twoDModelPreview) return toast.error("Please Upload 2D Model");
-    // dispatch(setBuildingData({ twoDModel, twoDModelPreview }));
+    if (!twoDModel && !twoDModelPreview) return toast.error("Please Upload 2D Model");
+    dispatch(setBuildingData({ ...buildingData, twoDModel, twoDModelPreview }));
     setCurrentStep((prevStep) => prevStep + 1);
   };
 
   useEffect(() => {
     if (buildingData?.twoDModel) setTwoDModel(buildingData?.twoDModel);
     if (buildingData?.twoDModelPreview) setTwoDModelPreview(buildingData?.twoDModelPreview);
-  }, [buildingData?.twoDModel, buildingData?.twoDModelPreview]);
+  }, [buildingData]);
 
   return (
     <div>
@@ -48,7 +48,7 @@ const UploadModel = ({ setCurrentStep }) => {
         setPreviewValue={setTwoDModelPreview}
       />
       <div className="mt-4 flex justify-end">
-        <Button text="Next" width="w-[128px]" onClick={submitHandler} />
+        <Button disabled={!twoDModel} text="Next" width="w-[128px]" onClick={submitHandler} />
       </div>
     </div>
   );
