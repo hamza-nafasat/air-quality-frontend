@@ -49,10 +49,10 @@ const Dropdown = ({ label, options, defaultText = "Select", onSelect, icon, heig
             ${overflow ? `overflow-${overflow}` : "overflow-hidden"}
             rounded-md shadow-md cursor-pointer border-y mt-1`}
           >
-            {options?.map((option) => (
+            {options?.map((option, i) => (
               <li
                 className="py-2 px-4 border-b  bg-white hover:bg-[hsl(208,100%,95%)]"
-                key={option.value}
+                key={i}
                 onClick={() => selectHandler(option)}
               >
                 {option?.option}
