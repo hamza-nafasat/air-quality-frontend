@@ -9,6 +9,7 @@ import BuildingView from "./components/buildingsData/buildingView/BuildingView";
 import FloorView from "./components/buildingsData/floorView/FloorView";
 import ChangePassword from "./components/settings/ChangePassword";
 import SubscriptionHistory from "./components/settings/SubscriptionHistory";
+import Configuration from "./components/settings/Configuration";
 import AuthBg from "./components/shared/large/AuthBg";
 import Loader from "./components/shared/small/Loader";
 import ScrollToTop from "./components/shared/small/ScrollToTop";
@@ -83,6 +84,7 @@ function App() {
           <Route path="add-building" element={<BuildingStepper />} />
           <Route path="subscription" element={<Subscription />} />
           <Route path="subscription-history" element={<SubscriptionHistory />} />
+          <Route path="configuration" element={<Configuration />} />
           <Route path="change-password" element={<ChangePassword />} />
           <Route path="profile" element={<Profile />} />
         </Route>

@@ -42,6 +42,18 @@ const Aside = () => {
       >
         Change Password
       </NavLink>
+      <NavLink
+        to="/dashboard/configuration"
+        className={({ isActive }) =>
+          `w-full  px-6 py-3  flex items-center justify-center rounded-lg text-center ${
+            isActive
+              ? "border-[2px] border-[#03A5E0] bg-gray-200 text-[#03A5E0]"
+              : "bg-gray-200"
+          }`
+        }
+      >
+        Configuration
+      </NavLink>
     </div>
   );
 };
