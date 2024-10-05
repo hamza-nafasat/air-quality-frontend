@@ -24,6 +24,7 @@ const GeneralInfo = ({ setCurrentStep }) => {
   const [name, setName] = useState("");
   const [type, setType] = useState("");
   const [area, setArea] = useState("");
+  const [floorsCount, setFloorsCount] = useState(1);
   const [address, setAddress] = useState("");
   const [thumbnail, setThumbnail] = useState(null);
   const [thumbnailPreview, setThumbNailPreview] = useState(null);
@@ -31,9 +32,20 @@ const GeneralInfo = ({ setCurrentStep }) => {
   const { buildingData } = useSelector((state) => state.building);
 
   const submitHandler = () => {
-    if (!thumbnail || !thumbnailPreview || !name || !type || !area || !address)
+    if (!thumbnail || !thumbnailPreview || !name || !type || !area || !address || !floorsCount)
       return toast.error("Please Enter all Fields");
-    dispatch(setBuildingData({ ...buildingData, thumbnail, thumbnailPreview, name, type, area, address }));
+    dispatch(
+      setBuildingData({
+        ...buildingData,
+        thumbnail,
+        thumbnailPreview,
+        name,
+        type,
+        area,
+        address,
+        floorsCount,
+      })
+    );
     setCurrentStep((prevStep) => prevStep + 1);
   };
 
@@ -44,6 +56,7 @@ const GeneralInfo = ({ setCurrentStep }) => {
     if (buildingData?.type) setType(buildingData?.type);
     if (buildingData?.area) setArea(buildingData?.area);
     if (buildingData?.address) setAddress(buildingData?.address);
+    if (buildingData?.floorsCount) setFloorsCount(buildingData?.floorsCount | 0);
   }, [buildingData]);
 
   return (
@@ -77,6 +90,14 @@ const GeneralInfo = ({ setCurrentStep }) => {
             value={area}
             placeholder="Area (Sq Ft)"
             onChange={(e) => setArea(e.target.value)}
+          />
+        </div>
+        <div className="lg:col-span-6">
+          <TextField
+            type="number"
+            value={floorsCount}
+            placeholder="Floors Count"
+            onChange={(e) => setFloorsCount(e.target.value)}
           />
         </div>
         <div className="lg:col-span-6">

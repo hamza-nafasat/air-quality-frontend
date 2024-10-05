@@ -12,6 +12,6 @@ const floorSlice = createSlice({
   },
 });
 
-export const { setBuildingData } = floorSlice.actions;
+export const { setFloorsData } = floorSlice.actions;
 
 export default floorSlice;
