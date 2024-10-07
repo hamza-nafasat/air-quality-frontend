@@ -33,10 +33,24 @@ const buildingSlice = createSlice({
       state.buildingData.position = action.payload.position || state.buildingData.position;
       // state.buildingData.floors = state.buildingData.floors.concat(action?.payload?.floors);
     },
-    remove,
+    removeBuildingData: (state) => {
+      state.buildingData = {
+        name: "",
+        type: "",
+        area: "",
+        address: "",
+        thumbnail: "",
+        thumbnailPreview: "",
+        twoDModel: "",
+        twoDModelPreview: "",
+        floorsCount: 1,
+        position: [],
+        floors: [],
+      };
+    },
   },
 });
 
-export const { setBuildingData } = buildingSlice.actions;
+export const { setBuildingData, removeBuildingData } = buildingSlice.actions;
 
 export default buildingSlice;

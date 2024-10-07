@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import AddIcon from "../../assets/svgs/stepper/AddIcon";
@@ -19,8 +19,10 @@ import BrowseFile from "../shared/large/BrowseFile";
 import Button from "../shared/small/Button";
 import Dropdown from "../shared/small/Dropdown";
 import TextField from "../shared/small/TextField";
+import { removeBuildingData } from "../../redux/slices/buildingSlice";
 
 const AddFloors = ({ setCurrentStep }) => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [addBuilding, { isLoading: isAddBuilding }] = useCreateBuildingMutation("");
   const [deleteBuilding, { isLoading: isDeleteBuilding }] = useDeleteSingleBuildingMutation("");
@@ -105,6 +107,7 @@ const AddFloors = ({ setCurrentStep }) => {
         await deleteBuilding(buildingId);
       }
       toast.success("Your Building and its floors created successfully");
+      dispatch(removeBuildingData());
       return navigate(`/dashboard/buildings`);
     } catch (error) {
       console.log("error while creating building", error);
