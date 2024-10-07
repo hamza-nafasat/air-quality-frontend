@@ -174,7 +174,7 @@ const AddFloors = ({ setCurrentStep }) => {
         />
         <Button
           type="button"
-          text="Next"
+          text="Add Building"
           width="w-[128px]"
           onClick={mainSaveHandler}
           disabled={!allFloorsFilled || isAddBuilding || isAddFloor || isUpdateBuilding || isDeleteBuilding}
