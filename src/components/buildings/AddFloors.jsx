@@ -1,27 +1,26 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import AddIcon from "../../assets/svgs/stepper/AddIcon";
 import DeleteIcon from "../../assets/svgs/stepper/DeleteIcon";
 import EditIcon from "../../assets/svgs/stepper/EditIcon";
 import TemperatureIcon from "../../assets/svgs/stepper/TemperatureIcon";
 import TvocIcon from "../../assets/svgs/stepper/TvocIcon";
-import { useGetAllSensorsQuery } from "../../redux/apis/sensorApis";
-import BrowseFile from "../shared/large/BrowseFile";
-import Button from "../shared/small/Button";
-import Dropdown from "../shared/small/Dropdown";
-import TextField from "../shared/small/TextField";
-import { useNavigate } from "react-router-dom";
 import {
   useCreateBuildingMutation,
   useDeleteSingleBuildingMutation,
   useUpdateSingleBuildingMutation,
 } from "../../redux/apis/buildingApis";
 import { useCreateFloorMutation } from "../../redux/apis/floorApis";
+import { useGetAllSensorsQuery } from "../../redux/apis/sensorApis";
+import BrowseFile from "../shared/large/BrowseFile";
+import Button from "../shared/small/Button";
+import Dropdown from "../shared/small/Dropdown";
+import TextField from "../shared/small/TextField";
 
 const AddFloors = ({ setCurrentStep }) => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [addBuilding, { isLoading: isAddBuilding }] = useCreateBuildingMutation("");
   const [deleteBuilding, { isLoading: isDeleteBuilding }] = useDeleteSingleBuildingMutation("");
@@ -106,7 +105,7 @@ const AddFloors = ({ setCurrentStep }) => {
         await deleteBuilding(buildingId);
       }
       toast.success("Your Building and its floors created successfully");
-      return navigate(`/buildings/buildings}`);
+      return navigate(`/dashboard/buildings`);
     } catch (error) {
       console.log("error while creating building", error);
       toast.error(error?.data?.message || "Error while creating building");

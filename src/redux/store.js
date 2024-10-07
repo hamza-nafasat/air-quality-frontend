@@ -1,9 +1,8 @@
 import { configureStore } from "@reduxjs/toolkit";
 import authApis from "./apis/authApis";
-import authSlice from "./slices/authSlice";
-import sensorApis from "./apis/sensorApis";
 import buildingApis from "./apis/buildingApis";
-import floorApis from "./apis/floorApis";
+import sensorApis from "./apis/sensorApis";
+import authSlice from "./slices/authSlice";
 import buildingSlice from "./slices/buildingSlice";
 
 const store = configureStore({
@@ -16,14 +15,12 @@ const store = configureStore({
     [authApis.reducerPath]: authApis.reducer,
     [buildingApis.reducerPath]: buildingApis.reducer,
     [sensorApis.reducerPath]: sensorApis.reducer,
-    [floorApis.reducerPath]: floorApis.reducer,
   },
   middleware: (getDefaultMiddleware) => {
     return getDefaultMiddleware({ serializableCheck: false })
       .concat(authApis.middleware)
       .concat(sensorApis.middleware)
-      .concat(buildingApis.middleware)
-      .concat(floorApis.middleware);
+      .concat(buildingApis.middleware);
   },
 });
 

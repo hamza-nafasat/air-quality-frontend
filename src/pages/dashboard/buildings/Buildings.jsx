@@ -1,14 +1,14 @@
-import React, { useState } from "react";
-import BuildingCard from "../../../components/buildings/BuildingCard";
-import AddIcon from "../../../assets/svgs/pages/AddIcon";
-import DeleteIcon from "../../../assets/svgs/pages/DeleteIcon";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { buildings } from "../../../data/data";
-import DeleteConfirmation from "../../../components/shared/large/modal/DeleteConfirmation";
-import Modal from "../../../components/shared/large/modal/Modal";
+import AddIcon from "../../../assets/svgs/pages/AddIcon";
 import SearchIcon from "../../../assets/svgs/reports/SearchIcon";
+import BuildingCard from "../../../components/buildings/BuildingCard";
+import { useGetAllBuildingsQuery } from "../../../redux/apis/buildingApis";
+import Loader from "../../../components/shared/small/Loader";
 
 const Buildings = () => {
+  const [buildings, setBuildings] = useState([]);
+  const { data, isLoading, isSuccess } = useGetAllBuildingsQuery("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
@@ -30,7 +30,29 @@ const Buildings = () => {
     }
   };
 
-  return (
+  useEffect(() => {
+    if (isSuccess) {
+      const buildingsData = data.data.map((building) => ({
+        id: building?._id,
+        name: building?.name,
+        address: building?.address,
+        sensors: building?.floors?.reduce((sensors, floor) => sensors + floor?.sensors?.length, 0) || 0,
+        temperature: building?.temperature || 0,
+        thumbnail: building?.thumbnail?.url || "",
+        thumbnailPublicId: building?.tumbnail?.public_id || "",
+        twoDModel: building?.twoDModel?.url || "",
+        twoDModelPublicId: building?.twoDModel?.public_id || "",
+        tvoc: building?.tvoc || 0,
+        co2: building?.co2 || 0,
+      }));
+
+      setBuildings(buildingsData);
+    }
+  }, [isSuccess, data]);
+
+  return isLoading ? (
+    <Loader />
+  ) : (
     <div className="bg-white p-[16px] rounded-[16px]">
       <section className="p-3 sm:flex-row flex-col flex justify-between  sm:items-center">
         <h5 className="text-[14px] xl:text-[16px] font-[600]">Buildings</h5>
@@ -45,36 +67,23 @@ const Buildings = () => {
                 <AddIcon />
               </Link>
             </button>
-
-            {/* <button onClick={handleOpenDeleteModal}>
-              <Link to="">
-                <DeleteIcon />
-              </Link>
-            </button> */}
           </div>
         </div>
       </section>
 
-      {/* {deleteModal && (
-        <Modal onClose={handleCloseDeleteModal} title="Confirmation">
-          <DeleteConfirmation
-            message="Are you sure you want to delete this building?"
-            onClose={handleCloseDeleteModal}
-          />{" "}
-        </Modal>
-      )} */}
-
       <section className="p-3">
-        {currentItems.map((building, i) => (
+        {currentItems?.map((building, i) => (
           <BuildingCard
             key={i}
-            name={building.name}
-            address={building.address}
-            sensors={building.sensors}
-            temperature={building.temperature}
-            tvoc={building.tvoc}
-            co2={building.co2}
-            link={`/dashboard/building-view/${building.id}`}
+            name={building?.name}
+            address={building?.address}
+            sensors={building?.sensors}
+            temperature={building?.temperature}
+            thumbnail={building?.thumbnail}
+            twoDModel={building?.twoDModel}
+            tvoc={building?.tvoc}
+            co2={building?.co2}
+            link={`/dashboard/building-view/${building?.id}`}
           />
         ))}
       </section>
@@ -109,11 +118,7 @@ const FilterSection = () => {
     <div className="flex flex-wrap  gap-4">
       <div className="flex items-center gap-1 border border-[#e7e7e7] rounded-lg h-[34px] bg-white px-3 basis-[35%] flex-1">
         <SearchIcon />
-        <input
-          type="search"
-          placeholder="Search"
-          className="focus:outline-none text-sm w-full"
-        />
+        <input type="search" placeholder="Search" className="focus:outline-none text-sm w-full" />
       </div>
       <div className="flex items-center justify-between gap-1 border border-[#e7e7e7] rounded-lg h-[34px] bg-white px-3 ">
         <p className="text-sm text-[#7e7e7e]">Sort By:</p>

@@ -33,6 +33,7 @@ const buildingSlice = createSlice({
       state.buildingData.position = action.payload.position || state.buildingData.position;
       // state.buildingData.floors = state.buildingData.floors.concat(action?.payload?.floors);
     },
+    remove,
   },
 });
 
