@@ -45,7 +45,6 @@ const UploadAddFloors = () => {
   const [draggedPolygon, setDraggedPolygon] = useState(null);
   const [draggingPolygon, setDraggingPolygon] = useState(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-  const [sensorModal, setSensorModal] = useState(false);
   // Modal Open of Sensor Add
 
   const [sensorPopup, setSensorPopup] = useState(false);
@@ -59,10 +58,22 @@ const UploadAddFloors = () => {
     setSensorIdInput("");
   };
   // -----
-  const sensorModalHandler = () => setSensorModal(true);
 
   const onCropComplete = (croppedArea, croppedAreaPixels) => {
     setCroppedAreaPixels(croppedAreaPixels);
+  };
+
+  const sensorInfoSubmitHandler = () => {
+    if (sensorIdInput) {
+      updateSensorAttached({
+        polygonId: selectedPolygon.id,
+        sensor: sensorIdInput,
+        sensorAttached: selectedSensor.value,
+        polygons,
+        setPolygons,
+      });
+      setSensorPopup(false);
+    }
   };
 
   const handleCropConfirm = async () => {
@@ -139,45 +150,6 @@ const UploadAddFloors = () => {
             )
           }
         />
-      )}
-      {sensorPopup && selectedPolygon && (
-        <Modal title="Add Sensor" onClose={() => setSensorPopup(false)}>
-          <div className="flex flex-col gap-2">
-            <TextField
-              type="text"
-              placeholder="Sensor Id"
-              label="Sensor Id"
-              value={sensorIdInput}
-              onChange={(e) => setSensorIdInput(e.target.value)}
-            />
-            <Dropdown
-              options={[
-                { option: "Sensor 1", value: "sensor-1" },
-                { option: "Sensor 2", value: "sensor-2" },
-              ]}
-              label="Sensor Name"
-              onChange={(e) => setSelectedSensor(e.target.value)}
-            />
-            <div className="flex justify-center">
-              <Button
-                text="Add"
-                width="w-fit"
-                onClick={() => {
-                  if (sensorIdInput) {
-                    updateSensorAttached({
-                      polygonId: selectedPolygon.id,
-                      sensor: sensorIdInput,
-                      sensorAttached: selectedSensor,
-                      polygons,
-                      setPolygons,
-                    });
-                    setSensorPopup(false);
-                  }
-                }}
-              />
-            </div>
-          </div>
-        </Modal>
       )}
 
       <canvas
@@ -343,85 +315,43 @@ const UploadAddFloors = () => {
               <CiExport />
             </button>
           </div>
-          <button
-            className="absolute top-5 left-5 bg-primary-lightBlue px-3 py-[6px] rounded-md text-white text-sm font-bold"
-            onClick={sensorModalHandler}
-          >
-            Add Sensor
-          </button>
-          {/* sensor modal */}
-          {sensorModal && (
-            <SensorModal
-              setSensorModal={setSensorModal}
-              polygons={polygons}
-              sensors={sensors}
-              onUpdateSensor={() =>
-                updateSensorAttached({
-                  polygons,
-                  setPolygons,
-                })
-              }
-            />
-          )}
         </>
+      )}
+      {sensorPopup && selectedPolygon && (
+        <Modal title="Add Sensor" onClose={() => setSensorPopup(false)}>
+          <div className="flex flex-col gap-2">
+            <TextField
+              type="text"
+              placeholder="Sensor Id"
+              label="Sensor Id"
+              value={sensorIdInput}
+              onChange={(e) => setSensorIdInput(e.target.value)}
+            />
+            <Dropdown
+              options={[
+                { option: "Sensor 1", value: "sensor-1" },
+                { option: "Sensor 2", value: "sensor-2" },
+              ]}
+              label="Sensor Name"
+              // onChange={(e) => setSelectedSensor(e.target.value)}
+              onSelect={(value) => setSelectedSensor(value)}
+            />
+
+            <div className="flex justify-center">
+              <Button
+                text="Add"
+                width="w-fit"
+                onClick={sensorInfoSubmitHandler}
+              />
+            </div>
+          </div>
+        </Modal>
       )}
     </div>
   );
 };
 
 export default UploadAddFloors;
-
-const SensorModal = ({ setSensorModal, polygons, sensors, onUpdateSensor }) => {
-  const [selectedSensors, setSelectedSensors] = useState({});
-
-  const sensorSelectHandler = (polygonId, sensor) => {
-    setSelectedSensors({ ...selectedSensors, [polygonId]: sensor });
-    onUpdateSensor(polygonId, sensor);
-  };
-  console.log("selectedSensors", selectedSensors);
-  return (
-    <div className="bg-white p-4 rounded-lg shadow-md absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[450px]">
-      <h6 className="text-sm font-medium text-[#414141] text-center">
-        Add Sensor
-      </h6>
-      <div className="my-6 h-[200px] overflow-y-scroll custom-scroll">
-        {polygons?.map((polygon, i) => (
-          <div key={i} className="grid grid-cols-2 gap-4 mb-2">
-            <h6 className="px-4 h-[45px] flex items-center border rounded-md text-xs text-[#414141]">
-              {polygon?.id}
-            </h6>
-            <select
-              name="sensors"
-              className="outline-none border rounded-md px-2 text-xs text-[#414141]"
-              onChange={(e) => sensorSelectHandler(polygon?.id, e.target.value)}
-            >
-              <option>Select Sensor</option>
-              {sensors?.map((sensor, i) => (
-                <option key={i} value={sensor?.value}>
-                  {sensor?.option}
-                </option>
-              ))}
-            </select>
-          </div>
-        ))}
-      </div>
-      <div className="flex items-center justify-center gap-3">
-        <Button
-          text="Cancel"
-          width="w-20 sm:w-[85px]"
-          bg="bg-white hover:bg-primary-lightBlue hover:text-white"
-          color="text-primary"
-          onClick={() => setSensorModal(false)}
-        />
-        <Button
-          text="Save"
-          width="w-20 sm:w-[85px]"
-          onClick={() => setSensorModal(false)}
-        />
-      </div>
-    </div>
-  );
-};
 
 const BrowseFileBtn = ({ onFileChange }) => {
   return (
