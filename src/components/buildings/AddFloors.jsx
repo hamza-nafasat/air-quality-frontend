@@ -20,35 +20,49 @@ import Button from "../shared/small/Button";
 import Dropdown from "../shared/small/Dropdown";
 import TextField from "../shared/small/TextField";
 import { removeBuildingData } from "../../redux/slices/buildingSlice";
+import UploadAddFloors from "./uploads/UploadAddFloors";
 
 const AddFloors = ({ setCurrentStep }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [addBuilding, { isLoading: isAddBuilding }] = useCreateBuildingMutation("");
-  const [deleteBuilding, { isLoading: isDeleteBuilding }] = useDeleteSingleBuildingMutation("");
-  const [updateBuilding, { isLoading: isUpdateBuilding }] = useUpdateSingleBuildingMutation("");
+  const [addBuilding, { isLoading: isAddBuilding }] =
+    useCreateBuildingMutation("");
+  const [deleteBuilding, { isLoading: isDeleteBuilding }] =
+    useDeleteSingleBuildingMutation("");
+  const [updateBuilding, { isLoading: isUpdateBuilding }] =
+    useUpdateSingleBuildingMutation("");
   const [addFloor, { isLoading: isAddFloor }] = useCreateFloorMutation();
   const { buildingData } = useSelector((state) => state.building);
   const { data, isSuccess } = useGetAllSensorsQuery("");
   const [floorsCount, setFloorsCount] = useState([{}]);
   const [floorsState, setFloorsState] = useState([]);
-  const [sensorsOptions, setSensorsOptions] = useState([{ option: "", value: "", icon: "" }]);
+  const [sensorsOptions, setSensorsOptions] = useState([
+    { option: "", value: "", icon: "" },
+  ]);
   const [accordionState, setAccordionState] = useState([]);
   const [buildingId, setBuildingId] = useState("");
 
   // Toggle specific accordion
   const toggleAccordion = (index) => {
-    setAccordionState((prev) => prev.map((isOpen, i) => (i === index ? !isOpen : isOpen)));
+    setAccordionState((prev) =>
+      prev.map((isOpen, i) => (i === index ? !isOpen : isOpen))
+    );
   };
 
   const openNextAccordion = (index) =>
-    setAccordionState((prev) => prev.map((isOpen, i) => (i === index + 1 ? true : false)));
+    setAccordionState((prev) =>
+      prev.map((isOpen, i) => (i === index + 1 ? true : false))
+    );
 
   // Check if all floors are filled to enable the Next button
   const allFloorsFilled =
     floorsState.length === floorsCount.length &&
     floorsState.every(
-      (floor) => floor.floorName && floor.roomsCount && floor.twoDModal && floor.selectedSensors?.length
+      (floor) =>
+        floor.floorName &&
+        floor.roomsCount &&
+        floor.twoDModal &&
+        floor.selectedSensors?.length
     );
 
   const mainSaveHandler = async () => {
@@ -177,7 +191,13 @@ const AddFloors = ({ setCurrentStep }) => {
           text="Add Building"
           width="w-[128px]"
           onClick={mainSaveHandler}
-          disabled={!allFloorsFilled || isAddBuilding || isAddFloor || isUpdateBuilding || isDeleteBuilding}
+          disabled={
+            !allFloorsFilled ||
+            isAddBuilding ||
+            isAddFloor ||
+            isUpdateBuilding ||
+            isDeleteBuilding
+          }
         />
       </div>
     </div>
@@ -207,12 +227,20 @@ const AddFloor = ({
   };
 
   const selectSensorHandler = (value) => {
-    setSensorsOptions(sensorsOptions.filter((sensor) => sensor?.value !== value?.value));
+    setSensorsOptions(
+      sensorsOptions.filter((sensor) => sensor?.value !== value?.value)
+    );
     setSelectedSensors([...selectedSensors, value]);
   };
 
   const saveStateHandler = () => {
-    if (!floorName || !roomsCount || !twoDModal || !twoDModalPreview || selectedSensors?.length === 0) {
+    if (
+      !floorName ||
+      !roomsCount ||
+      !twoDModal ||
+      !twoDModalPreview ||
+      selectedSensors?.length === 0
+    ) {
       return toast.error("Please Enter all Fields to Save");
     }
 
@@ -233,7 +261,9 @@ const AddFloor = ({
 
   return (
     <div>
-      <h3 className="text-sm font-semibold text-[rgba(6,6,6,0.8)]">Add Floors</h3>
+      <h3 className="text-sm font-semibold text-[rgba(6,6,6,0.8)]">
+        Add Floors
+      </h3>
       <form className="grid grid-cols-1 lg:grid-cols-12 gap-4 my-4">
         <div className="lg:col-span-6">
           <TextField
@@ -265,12 +295,13 @@ const AddFloor = ({
           </div>
         </div>
       </div>
-      <div className="my-4">
-        <BrowseFile
+      <div className="my-4 flex justify-center">
+        {/* <BrowseFile
           previewValue={twoDModalPreview}
           setPreviewValue={setTwoDModalPreview}
           setFile={setTwoDModal}
-        />
+        /> */}
+        <UploadAddFloors />
       </div>
       <div>
         <Dropdown
@@ -297,7 +328,10 @@ const AddFloor = ({
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button type="button" onClick={() => deleteSensorHandler(sensor)}>
+                  <button
+                    type="button"
+                    onClick={() => deleteSensorHandler(sensor)}
+                  >
                     <DeleteIcon />
                   </button>
                 </div>
@@ -310,7 +344,12 @@ const AddFloor = ({
       </div>
 
       <div className="flex items-center justify-end gap-4">
-        <Button type="button" text="Save" width="w-[128px]" onClick={saveStateHandler} />
+        <Button
+          type="button"
+          text="Save"
+          width="w-[128px]"
+          onClick={saveStateHandler}
+        />
       </div>
     </div>
   );

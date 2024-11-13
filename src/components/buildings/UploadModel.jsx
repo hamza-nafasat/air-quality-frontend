@@ -7,6 +7,7 @@ import BrowseFile from "../shared/large/BrowseFile";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import { setBuildingData } from "../../redux/slices/buildingSlice";
+import UploadModelImage from "./uploads/UploadModelImage";
 
 const UploadModel = ({ setCurrentStep }) => {
   const dispatch = useDispatch();
@@ -17,14 +18,16 @@ const UploadModel = ({ setCurrentStep }) => {
   // console.log("twoDModel", twoDModel, twoDModelPreview);
 
   const submitHandler = () => {
-    if (!twoDModel && !twoDModelPreview) return toast.error("Please Upload 2D Model");
+    // if (!twoDModel && !twoDModelPreview)
+    //   return toast.error("Please Upload 2D Model");
     dispatch(setBuildingData({ ...buildingData, twoDModel, twoDModelPreview }));
     setCurrentStep((prevStep) => prevStep + 1);
   };
 
   useEffect(() => {
     if (buildingData?.twoDModel) setTwoDModel(buildingData?.twoDModel);
-    if (buildingData?.twoDModelPreview) setTwoDModelPreview(buildingData?.twoDModelPreview);
+    if (buildingData?.twoDModelPreview)
+      setTwoDModelPreview(buildingData?.twoDModelPreview);
   }, [buildingData]);
 
   return (
@@ -42,13 +45,21 @@ const UploadModel = ({ setCurrentStep }) => {
           </div>
         </div>
       </div>
-      <BrowseFile
+      {/* <BrowseFile
         setFile={setTwoDModel}
         previewValue={twoDModelPreview}
         setPreviewValue={setTwoDModelPreview}
-      />
+      /> */}
+      <div className="flex justify-center">
+        <UploadModelImage />
+      </div>
       <div className="mt-4 flex justify-end">
-        <Button disabled={!twoDModel} text="Next" width="w-[128px]" onClick={submitHandler} />
+        <Button
+          // disabled={!twoDModel}
+          text="Next"
+          width="w-[128px]"
+          onClick={submitHandler}
+        />
       </div>
     </div>
   );
