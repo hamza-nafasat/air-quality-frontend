@@ -102,11 +102,17 @@ export const handleCanvasClick = ({
   currentPolygon,
   setCurrentPolygon,
   openSensorPopup,
+  isUpdateMode,
+  handleReEditPolygon,
 }) => {
   const canvas = canvasRef.current;
   const rect = canvas.getBoundingClientRect();
   const x = event.clientX - rect.left;
   const y = event.clientY - rect.top;
+
+  if (isUpdateMode) {
+    handleReEditPolygon(x, y);
+  }
 
   if (isDeleteMode) {
     handleDeletePolygon(x, y);
@@ -148,13 +154,33 @@ export const handleCopyMode = ({
   setIsMoveMode,
   setIsDeleteMode,
   setDraggedPolygon,
+  setIsUpdateMode,
   isCopyMode,
 }) => {
   setIsCopyMode(!isCopyMode);
   setIsEditMode(false);
   setIsMoveMode(false);
   setIsDeleteMode(false);
+  setIsUpdateMode(false);
   setDraggedPolygon(null);
+};
+
+// Toggle Update Mode
+export const handleUpdateMode = ({
+  setIsCopyMode,
+  setIsEditMode,
+  setIsMoveMode,
+  setIsDeleteMode,
+  setDraggedPolygon,
+  setIsUpdateMode,
+  isUpdateMode,
+}) => {
+  setIsCopyMode(false);
+  setIsEditMode(false);
+  setIsMoveMode(false);
+  setIsDeleteMode(false);
+  setDraggedPolygon(null);
+  setIsUpdateMode(!isUpdateMode);
 };
 
 // Toggle Move Mode
@@ -164,6 +190,7 @@ export const handleMoveMode = ({
   setIsCopyMode,
   setIsDeleteMode,
   isMoveMode,
+  setIsUpdateMode,
   setDraggingPolygon,
 }) => {
   setIsMoveMode(!isMoveMode);
@@ -171,6 +198,7 @@ export const handleMoveMode = ({
   setIsCopyMode(false);
   setIsDeleteMode(false);
   setDraggingPolygon(null);
+  setIsUpdateMode(false);
 };
 
 // Export SVG functionality
@@ -229,11 +257,13 @@ export const handleDeleteMode = ({
   setIsEditMode,
   setIsCopyMode,
   setIsMoveMode,
+  setIsUpdateMode,
 }) => {
   setIsDeleteMode(!isDeleteMode);
   setIsEditMode(false);
   setIsCopyMode(false);
   setIsMoveMode(false);
+  setIsUpdateMode(false);
 };
 
 // attaching sensor to the polygon
@@ -252,6 +282,8 @@ export const updateSensorAttached = ({
   });
   setPolygons(updatedPolygons);
 };
+
+////////// Alllllllll Done
 
 // Handle polygon dragging in Move Mode
 export const handleCanvasMouseMove = ({

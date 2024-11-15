@@ -2,7 +2,6 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useRef, useState } from "react";
 import Cropper from "react-easy-crop";
-import { CiEdit } from "react-icons/ci";
 import { VscCopy } from "react-icons/vsc";
 import { SlCursorMove } from "react-icons/sl";
 import { AiOutlineDelete } from "react-icons/ai";
@@ -20,11 +19,15 @@ import {
   handleDeleteMode,
   handleImageUpload,
   handleMoveMode,
+  handleUpdateMode,
   updateSensorAttached,
 } from "../../globalUtils/uploadFeatures";
 import TextField from "../../shared/small/TextField";
 import Modal from "../../shared/modal/Modal";
 import Dropdown from "../../shared/small/Dropdown";
+import { FaDrawPolygon } from "react-icons/fa";
+import { RiEditBoxFill } from "react-icons/ri";
+import { LiaDrawPolygonSolid } from "react-icons/lia";
 
 const UploadAddFloors = () => {
   const canvasRef = useRef(null);
@@ -42,6 +45,8 @@ const UploadAddFloors = () => {
   const [isCopyMode, setIsCopyMode] = useState(false);
   const [isMoveMode, setIsMoveMode] = useState(false);
   const [isDeleteMode, setIsDeleteMode] = useState(false);
+  const [isUpdateMode, setIsUpdateMode] = useState(false);
+
   const [draggedPolygon, setDraggedPolygon] = useState(null);
   const [draggingPolygon, setDraggingPolygon] = useState(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
@@ -50,7 +55,7 @@ const UploadAddFloors = () => {
   const [sensorPopup, setSensorPopup] = useState(false);
   const [selectedPolygon, setSelectedPolygon] = useState(null);
   const [sensorIdInput, setSensorIdInput] = useState("");
-  const [selectedSensor, setSelectedSensor] = useState("");
+  const [selectedSensor, setSelectedSensor] = useState("No sensor");
 
   const openSensorPopup = (polygon) => {
     setSelectedPolygon(polygon);
@@ -68,12 +73,28 @@ const UploadAddFloors = () => {
       updateSensorAttached({
         polygonId: selectedPolygon.id,
         sensor: sensorIdInput,
-        sensorAttached: selectedSensor.value,
+        sensorAttached: selectedSensor,
         polygons,
         setPolygons,
       });
       setSensorPopup(false);
     }
+  };
+
+  // Modal Update Handler
+  const sensorInfoUpdateHandler = () => {
+    setPolygons((prevPolygons) =>
+      prevPolygons.map((polygon) =>
+        polygon.id === selectedPolygon.id
+          ? {
+              ...polygon,
+              id: selectedPolygonId,
+              sensorAttached: selectedPolygonSensor || selectedSensor,
+            }
+          : polygon
+      )
+    );
+    setReEditModalOpen(false);
   };
 
   const handleCropConfirm = async () => {
@@ -125,6 +146,34 @@ const UploadAddFloors = () => {
     setPolygons(updatedPolygons);
   };
 
+  const [reEditModalOpen, setReEditModalOpen] = useState(false);
+  const [selectedPolygonId, setSelectedPolygonId] = useState("");
+  const [selectedPolygonSensor, setSelectedPolygonSensor] = useState("");
+
+  // Function to open modal with polygon ID
+  const handlePolygonClick = (polygonId, polygonSensor) => {
+    const polygonToEdit = polygons.find((polygon) => polygon.id === polygonId);
+    setSelectedPolygon(polygonToEdit); // Set the entire polygon object to selectedPolygon
+    setSelectedPolygonId(polygonId);
+    setSelectedPolygonSensor(polygonSensor);
+    setReEditModalOpen(true);
+  };
+
+  // Re-Edit Polygon
+  const handleReEditPolygon = (x, y) => {
+    const canvas = canvasRef.current;
+    const clickedPolygon = polygons.find((polygon) => {
+      const path = new Path2D();
+      path.moveTo(polygon.points[0].x, polygon.points[0].y);
+      polygon.points.forEach((point) => path.lineTo(point.x, point.y));
+      path.closePath();
+      return canvas.getContext("2d").isPointInPath(path, x, y);
+    });
+    if (clickedPolygon) {
+      handlePolygonClick(clickedPolygon.id, clickedPolygon.sensorAttached);
+    }
+  };
+
   useEffect(() => {
     if (isDrawingEnabled && canvasRef.current) {
       drawCanvas({
@@ -171,9 +220,11 @@ const UploadAddFloors = () => {
             setPolygonCount,
             setDraggedPolygon,
             isEditMode,
+            isUpdateMode,
             currentPolygon,
             setCurrentPolygon,
             openSensorPopup,
+            handleReEditPolygon,
           })
         }
         onMouseDown={(event) =>
@@ -239,12 +290,13 @@ const UploadAddFloors = () => {
                 setIsCopyMode(false);
                 setIsMoveMode(false);
                 setIsDeleteMode(false);
+                setIsUpdateMode(false);
               }}
               className={`p-2 border rounded-md text-white ${
                 isEditMode ? "border-primary-lightBlue" : "border-[#565656]"
               }`}
             >
-              <CiEdit
+              <LiaDrawPolygonSolid
                 fontSize={20}
                 color={isEditMode ? "rgba(3, 165, 224, 1)" : "#565656"}
               />
@@ -257,6 +309,7 @@ const UploadAddFloors = () => {
                   setIsMoveMode,
                   setIsDeleteMode,
                   setDraggedPolygon,
+                  setIsUpdateMode,
                   isCopyMode,
                 })
               }
@@ -271,6 +324,27 @@ const UploadAddFloors = () => {
             </button>
             <button
               onClick={() =>
+                handleUpdateMode({
+                  setIsCopyMode,
+                  setIsEditMode,
+                  setIsMoveMode,
+                  setIsDeleteMode,
+                  setIsUpdateMode,
+                  setDraggedPolygon,
+                  isCopyMode,
+                })
+              }
+              className={`p-2 border rounded-md text-white ${
+                isUpdateMode ? "border-primary-lightBlue" : "border-[#565656]"
+              }`}
+            >
+              <RiEditBoxFill
+                fontSize={20}
+                color={isUpdateMode ? "rgba(3, 165, 224, 1)" : "#565656"}
+              />
+            </button>
+            <button
+              onClick={() =>
                 handleMoveMode({
                   setIsMoveMode,
                   setIsEditMode,
@@ -278,6 +352,7 @@ const UploadAddFloors = () => {
                   setIsDeleteMode,
                   isMoveMode,
                   setDraggingPolygon,
+                  setIsUpdateMode,
                 })
               }
               className={`p-2 border rounded-md text-white ${
@@ -297,6 +372,7 @@ const UploadAddFloors = () => {
                   setIsEditMode,
                   setIsCopyMode,
                   setIsMoveMode,
+                  setIsUpdateMode,
                 })
               }
               className={`p-2 border rounded-md text-white ${
@@ -328,20 +404,60 @@ const UploadAddFloors = () => {
               onChange={(e) => setSensorIdInput(e.target.value)}
             />
             <Dropdown
+              defaultText={selectedSensor}
               options={[
                 { option: "Sensor 1", value: "sensor-1" },
                 { option: "Sensor 2", value: "sensor-2" },
               ]}
               label="Sensor Name"
               // onChange={(e) => setSelectedSensor(e.target.value)}
-              onSelect={(value) => setSelectedSensor(value)}
+              onSelect={(selectedOption) =>
+                setSelectedSensor(selectedOption.value)
+              }
             />
 
             <div className="flex justify-center">
               <Button
                 text="Add"
                 width="w-fit"
-                onClick={sensorInfoSubmitHandler}
+                onClick={() => {
+                  sensorInfoSubmitHandler();
+                  setSensorPopup(false);
+                }}
+              />
+            </div>
+          </div>
+        </Modal>
+      )}
+      {reEditModalOpen && (
+        <Modal title="Add Sensor" onClose={() => setReEditModalOpen(false)}>
+          <div className="flex flex-col gap-2">
+            <TextField
+              type="text"
+              placeholder="Sensor Id"
+              label="Sensor Id"
+              value={selectedPolygonId}
+              onChange={(e) => setSelectedPolygonId(e.target.value)}
+            />
+            <Dropdown
+              defaultText={selectedPolygonSensor || selectedSensor}
+              options={[
+                { option: "No sensor", value: "no-sensor" },
+                { option: "Sensor 1", value: "sensor-1" },
+                { option: "Sensor 2", value: "sensor-2" },
+              ]}
+              label="Sensor Name"
+              // onChange={(e) => setSelectedSensor(e.target.value)}
+              onSelect={(selectedOption) =>
+                setSelectedPolygonSensor(selectedOption.value)
+              }
+            />
+
+            <div className="flex justify-center">
+              <Button
+                text="Update"
+                width="w-fit"
+                onClick={sensorInfoUpdateHandler}
               />
             </div>
           </div>
