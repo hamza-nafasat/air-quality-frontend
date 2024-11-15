@@ -68,6 +68,14 @@ const UploadAddFloors = () => {
     setCroppedAreaPixels(croppedAreaPixels);
   };
 
+  const handleCancelPolygon = () => {
+    setSensorPopup(false);
+    setPolygons((prevPolygons) =>
+      prevPolygons.filter((polygon) => polygon.id !== selectedPolygon?.id)
+    );
+    setCurrentPolygon([]);
+    setSelectedPolygon(null);
+  };
   const sensorInfoSubmitHandler = () => {
     if (sensorIdInput) {
       updateSensorAttached({
@@ -394,7 +402,11 @@ const UploadAddFloors = () => {
         </>
       )}
       {sensorPopup && selectedPolygon && (
-        <Modal title="Add Sensor" onClose={() => setSensorPopup(false)}>
+        <Modal
+          title="Add Sensor"
+          isCrossShow={false}
+          onClose={() => setSensorPopup(false)}
+        >
           <div className="flex flex-col gap-2">
             <TextField
               type="text"
@@ -416,7 +428,7 @@ const UploadAddFloors = () => {
               }
             />
 
-            <div className="flex justify-center">
+            <div className="flex justify-center gap-3">
               <Button
                 text="Add"
                 width="w-fit"
@@ -424,6 +436,11 @@ const UploadAddFloors = () => {
                   sensorInfoSubmitHandler();
                   setSensorPopup(false);
                 }}
+              />
+              <Button
+                width="w-fit"
+                text="cancel"
+                onClick={handleCancelPolygon}
               />
             </div>
           </div>

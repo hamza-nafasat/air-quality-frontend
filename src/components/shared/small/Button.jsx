@@ -25,7 +25,7 @@ const Button = ({
   return (
     <button
       style={style}
-      className={`flex items-center justify-center text-nowrap px-7 py-5 transition-all duration-300 hover:bg-[#3dc5ff] ${
+      className={`flex items-center justify-center text-nowrap px-7 py-5 transition-all duration-300 hover:bg-[#3dc5ff] capitalize ${
         width ? width : "w-full"
       }
       ${height ? height : "h-[36px]"} 
