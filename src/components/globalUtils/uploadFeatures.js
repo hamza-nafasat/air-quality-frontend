@@ -25,6 +25,7 @@ export const drawCanvas = ({
   image,
   polygons,
   currentPolygon,
+  color, // Default color, if needed
 }) => {
   const canvas = canvasRef.current;
   if (!canvas || !isDrawingEnabled) return;
@@ -38,18 +39,40 @@ export const drawCanvas = ({
 
   polygons.forEach((polygon) => {
     if (!polygon || !polygon.points) return;
+
+    // Start drawing polygon
     context.beginPath();
     context.moveTo(polygon.points[0].x, polygon.points[0].y);
     polygon.points.forEach((point) => context.lineTo(point.x, point.y));
     context.closePath();
-    context.fillStyle = "#03a5e070";
+
+    // Fill the polygon with the color
+    context.fillStyle = `${polygon.color}${90}` || "#03a5e060"; // Default color
+    context.strokeStyle = polygon.fillColor || "#03a5e0"; // Use polygon's specific color
     context.fill();
-    context.strokeStyle = "#03a5e0";
+
+    // Draw the border with the specified color
+    context.strokeStyle = polygon.fillColor || polygon.color || "#03a5e060"; // Fallback to fill color
     context.lineWidth = 2;
     context.stroke();
 
+    // Draw the ID box
+    // top-right
     const idX = polygon.points[0].x;
     const idY = polygon.points[0].y - 5;
+
+    // bottom-right
+    // const idX = polygon.points[0].x;
+    // const idY = polygon.points[2].y - 5;
+
+    // top-left
+    // const idX = polygon.points[1].x;
+    // const idY = polygon.points[1].y - 5;
+
+    // bottom-left
+    // const idX = polygon.points[1].x;
+    // const idY = polygon.points[2].y - 5;
+
     const padding = 4;
     const text = polygon.id;
 
@@ -61,6 +84,7 @@ export const drawCanvas = ({
     const boxX = idX - padding;
     const boxY = idY - textHeight - padding;
 
+    // Draw the box background
     context.fillStyle = "#FFFFFF";
     context.beginPath();
     context.moveTo(boxX + 4, boxY);
@@ -71,6 +95,7 @@ export const drawCanvas = ({
     context.closePath();
     context.fill();
 
+    // Draw the text inside the box
     context.fillStyle = "#000000";
     context.fillText(text, boxX + padding, boxY + padding + textHeight - 4);
   });
@@ -104,6 +129,8 @@ export const handleCanvasClick = ({
   openSensorPopup,
   isUpdateMode,
   handleReEditPolygon,
+  selectedColor, // Pass selected color here
+  selectedFillColor,
 }) => {
   const canvas = canvasRef.current;
   const rect = canvas.getBoundingClientRect();
@@ -125,6 +152,7 @@ export const handleCanvasClick = ({
         x: point.x + (x - draggedPolygon.points[0].x),
         y: point.y + (y - draggedPolygon.points[0].y),
       })),
+      fillColor: draggedPolygon.fillColor, // Copy the color as well
     };
     setPolygons([...polygons, newPolygon]);
     setPolygonCount(polygonCount + 1);
@@ -138,6 +166,8 @@ export const handleCanvasClick = ({
       const polygonWithId = {
         points: newPolygon,
         id: `F1-PS${polygonCount}`,
+        color: selectedColor,
+        fillColor: selectedFillColor || selectedColor,
       };
       setPolygons([...polygons, polygonWithId]);
       setPolygonCount(polygonCount + 1);
@@ -202,7 +232,12 @@ export const handleMoveMode = ({
 };
 
 // Export SVG functionality
-export const exportSVG = async ({ canvasRef, image, polygons }) => {
+export const exportSVG = async ({
+  canvasRef,
+  image,
+  polygons,
+  selectedColor,
+}) => {
   const canvas = canvasRef.current;
   if (!canvas || !image) return;
 
@@ -282,8 +317,6 @@ export const updateSensorAttached = ({
   });
   setPolygons(updatedPolygons);
 };
-
-////////// Alllllllll Done
 
 // Handle polygon dragging in Move Mode
 export const handleCanvasMouseMove = ({

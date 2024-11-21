@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable react/prop-types */
+// / eslint-disable react-hooks/exhaustive-deps /
+// / eslint-disable react/prop-types /
 import { useEffect, useRef, useState } from "react";
 import Cropper from "react-easy-crop";
 import { VscCopy } from "react-icons/vsc";
@@ -28,6 +28,7 @@ import Dropdown from "../../shared/small/Dropdown";
 import { FaDrawPolygon } from "react-icons/fa";
 import { RiEditBoxFill } from "react-icons/ri";
 import { LiaDrawPolygonSolid } from "react-icons/lia";
+import { toast } from "react-toastify";
 
 const UploadAddFloors = () => {
   const canvasRef = useRef(null);
@@ -56,6 +57,8 @@ const UploadAddFloors = () => {
   const [selectedPolygon, setSelectedPolygon] = useState(null);
   const [sensorIdInput, setSensorIdInput] = useState("");
   const [selectedSensor, setSelectedSensor] = useState("No sensor");
+  // Select color
+  const [color, setColor] = useState("#ffff00");
 
   const openSensorPopup = (polygon) => {
     setSelectedPolygon(polygon);
@@ -78,14 +81,22 @@ const UploadAddFloors = () => {
   };
   const sensorInfoSubmitHandler = () => {
     if (sensorIdInput) {
-      updateSensorAttached({
-        polygonId: selectedPolygon.id,
-        sensor: sensorIdInput,
-        sensorAttached: selectedSensor,
-        polygons,
-        setPolygons,
-      });
+      const updatedPolygons = polygons.map((polygon) =>
+        polygon.id === selectedPolygon.id
+          ? {
+              ...polygon,
+              id: sensorIdInput, // Assign the user input ID
+              sensorAttached: selectedSensor || sensorIdInput, // Assign sensor, either selected or input
+              color: color, // Apply the selected color to the border
+              fillColor: color, // Apply the selected color to the fill
+            }
+          : polygon
+      );
+      setPolygons(updatedPolygons);
       setSensorPopup(false);
+    } else {
+      // If sensorIdInput is empty, we do not allow the polygon to be drawn.
+      alert("without sensor id and sensor name polygon not draw");
     }
   };
 
@@ -190,9 +201,10 @@ const UploadAddFloors = () => {
         image,
         polygons,
         currentPolygon,
+        color,
       });
     }
-  }, [image, polygons, currentPolygon, canvasRef]);
+  }, [image, polygons, currentPolygon, canvasRef, color]);
 
   return (
     <div className="relative">
@@ -415,6 +427,7 @@ const UploadAddFloors = () => {
               value={sensorIdInput}
               onChange={(e) => setSensorIdInput(e.target.value)}
             />
+
             <Dropdown
               defaultText={selectedSensor}
               options={[
@@ -427,9 +440,18 @@ const UploadAddFloors = () => {
                 setSelectedSensor(selectedOption.value)
               }
             />
+            <div className="flex items-center gap-4">
+              <h1 className="font-bold text-xs">Select Color of Polygon</h1>
+              <input
+                type="color"
+                value={color}
+                onChange={(e) => setColor(e.target.value)}
+              />
+            </div>
 
             <div className="flex justify-center gap-3">
               <Button
+                disabled={!sensorIdInput}
                 text="Add"
                 width="w-fit"
                 onClick={() => {
