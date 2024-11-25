@@ -23,7 +23,13 @@ import {
   updateSensorAttached,
 } from "../../globalUtils/uploadFeatures";
 
-const UploadModelImage = () => {
+const UploadModelImage = ({
+  setFile,
+  previewValue,
+  setPreviewValue,
+  polygons,
+  setPolygons,
+}) => {
   const canvasRef = useRef(null);
   const [imageSrc, setImageSrc] = useState(null);
   const [isDrawingEnabled, setIsDrawingEnabled] = useState(false);
@@ -33,7 +39,6 @@ const UploadModelImage = () => {
   const [showCropper, setShowCropper] = useState(false);
   const [image, setImage] = useState(null);
   const [currentPolygon, setCurrentPolygon] = useState([]);
-  const [polygons, setPolygons] = useState([]);
   const [polygonCount, setPolygonCount] = useState(1);
   const [isEditMode, setIsEditMode] = useState(true);
   const [isCopyMode, setIsCopyMode] = useState(false);
@@ -53,7 +58,11 @@ const UploadModelImage = () => {
       const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels);
       const img = new Image();
       img.src = croppedImage;
-      img.onload = () => setImage(img);
+      img.onload = () => {
+        setImage(img);
+        setFile(croppedImage);
+        setPreviewValue(img);
+      };
       setShowCropper(false);
     } catch (error) {
       console.error("Crop failed:", error);
@@ -108,6 +117,13 @@ const UploadModelImage = () => {
       });
     }
   }, [image, polygons, currentPolygon, canvasRef]);
+
+  useEffect(() => {
+    if (previewValue) {
+      setImage(previewValue);
+      setIsDrawingEnabled(true);
+    }
+  }, [previewValue]);
 
   return (
     <div className="relative">

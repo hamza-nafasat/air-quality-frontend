@@ -18,7 +18,6 @@ export const handleImageUpload = (
 };
 
 //  Draw Canvas Content
-
 export const drawCanvas = ({
   canvasRef,
   isDrawingEnabled,
@@ -126,7 +125,7 @@ export const handleCanvasClick = ({
   isEditMode,
   currentPolygon,
   setCurrentPolygon,
-  openSensorPopup,
+  // openSensorPopup,
   isUpdateMode,
   handleReEditPolygon,
   selectedColor, // Pass selected color here
@@ -172,7 +171,7 @@ export const handleCanvasClick = ({
       setPolygons([...polygons, polygonWithId]);
       setPolygonCount(polygonCount + 1);
       setCurrentPolygon([]);
-      openSensorPopup(polygonWithId);
+      // openSensorPopup(polygonWithId);
     }
   }
 };
@@ -238,6 +237,7 @@ export const exportSVG = async ({
   polygons,
   selectedColor,
 }) => {
+  console.log("export svg data", canvasRef, polygons);
   const canvas = canvasRef.current;
   if (!canvas || !image) return;
 

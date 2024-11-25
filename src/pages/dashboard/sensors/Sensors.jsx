@@ -26,17 +26,8 @@ const columns = (modalOpenHandler, navigate, statusToggleHandler, deleteHandler)
     // width: "10%",
   },
   {
-    name: "IP",
-    selector: (row) => row.ip,
-  },
-  {
     name: "URL",
     selector: (row) => row.url,
-  },
-  {
-    name: "Port",
-    selector: (row) => row.port,
-    width: "7%",
   },
   {
     name: "Type",

@@ -7,26 +7,41 @@ import Button from "../shared/small/Button";
 import { useDispatch, useSelector } from "react-redux";
 import { setBuildingData } from "../../redux/slices/buildingSlice";
 import UploadModelImage from "./uploads/UploadModelImage";
+import { toast } from "react-toastify";
 
 const UploadModel = ({ setCurrentStep }) => {
   const dispatch = useDispatch();
   const { buildingData } = useSelector((state) => state.building);
   const [twoDModel, setTwoDModel] = useState(null);
   const [twoDModelPreview, setTwoDModelPreview] = useState(null);
-
-  // console.log("twoDModel", twoDModel, twoDModelPreview);
+  const [twoDModelCoordinates, setTwoDModelCoordinates] = useState([]);
 
   const submitHandler = () => {
-    // if (!twoDModel && !twoDModelPreview)
-    //   return toast.error("Please Upload 2D Model");
-    dispatch(setBuildingData({ ...buildingData, twoDModel, twoDModelPreview }));
+    if (!twoDModel || !twoDModelPreview || twoDModelCoordinates?.length === 0) {
+      toast.error("Please Upload 2D Model and draw canvas over image");
+      console.log("clicked");
+      return;
+    }
+    dispatch(
+      setBuildingData({
+        ...buildingData,
+        twoDModel,
+        twoDModelCoordinates,
+        twoDModelPreview,
+      })
+    );
     setCurrentStep((prevStep) => prevStep + 1);
   };
+
+  console.log("buildings data", buildingData);
+  console.log("polygons", twoDModelCoordinates);
 
   useEffect(() => {
     if (buildingData?.twoDModel) setTwoDModel(buildingData?.twoDModel);
     if (buildingData?.twoDModelPreview)
       setTwoDModelPreview(buildingData?.twoDModelPreview);
+    if (buildingData?.twoDModelCoordinates)
+      setTwoDModelCoordinates(buildingData?.twoDModelCoordinates);
   }, [buildingData]);
 
   return (
@@ -44,17 +59,18 @@ const UploadModel = ({ setCurrentStep }) => {
           </div>
         </div>
       </div>
-      {/* <BrowseFile
-        setFile={setTwoDModel}
-        previewValue={twoDModelPreview}
-        setPreviewValue={setTwoDModelPreview}
-      /> */}
       <div className="flex justify-center">
-        <UploadModelImage />
+        <UploadModelImage
+          setFile={setTwoDModel}
+          previewValue={twoDModelPreview}
+          setPreviewValue={setTwoDModelPreview}
+          polygons={twoDModelCoordinates}
+          setPolygons={setTwoDModelCoordinates}
+        />
       </div>
       <div className="mt-4 flex justify-end">
         <Button
-          // disabled={!twoDModel}
+          disabled={!twoDModel || twoDModelCoordinates.length === 0}
           text="Next"
           width="w-[128px]"
           onClick={submitHandler}

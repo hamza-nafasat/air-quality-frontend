@@ -12,15 +12,13 @@ const EditSensor = ({ selectedSensor, onClose, refetch }) => {
   const [form, setForm] = useState({
     name: selectedSensor?.name,
     type: selectedSensor?.type,
-    ip: selectedSensor?.ip,
-    port: selectedSensor?.port,
     uniqueId: selectedSensor?.uniqueId,
     url: selectedSensor?.url,
     location: selectedSensor?.location,
   });
   const handleEditSensor = async () => {
     try {
-      if (!form?.name || !form?.type || !form?.ip || !form?.port || !form?.uniqueId || !form?.url) {
+      if (!form?.name || !form?.type || !form?.uniqueId || !form?.url) {
         return toast.error("Please fill all the fields");
       }
 
@@ -52,20 +50,6 @@ const EditSensor = ({ selectedSensor, onClose, refetch }) => {
           label={"Type"}
           defaultText={form?.type}
           onSelect={(option) => setForm({ ...form, type: option?.value })}
-        />
-        <TextField
-          label="Ip"
-          type="text"
-          placeholder="Device IP address"
-          value={form?.ip}
-          onChange={(e) => setForm({ ...form, ip: e.target.value })}
-        />
-        <TextField
-          label=" Port"
-          type="number"
-          placeholder="Device Port Number"
-          value={form?.port}
-          onChange={(e) => setForm({ ...form, port: e.target.value })}
         />
         <TextField
           label="Unique Id"

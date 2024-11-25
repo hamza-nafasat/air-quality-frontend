@@ -47,17 +47,16 @@ const UploadAddFloors = () => {
   const [isMoveMode, setIsMoveMode] = useState(false);
   const [isDeleteMode, setIsDeleteMode] = useState(false);
   const [isUpdateMode, setIsUpdateMode] = useState(false);
-
   const [draggedPolygon, setDraggedPolygon] = useState(null);
   const [draggingPolygon, setDraggingPolygon] = useState(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-  // Modal Open of Sensor Add
-
   const [sensorPopup, setSensorPopup] = useState(false);
   const [selectedPolygon, setSelectedPolygon] = useState(null);
   const [sensorIdInput, setSensorIdInput] = useState("");
   const [selectedSensor, setSelectedSensor] = useState("No sensor");
-  // Select color
+  const [reEditModalOpen, setReEditModalOpen] = useState(false);
+  const [selectedPolygonId, setSelectedPolygonId] = useState("");
+  const [selectedPolygonSensor, setSelectedPolygonSensor] = useState("");
   const [color, setColor] = useState("#ffff00");
 
   const openSensorPopup = (polygon) => {
@@ -165,10 +164,6 @@ const UploadAddFloors = () => {
     setPolygons(updatedPolygons);
   };
 
-  const [reEditModalOpen, setReEditModalOpen] = useState(false);
-  const [selectedPolygonId, setSelectedPolygonId] = useState("");
-  const [selectedPolygonSensor, setSelectedPolygonSensor] = useState("");
-
   // Function to open modal with polygon ID
   const handlePolygonClick = (polygonId, polygonSensor) => {
     const polygonToEdit = polygons.find((polygon) => polygon.id === polygonId);
@@ -204,7 +199,7 @@ const UploadAddFloors = () => {
         color,
       });
     }
-  }, [image, polygons, currentPolygon, canvasRef, color]);
+  }, [image, polygons, currentPolygon, canvasRef, color, isDrawingEnabled]);
 
   return (
     <div className="relative">
