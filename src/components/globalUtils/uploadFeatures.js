@@ -432,17 +432,19 @@ export const sensorInfoSubmitHandler = (
   selectedSensor,
   color,
   setPolygons,
-  setSensorPopup
+  setSensorPopup,
+  labelPoint
 ) => {
   if (sensorIdInput) {
     const updatedPolygons = polygons.map((polygon) =>
       polygon.id === selectedPolygon.id
         ? {
             ...polygon,
-            id: sensorIdInput, // Assign the user input ID
-            sensorAttached: selectedSensor || sensorIdInput, // Assign sensor, either selected or input
-            color: color, // Apply the selected color to the border
-            fillColor: color, // Apply the selected color to the fill
+            id: sensorIdInput,
+            sensorAttached: selectedSensor || sensorIdInput,
+            color: color,
+            fillColor: color,
+            labelPoint: "first",
           }
         : polygon
     );
@@ -473,4 +475,42 @@ export const handleReEditPolygon = ({
   if (clickedPolygon) {
     handlePolygonClick(clickedPolygon.id, clickedPolygon.sensorAttached);
   }
+};
+
+// Modal Update Handler
+export const sensorInfoUpdateHandler = (
+  setPolygons,
+  selectedPolygon,
+  selectedPolygonId,
+  selectedPolygonSensor,
+  selectedSensor,
+  setReEditModalOpen
+) => {
+  setPolygons((prevPolygons) =>
+    prevPolygons.map((polygon) =>
+      polygon.id === selectedPolygon.id
+        ? {
+            ...polygon,
+            id: selectedPolygonId,
+            sensorAttached: selectedPolygonSensor || selectedSensor,
+          }
+        : polygon
+    )
+  );
+  setReEditModalOpen(false);
+};
+
+export const handleCancelPolygon = (
+  setSensorPopup,
+  setPolygons,
+  selectedPolygon,
+  setCurrentPolygon,
+  setSelectedPolygon
+) => {
+  setSensorPopup(false);
+  setPolygons((prevPolygons) =>
+    prevPolygons.filter((polygon) => polygon.id !== selectedPolygon?.id)
+  );
+  setCurrentPolygon([]);
+  setSelectedPolygon(null);
 };

@@ -25,6 +25,8 @@ import {
   handleDeletePolygon,
   sensorInfoSubmitHandler,
   polygonsLabelHandler,
+  sensorInfoUpdateHandler,
+  handleCancelPolygon,
 } from "../../globalUtils/uploadFeatures";
 import TextField from "../../shared/small/TextField";
 import Modal from "../../shared/modal/Modal";
@@ -75,31 +77,6 @@ const UploadAddFloors = () => {
 
   const onCropComplete = (croppedArea, croppedAreaPixels) => {
     setCroppedAreaPixels(croppedAreaPixels);
-  };
-
-  const handleCancelPolygon = () => {
-    setSensorPopup(false);
-    setPolygons((prevPolygons) =>
-      prevPolygons.filter((polygon) => polygon.id !== selectedPolygon?.id)
-    );
-    setCurrentPolygon([]);
-    setSelectedPolygon(null);
-  };
-
-  // Modal Update Handler
-  const sensorInfoUpdateHandler = () => {
-    setPolygons((prevPolygons) =>
-      prevPolygons.map((polygon) =>
-        polygon.id === selectedPolygon.id
-          ? {
-              ...polygon,
-              id: selectedPolygonId,
-              sensorAttached: selectedPolygonSensor || selectedSensor,
-            }
-          : polygon
-      )
-    );
-    setReEditModalOpen(false);
   };
 
   const handleCropConfirm = async () => {
@@ -418,7 +395,12 @@ const UploadAddFloors = () => {
               ]}
               label="Label Positioning of polygon"
               onSelect={(selectedOption) =>
-                polygonsLabelHandler(selectedOption, selectedPolygon, polygons)
+                polygonsLabelHandler(
+                  selectedOption,
+                  selectedPolygon,
+                  polygons,
+                  setPolygons
+                )
               }
             />
 
@@ -444,7 +426,8 @@ const UploadAddFloors = () => {
                     selectedSensor,
                     color,
                     setPolygons,
-                    setSensorPopup
+                    setSensorPopup,
+                    labelPoint
                   );
                   setSensorPopup(false);
                 }}
@@ -452,7 +435,15 @@ const UploadAddFloors = () => {
               <Button
                 width="w-fit"
                 text="cancel"
-                onClick={handleCancelPolygon}
+                onClick={() =>
+                  handleCancelPolygon(
+                    setSensorPopup,
+                    setPolygons,
+                    selectedPolygon,
+                    setCurrentPolygon,
+                    setSelectedPolygon
+                  )
+                }
               />
             </div>
           </div>
@@ -486,7 +477,16 @@ const UploadAddFloors = () => {
               <Button
                 text="Update"
                 width="w-fit"
-                onClick={sensorInfoUpdateHandler}
+                onClick={() =>
+                  sensorInfoUpdateHandler(
+                    setPolygons,
+                    selectedPolygon,
+                    selectedPolygonId,
+                    selectedPolygonSensor,
+                    selectedSensor,
+                    setReEditModalOpen
+                  )
+                }
               />
             </div>
           </div>
