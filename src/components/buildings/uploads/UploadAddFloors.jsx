@@ -21,6 +21,10 @@ import {
   handleMoveMode,
   handleUpdateMode,
   updateSensorAttached,
+  handleReEditPolygon,
+  handleDeletePolygon,
+  sensorInfoSubmitHandler,
+  polygonsLabelHandler,
 } from "../../globalUtils/uploadFeatures";
 import TextField from "../../shared/small/TextField";
 import Modal from "../../shared/modal/Modal";
@@ -60,7 +64,7 @@ const UploadAddFloors = () => {
   // Select color
   const [color, setColor] = useState("#ffff00");
   const [labelPoint, setLabelPoint] = useState("first");
-  console.log("polygons",polygons)
+  console.log("polygons", polygons);
 
   const openSensorPopup = (polygon) => {
     setSelectedPolygon(polygon);
@@ -80,26 +84,6 @@ const UploadAddFloors = () => {
     );
     setCurrentPolygon([]);
     setSelectedPolygon(null);
-  };
-  const sensorInfoSubmitHandler = () => {
-    if (sensorIdInput) {
-      const updatedPolygons = polygons.map((polygon) =>
-        polygon.id === selectedPolygon.id
-          ? {
-              ...polygon,
-              id: sensorIdInput, // Assign the user input ID
-              sensorAttached: selectedSensor || sensorIdInput, // Assign sensor, either selected or input
-              color: color, // Apply the selected color to the border
-              fillColor: color, // Apply the selected color to the fill
-            }
-          : polygon
-      );
-      setPolygons(updatedPolygons);
-      setSensorPopup(false);
-    } else {
-      // If sensorIdInput is empty, we do not allow the polygon to be drawn.
-      alert("without sensor id and sensor name polygon not draw");
-    }
   };
 
   // Modal Update Handler
@@ -153,20 +137,6 @@ const UploadAddFloors = () => {
     }
   };
 
-  // Delete polygon
-  const handleDeletePolygon = (x, y) => {
-    const canvas = canvasRef.current;
-    const updatedPolygons = polygons.filter((polygon) => {
-      const path = new Path2D();
-      path.moveTo(polygon.points[0].x, polygon.points[0].y);
-      polygon.points.forEach((point) => path.lineTo(point.x, point.y));
-      path.closePath();
-
-      return !canvas.getContext("2d").isPointInPath(path, x, y);
-    });
-    setPolygons(updatedPolygons);
-  };
-
   const [reEditModalOpen, setReEditModalOpen] = useState(false);
   const [selectedPolygonId, setSelectedPolygonId] = useState("");
   const [selectedPolygonSensor, setSelectedPolygonSensor] = useState("");
@@ -180,32 +150,6 @@ const UploadAddFloors = () => {
     setReEditModalOpen(true);
   };
 
-  // Re-Edit Polygon
-  const handleReEditPolygon = (x, y) => {
-    const canvas = canvasRef.current;
-    const clickedPolygon = polygons.find((polygon) => {
-      const path = new Path2D();
-      path.moveTo(polygon.points[0].x, polygon.points[0].y);
-      polygon.points.forEach((point) => path.lineTo(point.x, point.y));
-      path.closePath();
-      return canvas.getContext("2d").isPointInPath(path, x, y);
-    });
-    if (clickedPolygon) {
-      handlePolygonClick(clickedPolygon.id, clickedPolygon.sensorAttached);
-    }
-  };
-  const polygonsLabelHandler=(selectedOption,selectedPolygon,polygons)=>{
-    console.log("fjl;kasjdfl;kasjdfl;as",selectedOption,selectedPolygon)
-    let selectedPolygonId=selectedPolygon.id
-    setPolygons(polygons.map((poly)=>{
-      if(poly.id===selectedPolygonId){
-        poly.labelPoint=selectedOption.value
-        return poly
-      }else return poly
-    }))
-
-  }
-
   useEffect(() => {
     if (isDrawingEnabled && canvasRef.current) {
       drawCanvas({
@@ -218,7 +162,15 @@ const UploadAddFloors = () => {
         labelPoint,
       });
     }
-  }, [image, polygons, currentPolygon, canvasRef, color, labelPoint, isDrawingEnabled]);
+  }, [
+    image,
+    polygons,
+    currentPolygon,
+    canvasRef,
+    color,
+    labelPoint,
+    isDrawingEnabled,
+  ]);
 
   return (
     <div className="relative">
@@ -259,6 +211,7 @@ const UploadAddFloors = () => {
             setCurrentPolygon,
             openSensorPopup,
             handleReEditPolygon,
+            handlePolygonClick,
           })
         }
         onMouseDown={(event) =>
@@ -464,9 +417,9 @@ const UploadAddFloors = () => {
                 { option: "Fourth-Point", value: "fourth" },
               ]}
               label="Label Positioning of polygon"
-              onSelect={(selectedOption) =>polygonsLabelHandler(selectedOption,selectedPolygon,polygons)}
-
-  
+              onSelect={(selectedOption) =>
+                polygonsLabelHandler(selectedOption, selectedPolygon, polygons)
+              }
             />
 
             <div className="flex items-center gap-4">
@@ -484,7 +437,15 @@ const UploadAddFloors = () => {
                 text="Add"
                 width="w-fit"
                 onClick={() => {
-                  sensorInfoSubmitHandler();
+                  sensorInfoSubmitHandler(
+                    sensorIdInput,
+                    polygons,
+                    selectedPolygon,
+                    selectedSensor,
+                    color,
+                    setPolygons,
+                    setSensorPopup
+                  );
                   setSensorPopup(false);
                 }}
               />

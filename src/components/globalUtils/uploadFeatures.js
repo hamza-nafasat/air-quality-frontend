@@ -128,8 +128,8 @@ export const handleCanvasClick = ({
   openSensorPopup,
   isUpdateMode,
   handleReEditPolygon,
+  handlePolygonClick,
   selectedColor, // Pass selected color here
-  selectedFillColor,
 }) => {
   const canvas = canvasRef.current;
   const rect = canvas.getBoundingClientRect();
@@ -137,11 +137,11 @@ export const handleCanvasClick = ({
   const y = event.clientY - rect.top;
 
   if (isUpdateMode) {
-    handleReEditPolygon(x, y);
+    handleReEditPolygon({ x, y, canvasRef, polygons, handlePolygonClick });
   }
 
   if (isDeleteMode) {
-    handleDeletePolygon(x, y);
+    handleDeletePolygon(x, y, polygons, setPolygons, canvasRef);
   } else if (isCopyMode && draggedPolygon) {
     // Handle copy-pasting of polygons
     const newPolygon = {
@@ -388,5 +388,89 @@ export const handleCanvasMouseDown = ({
       x: x - selectedPolygon.points[0].x,
       y: y - selectedPolygon.points[0].y,
     });
+  }
+};
+
+// Delete polygon
+export const handleDeletePolygon = (x, y, polygons, setPolygons, canvasRef) => {
+  const canvas = canvasRef.current;
+  const updatedPolygons = polygons.filter((polygon) => {
+    const path = new Path2D();
+    path.moveTo(polygon.points[0].x, polygon.points[0].y);
+    polygon.points.forEach((point) => path.lineTo(point.x, point.y));
+    path.closePath();
+
+    // Check if the clicked point is inside the polygon
+    return !canvas.getContext("2d").isPointInPath(path, x, y);
+  });
+  setPolygons(updatedPolygons);
+};
+
+// Polygon Label Position
+export const polygonsLabelHandler = (
+  selectedOption,
+  selectedPolygon,
+  polygons,
+  setPolygons
+) => {
+  console.log("fjl;kasjdfl;kasjdfl;as", selectedOption, selectedPolygon);
+  let selectedPolygonId = selectedPolygon.id;
+  setPolygons(
+    polygons.map((poly) => {
+      if (poly.id === selectedPolygonId) {
+        poly.labelPoint = selectedOption.value;
+        return poly;
+      } else return poly;
+    })
+  );
+};
+
+export const sensorInfoSubmitHandler = (
+  sensorIdInput,
+  polygons,
+  selectedPolygon,
+  selectedSensor,
+  color,
+  setPolygons,
+  setSensorPopup
+) => {
+  if (sensorIdInput) {
+    const updatedPolygons = polygons.map((polygon) =>
+      polygon.id === selectedPolygon.id
+        ? {
+            ...polygon,
+            id: sensorIdInput, // Assign the user input ID
+            sensorAttached: selectedSensor || sensorIdInput, // Assign sensor, either selected or input
+            color: color, // Apply the selected color to the border
+            fillColor: color, // Apply the selected color to the fill
+          }
+        : polygon
+    );
+    setPolygons(updatedPolygons);
+    setSensorPopup(false);
+  } else {
+    // If sensorIdInput is empty, we do not allow the polygon to be drawn.
+    alert("without sensor id and sensor name polygon not draw");
+  }
+};
+
+// Re-Edit Polygon
+export const handleReEditPolygon = ({
+  x,
+  y,
+  canvasRef,
+  polygons,
+  handlePolygonClick,
+}) => {
+  const canvas = canvasRef.current;
+  const clickedPolygon = polygons.find((polygon) => {
+    const path = new Path2D();
+    path.moveTo(polygon.points[0].x, polygon.points[0].y);
+    polygon.points.forEach((point) => path.lineTo(point.x, point.y));
+    path.closePath();
+    return canvas.getContext("2d").isPointInPath(path, x, y);
+  });
+  if (clickedPolygon) {
+    handlePolygonClick(clickedPolygon.id, clickedPolygon.sensorAttached);
   }
 };
