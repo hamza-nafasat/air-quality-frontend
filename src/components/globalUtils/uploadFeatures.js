@@ -58,16 +58,16 @@ export const drawCanvas = ({
 
     // Determine the label position based on `labelPoint`
     let idX, idY;
-    if (labelPoint === "first" && polygon.points[0]) {
+    if (polygon?.labelPoint === "first" && polygon.points[0]) {
       idX = polygon.points[0].x;
       idY = polygon.points[0].y - 5;
-    } else if (labelPoint === "second" && polygon.points[1]) {
+    } else if (polygon?.labelPoint === "second" && polygon.points[1]) {
       idX = polygon.points[1].x;
       idY = polygon.points[1].y - 5;
-    } else if (labelPoint === "third" && polygon.points[2]) {
+    } else if (polygon?.labelPoint === "third" && polygon.points[2]) {
       idX = polygon.points[2].x;
       idY = polygon.points[2].y - 5;
-    } else if (labelPoint === "fourth" && polygon.points[3]) {
+    } else if (polygon?.labelPoint === "fourth" && polygon.points[3]) {
       idX = polygon.points[3].x;
       idY = polygon.points[3].y - 5;
     }

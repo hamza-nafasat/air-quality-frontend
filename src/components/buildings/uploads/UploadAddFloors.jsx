@@ -60,6 +60,7 @@ const UploadAddFloors = () => {
   // Select color
   const [color, setColor] = useState("#ffff00");
   const [labelPoint, setLabelPoint] = useState("first");
+  console.log("polygons",polygons)
 
   const openSensorPopup = (polygon) => {
     setSelectedPolygon(polygon);
@@ -193,6 +194,17 @@ const UploadAddFloors = () => {
       handlePolygonClick(clickedPolygon.id, clickedPolygon.sensorAttached);
     }
   };
+  const polygonsLabelHandler=(selectedOption,selectedPolygon,polygons)=>{
+    console.log("fjl;kasjdfl;kasjdfl;as",selectedOption,selectedPolygon)
+    let selectedPolygonId=selectedPolygon.id
+    setPolygons(polygons.map((poly)=>{
+      if(poly.id===selectedPolygonId){
+        poly.labelPoint=selectedOption.value
+        return poly
+      }else return poly
+    }))
+
+  }
 
   useEffect(() => {
     if (isDrawingEnabled && canvasRef.current) {
@@ -206,7 +218,7 @@ const UploadAddFloors = () => {
         labelPoint,
       });
     }
-  }, [image, polygons, currentPolygon, canvasRef, color, labelPoint]);
+  }, [image, polygons, currentPolygon, canvasRef, color, labelPoint, isDrawingEnabled]);
 
   return (
     <div className="relative">
@@ -444,7 +456,7 @@ const UploadAddFloors = () => {
             />
 
             <Dropdown
-              defaultText={labelPoint}
+              defaultText={"first"}
               options={[
                 { option: "First-Point", value: "first" },
                 { option: "Second-Point", value: "second" },
@@ -452,7 +464,9 @@ const UploadAddFloors = () => {
                 { option: "Fourth-Point", value: "fourth" },
               ]}
               label="Label Positioning of polygon"
-              onSelect={(selectedOption) => setLabelPoint(selectedOption.value)}
+              onSelect={(selectedOption) =>polygonsLabelHandler(selectedOption,selectedPolygon,polygons)}
+
+  
             />
 
             <div className="flex items-center gap-4">
