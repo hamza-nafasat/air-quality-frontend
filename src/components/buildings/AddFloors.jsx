@@ -43,6 +43,7 @@ const AddFloors = ({ setCurrentStep }) => {
   const [accordionState, setAccordionState] = useState([]);
   const [buildingId, setBuildingId] = useState("");
 
+
   // Toggle specific accordion
   const toggleAccordion = (index) => {
     setAccordionState((prev) =>
@@ -63,10 +64,12 @@ const AddFloors = ({ setCurrentStep }) => {
         floor.floorName &&
         floor.roomsCount &&
         floor.twoDModal &&
-        floor.selectedSensors?.length
+        floor.selectedSensors?.length&&
+        floor.twoDModelCoordinates?.length
     );
 
   const mainSaveHandler = async () => {
+    console.log("building dat ",buildingData?.thumbnail, buildingData?.twoDModel)
     try {
       const formData = new FormData();
       formData.append("name", buildingData?.name);
@@ -76,54 +79,58 @@ const AddFloors = ({ setCurrentStep }) => {
       formData.append("position", buildingData?.position);
       formData.append("thumbnail", buildingData?.thumbnail);
       formData.append("2dModel", buildingData?.twoDModel);
+      formData.append("twoDModalCanvasData",JSON.stringify(buildingData?.twoDModelCoordinates))
       const addBuildingResponse = await addBuilding(formData).unwrap();
       console.log("building add response", addBuildingResponse);
 
-      if (addBuildingResponse?.success) {
-        const buildingId = addBuildingResponse?.buildingId;
-        setBuildingId(String(buildingId));
-        const floorPromises = [];
-        for (let i = 0; i < floorsState.length; i++) {
-          const floor = floorsState[i];
-          console.log("floors state data", floor);
-          if (
-            !floor?.floorName ||
-            !floor?.roomsCount ||
-            !floor?.twoDModal ||
-            !floor?.selectedSensors?.length
-          ) {
-            return toast.error("Please Enter all Fields to Save");
-          }
-          let sensors = "";
-          floor?.selectedSensors?.forEach((sensor) => {
-            sensors += `${sensor?.value},`;
-          });
-          const formData = new FormData();
-          formData.append("name", floor?.floorName);
-          formData.append("rooms", floor?.roomsCount);
-          formData.append("file", floor?.twoDModal);
-          formData.append("sensors", sensors);
-          formData.append("buildingId", buildingId);
-          floorPromises.push(addFloor(formData).unwrap());
-        }
-        const floors = await Promise.all(floorPromises);
-        if (floors?.every((floor) => floor?.success)) {
-          let floorsIds = "";
-          floors.forEach((floor) => {
-            floorsIds += `${floor?.data?._id},`;
-          });
-          const updateBuildingResponse = await updateBuilding({
-            buildingId,
-            data: { floors: floorsIds },
-          }).unwrap();
-          console.log("update building response", updateBuildingResponse);
-        }
-      } else {
-        await deleteBuilding(buildingId);
-      }
-      toast.success("Your Building and its floors created successfully");
-      dispatch(removeBuildingData());
-      return navigate(`/dashboard/buildings`);
+      // if (addBuildingResponse?.success) {
+      //   const buildingId = addBuildingResponse?.buildingId||"hello";
+      //   setBuildingId(String(buildingId));
+      //   const floorPromises = [];
+      //   for (let i = 0; i < floorsState.length; i++) {
+      //     const floor = floorsState[i];
+      //     console.log("floors state data", floor);
+      //     if (
+      //       !floor?.floorName ||
+      //       !floor?.roomsCount ||
+      //       !floor?.twoDModal ||
+      //       !floor?.selectedSensors?.length
+      //     ) {
+      //       return toast.error("Please Enter all Fields to Save");
+      //     }
+      //     let sensors = "";
+      //     floor?.selectedSensors?.forEach((sensor) => {
+      //       sensors += `${sensor?.value},`;
+      //     });
+      //     const formData = new FormData();
+      //     formData.append("name", floor?.floorName);
+      //     formData.append("rooms", floor?.roomsCount);
+      //     formData.append("file", floor?.twoDModal);
+      //     formData.append("sensors", sensors);
+      //     formData.append("twoDModalCanvasData",JSON.stringify(floor.twoDModelCoordinates))
+      //     // formData.append("buildingId", buildingId);
+      //     floorPromises.push(addFloor(formData).unwrap());
+      //   }
+      //   console.log("all floors",floors)
+
+      //   const floors = await Promise.all(floorPromises);
+      //   if (floors?.every((floor) => floor?.success)) {
+      //     let floorsIds = "";
+      //     floors.forEach((floor) => {
+      //       floorsIds += `${floor?.data?._id},`;
+      //     });
+      //     const updateBuildingResponse = await updateBuilding({
+      //       buildingId,
+      //       data: { floors: floorsIds },
+      //     }).unwrap();
+      //     console.log("update building response", updateBuildingResponse);
+      //   }
+      // } else {
+      //   await deleteBuilding(buildingId);
+      // }
+      // toast.success("Your Building and its floors created successfully");
+      // dispatch(removeBuildingData());
+      // return navigate(`/dashboard/buildings`);
     } catch (error) {
       console.log("error while creating building", error);
       toast.error(error?.data?.message || "Error while creating building");
@@ -218,9 +225,15 @@ const AddFloor = ({
 }) => {
   const [twoDModal, setTwoDModal] = useState();
   const [twoDModalPreview, setTwoDModalPreview] = useState();
+  const [twoDModalCanvasData,setTwoDModalCanvasData]=useState([])
   const [floorName, setFloorName] = useState("");
   const [roomsCount, setRoomsCount] = useState(1);
   const [selectedSensors, setSelectedSensors] = useState([]);
+  const [twoDModelCoordinates,setTwoDModelCoordinates]=useState([])
+
+
+
+
 
   const deleteSensorHandler = (value) => {
     setSelectedSensors(selectedSensors.filter((sensor) => sensor !== value));
@@ -240,6 +253,7 @@ const AddFloor = ({
       !roomsCount ||
       !twoDModal ||
       !twoDModalPreview ||
+      !twoDModelCoordinates||
       selectedSensors?.length === 0
     ) {
       return toast.error("Please Enter all Fields to Save");
@@ -253,6 +267,7 @@ const AddFloor = ({
       twoDModal,
       twoDModalPreview,
       selectedSensors,
+      twoDModelCoordinates
     };
     setFloorsState(newFloorState);
 
@@ -302,7 +317,14 @@ const AddFloor = ({
           setPreviewValue={setTwoDModalPreview}
           setFile={setTwoDModal}
         /> */}
-        <UploadAddFloors />
+        <UploadAddFloors
+     setFile={setTwoDModal}
+     previewValue={twoDModalPreview}
+     setPreviewValue={setTwoDModalPreview}
+     polygons={twoDModelCoordinates}
+     setPolygons={setTwoDModelCoordinates}
+
+        />
       </div>
       <div>
         <Dropdown

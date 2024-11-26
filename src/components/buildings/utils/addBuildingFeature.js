@@ -1,4 +1,3 @@
-// getCroppedImg.js
 const getCroppedImg = (imageSrc, crop) => {
   return new Promise((resolve) => {
     const image = new Image();
@@ -27,6 +26,8 @@ const getCroppedImg = (imageSrc, crop) => {
     };
   });
 };
+
+
 
 const sensors = [
   { option: "Sensor-01", value: "sensor-01" },

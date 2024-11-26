@@ -1,44 +1,41 @@
+/* eslint-disable react/prop-types */
 // / eslint-disable react-hooks/exhaustive-deps /
 // / eslint-disable react/prop-types /
 import { useEffect, useRef, useState } from "react";
 import Cropper from "react-easy-crop";
-import { VscCopy } from "react-icons/vsc";
-import { SlCursorMove } from "react-icons/sl";
 import { AiOutlineDelete } from "react-icons/ai";
 import { CiExport } from "react-icons/ci";
-import { getCroppedImg, sensors } from "../utils/addBuildingFeature";
-import Button from "../../shared/small/Button";
+import { LiaDrawPolygonSolid } from "react-icons/lia";
+import { RiEditBoxFill } from "react-icons/ri";
+import { SlCursorMove } from "react-icons/sl";
+import { VscCopy } from "react-icons/vsc";
 import {
   drawCanvas,
   exportSVG,
+  handleCancelPolygon,
   handleCanvasClick,
   handleCanvasMouseDown,
   handleCanvasMouseMove,
   handleCanvasMouseUp,
   handleCopyMode,
   handleDeleteMode,
+  handleDeletePolygon,
   handleImageUpload,
   handleMoveMode,
-  handleUpdateMode,
-  updateSensorAttached,
   handleReEditPolygon,
-  handleDeletePolygon,
-  sensorInfoSubmitHandler,
+  handleUpdateMode,
   polygonsLabelHandler,
-  sensorInfoUpdateHandler,
-  handleCancelPolygon,
+  sensorInfoSubmitHandler,
+  sensorInfoUpdateHandler
 } from "../../globalUtils/uploadFeatures";
-import TextField from "../../shared/small/TextField";
 import Modal from "../../shared/modal/Modal";
+import Button from "../../shared/small/Button";
 import Dropdown from "../../shared/small/Dropdown";
-import { FaDrawPolygon } from "react-icons/fa";
-import { RiEditBoxFill } from "react-icons/ri";
-import { LiaDrawPolygonSolid } from "react-icons/lia";
-import { toast } from "react-toastify";
+import TextField from "../../shared/small/TextField";
+import { getCroppedImg } from "../utils/addBuildingFeature";
 
-const UploadAddFloors = () => {
+const UploadAddFloors = ({setFile, previewValue, setPreviewValue, polygons, setPolygons}) => {
   const canvasRef = useRef(null);
-  const [imageSrc, setImageSrc] = useState(null);
   const [isDrawingEnabled, setIsDrawingEnabled] = useState(false);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
@@ -46,7 +43,6 @@ const UploadAddFloors = () => {
   const [showCropper, setShowCropper] = useState(false);
   const [image, setImage] = useState(null);
   const [currentPolygon, setCurrentPolygon] = useState([]);
-  const [polygons, setPolygons] = useState([]);
   const [polygonCount, setPolygonCount] = useState(1);
   const [isEditMode, setIsEditMode] = useState(true);
   const [isCopyMode, setIsCopyMode] = useState(false);
@@ -65,8 +61,7 @@ const UploadAddFloors = () => {
   const [selectedSensor, setSelectedSensor] = useState("No sensor");
   // Select color
   const [color, setColor] = useState("#ffff00");
-  const [labelPoint, setLabelPoint] = useState("first");
-  console.log("polygons", polygons);
+
 
   const openSensorPopup = (polygon) => {
     setSelectedPolygon(polygon);
@@ -77,12 +72,15 @@ const UploadAddFloors = () => {
 
   const onCropComplete = (croppedArea, croppedAreaPixels) => {
     setCroppedAreaPixels(croppedAreaPixels);
+
+
   };
 
   const handleCropConfirm = async () => {
     try {
-      const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels);
+      const {croppedImage} = await getCroppedImg(previewValue, croppedAreaPixels);
       const img = new Image();
+      setFile(croppedImage)
       img.src = croppedImage;
       img.onload = () => setImage(img);
       setShowCropper(false);
@@ -136,7 +134,6 @@ const UploadAddFloors = () => {
         polygons,
         currentPolygon,
         color,
-        labelPoint,
       });
     }
   }, [
@@ -145,7 +142,6 @@ const UploadAddFloors = () => {
     currentPolygon,
     canvasRef,
     color,
-    labelPoint,
     isDrawingEnabled,
   ]);
 
@@ -156,7 +152,7 @@ const UploadAddFloors = () => {
           onFileChange={(event) =>
             handleImageUpload(
               event,
-              setImageSrc,
+              setPreviewValue,
               setShowCropper,
               setIsDrawingEnabled
             )
@@ -220,7 +216,7 @@ const UploadAddFloors = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
           <div className="bg-white p-4 rounded-lg w-3/4 max-w-lg">
             <Cropper
-              image={imageSrc}
+              image={previewValue}
               crop={crop}
               zoom={zoom}
               aspect={8 / 5}
@@ -427,7 +423,7 @@ const UploadAddFloors = () => {
                     color,
                     setPolygons,
                     setSensorPopup,
-                    labelPoint
+                    
                   );
                   setSensorPopup(false);
                 }}

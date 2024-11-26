@@ -19,7 +19,7 @@ const UploadModel = ({ setCurrentStep }) => {
   const submitHandler = () => {
     if (!twoDModel || !twoDModelPreview || twoDModelCoordinates?.length === 0) {
       toast.error("Please Upload 2D Model and draw canvas over image");
-      console.log("clicked");
+      // console.log("clicked");
       return;
     }
     dispatch(
@@ -34,7 +34,6 @@ const UploadModel = ({ setCurrentStep }) => {
   };
 
   console.log("buildings data", buildingData);
-  console.log("polygons", twoDModelCoordinates);
 
   useEffect(() => {
     if (buildingData?.twoDModel) setTwoDModel(buildingData?.twoDModel);
@@ -61,6 +60,7 @@ const UploadModel = ({ setCurrentStep }) => {
       </div>
       <div className="flex justify-center">
         <UploadModelImage
+        // image={twoDModel}
           setFile={setTwoDModel}
           previewValue={twoDModelPreview}
           setPreviewValue={setTwoDModelPreview}

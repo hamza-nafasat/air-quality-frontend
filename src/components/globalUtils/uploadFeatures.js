@@ -24,8 +24,6 @@ export const drawCanvas = ({
   image,
   polygons,
   currentPolygon,
-  color,
-  labelPoint,
 }) => {
   const canvas = canvasRef.current;
   if (!canvas || !isDrawingEnabled) return;
@@ -433,7 +431,6 @@ export const sensorInfoSubmitHandler = (
   color,
   setPolygons,
   setSensorPopup,
-  labelPoint
 ) => {
   if (sensorIdInput) {
     const updatedPolygons = polygons.map((polygon) =>
@@ -444,7 +441,7 @@ export const sensorInfoSubmitHandler = (
             sensorAttached: selectedSensor || sensorIdInput,
             color: color,
             fillColor: color,
-            labelPoint: "first",
+            labelPoint:polygon.labelPoint||"first",
           }
         : polygon
     );
@@ -513,4 +510,11 @@ export const handleCancelPolygon = (
   );
   setCurrentPolygon([]);
   setSelectedPolygon(null);
+};
+
+
+export const convertImageSrcToFile = async (imageSrc, fileName = "image.png") => {
+  const res = await fetch(imageSrc);
+  const blob = await res.blob();
+  return new File([blob], fileName, { type: "image/png" });
 };
