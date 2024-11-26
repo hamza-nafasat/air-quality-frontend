@@ -16,7 +16,7 @@ export const handleImageUpload = (
     reader.readAsDataURL(file);
   }
 };
-
+//  -------------------------------------------------------__start
 //  Draw Canvas Content
 export const drawCanvas = ({
   canvasRef,
@@ -24,7 +24,8 @@ export const drawCanvas = ({
   image,
   polygons,
   currentPolygon,
-  color, // Default color, if needed
+  color,
+  labelPoint,
 }) => {
   const canvas = canvasRef.current;
   if (!canvas || !isDrawingEnabled) return;
@@ -46,31 +47,30 @@ export const drawCanvas = ({
     context.closePath();
 
     // Fill the polygon with the color
-    context.fillStyle = `${polygon.color}${90}` || "#03a5e060"; // Default color
-    context.strokeStyle = polygon.fillColor || "#03a5e0"; // Use polygon's specific color
+    context.fillStyle = `${polygon.color}${90}` || "#03a5e060";
+    context.strokeStyle = polygon.fillColor || "#03a5e0";
     context.fill();
 
     // Draw the border with the specified color
-    context.strokeStyle = polygon.fillColor || polygon.color || "#03a5e060"; // Fallback to fill color
+    context.strokeStyle = polygon.fillColor || polygon.color || "#03a5e060";
     context.lineWidth = 2;
     context.stroke();
 
-    // Draw the ID box
-    // top-right
-    const idX = polygon.points[0].x;
-    const idY = polygon.points[0].y - 5;
-
-    // bottom-right
-    // const idX = polygon.points[0].x;
-    // const idY = polygon.points[2].y - 5;
-
-    // top-left
-    // const idX = polygon.points[1].x;
-    // const idY = polygon.points[1].y - 5;
-
-    // bottom-left
-    // const idX = polygon.points[1].x;
-    // const idY = polygon.points[2].y - 5;
+    // Determine the label position based on `labelPoint`
+    let idX, idY;
+    if (labelPoint === "first" && polygon.points[0]) {
+      idX = polygon.points[0].x;
+      idY = polygon.points[0].y - 5;
+    } else if (labelPoint === "second" && polygon.points[1]) {
+      idX = polygon.points[1].x;
+      idY = polygon.points[1].y - 5;
+    } else if (labelPoint === "third" && polygon.points[2]) {
+      idX = polygon.points[2].x;
+      idY = polygon.points[2].y - 5;
+    } else if (labelPoint === "fourth" && polygon.points[3]) {
+      idX = polygon.points[3].x;
+      idY = polygon.points[3].y - 5;
+    }
 
     const padding = 4;
     const text = polygon.id;
@@ -125,7 +125,7 @@ export const handleCanvasClick = ({
   isEditMode,
   currentPolygon,
   setCurrentPolygon,
-  // openSensorPopup,
+  openSensorPopup,
   isUpdateMode,
   handleReEditPolygon,
   selectedColor, // Pass selected color here
@@ -166,12 +166,12 @@ export const handleCanvasClick = ({
         points: newPolygon,
         id: `F1-PS${polygonCount}`,
         color: selectedColor,
-        fillColor: selectedFillColor || selectedColor,
+        fillColor: selectedColor,
       };
       setPolygons([...polygons, polygonWithId]);
       setPolygonCount(polygonCount + 1);
       setCurrentPolygon([]);
-      // openSensorPopup(polygonWithId);
+      openSensorPopup(polygonWithId);
     }
   }
 };
@@ -231,13 +231,7 @@ export const handleMoveMode = ({
 };
 
 // Export SVG functionality
-export const exportSVG = async ({
-  canvasRef,
-  image,
-  polygons,
-  selectedColor,
-}) => {
-  console.log("export svg data", canvasRef, polygons);
+export const exportSVG = async ({ canvasRef, image, polygons }) => {
   const canvas = canvasRef.current;
   if (!canvas || !image) return;
 
@@ -263,11 +257,17 @@ export const exportSVG = async ({
 
   // Add polygons and text labels to the SVG
   polygons.forEach((polygon) => {
+    if (!polygon || !polygon.points) return;
+
+    const fillColor = `${polygon.color}${90}` || "#03a5e060";
+    const strokeColor = polygon.fillColor || polygon.color || "#03a5e060";
+
     svgContent += `<polygon points="${polygon.points
       .map((point) => `${point.x},${point.y}`)
       .join(" ")}" id="${polygon.id}" sensorAttached="${
       polygon.sensorAttached || ""
-    }" fill="#03a5e060" stroke="#03a5e0" stroke-width="2"/>`;
+    }" fill="${fillColor}" stroke="${strokeColor}" stroke-width="2"/>`;
+
     svgContent += `<text x="${polygon.points[0].x}" y="${
       polygon.points[0].y - 10
     }" font-size="12" fill="black">${polygon.id}</text>`;

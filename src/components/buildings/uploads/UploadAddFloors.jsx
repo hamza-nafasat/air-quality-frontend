@@ -47,17 +47,19 @@ const UploadAddFloors = () => {
   const [isMoveMode, setIsMoveMode] = useState(false);
   const [isDeleteMode, setIsDeleteMode] = useState(false);
   const [isUpdateMode, setIsUpdateMode] = useState(false);
+
   const [draggedPolygon, setDraggedPolygon] = useState(null);
   const [draggingPolygon, setDraggingPolygon] = useState(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  // Modal Open of Sensor Add
+
   const [sensorPopup, setSensorPopup] = useState(false);
   const [selectedPolygon, setSelectedPolygon] = useState(null);
   const [sensorIdInput, setSensorIdInput] = useState("");
   const [selectedSensor, setSelectedSensor] = useState("No sensor");
-  const [reEditModalOpen, setReEditModalOpen] = useState(false);
-  const [selectedPolygonId, setSelectedPolygonId] = useState("");
-  const [selectedPolygonSensor, setSelectedPolygonSensor] = useState("");
+  // Select color
   const [color, setColor] = useState("#ffff00");
+  const [labelPoint, setLabelPoint] = useState("first");
 
   const openSensorPopup = (polygon) => {
     setSelectedPolygon(polygon);
@@ -164,6 +166,10 @@ const UploadAddFloors = () => {
     setPolygons(updatedPolygons);
   };
 
+  const [reEditModalOpen, setReEditModalOpen] = useState(false);
+  const [selectedPolygonId, setSelectedPolygonId] = useState("");
+  const [selectedPolygonSensor, setSelectedPolygonSensor] = useState("");
+
   // Function to open modal with polygon ID
   const handlePolygonClick = (polygonId, polygonSensor) => {
     const polygonToEdit = polygons.find((polygon) => polygon.id === polygonId);
@@ -197,9 +203,10 @@ const UploadAddFloors = () => {
         polygons,
         currentPolygon,
         color,
+        labelPoint,
       });
     }
-  }, [image, polygons, currentPolygon, canvasRef, color, isDrawingEnabled]);
+  }, [image, polygons, currentPolygon, canvasRef, color, labelPoint]);
 
   return (
     <div className="relative">
@@ -435,6 +442,19 @@ const UploadAddFloors = () => {
                 setSelectedSensor(selectedOption.value)
               }
             />
+
+            <Dropdown
+              defaultText={labelPoint}
+              options={[
+                { option: "First-Point", value: "first" },
+                { option: "Second-Point", value: "second" },
+                { option: "Third-Point", value: "third" },
+                { option: "Fourth-Point", value: "fourth" },
+              ]}
+              label="Label Positioning of polygon"
+              onSelect={(selectedOption) => setLabelPoint(selectedOption.value)}
+            />
+
             <div className="flex items-center gap-4">
               <h1 className="font-bold text-xs">Select Color of Polygon</h1>
               <input
