@@ -35,6 +35,16 @@ const authApis = createApi({
       }),
     }),
 
+    // updateMyProfile
+    // ---------------
+    updateMyProfile: builder.mutation({
+      query: (data) => ({
+        url: "/my-profile",
+        method: "PUT",
+        body: data,
+      }),
+    }),
+
     // logout
     // ------
     logout: builder.query({
@@ -46,5 +56,11 @@ const authApis = createApi({
   }),
 });
 
-export const { useRegisterMutation, useLoginMutation, useGetMyProfileQuery, useLogoutQuery } = authApis;
+export const {
+  useRegisterMutation,
+  useLoginMutation,
+  useGetMyProfileQuery,
+  useLogoutQuery,
+  useUpdateMyProfileMutation,
+} = authApis;
 export default authApis;

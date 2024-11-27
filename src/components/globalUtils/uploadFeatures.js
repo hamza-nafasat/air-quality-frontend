@@ -485,3 +485,11 @@ export const convertImageSrcToFile = async (imageSrc, fileName = "image.png") =>
   const blob = await res.blob();
   return new File([blob], fileName, { type: "image/png" });
 };
+
+// export const convertImageSrcToFile = async (imageSrc, fileName = "image.png", fileType = "image/png") => {
+//   const res = await fetch(imageSrc);
+//   if (!res.ok) throw new Error("Failed to fetch image.");
+
+//   const blob = await res.blob();
+//   return new File([blob], fileName, { type: fileType });
+// };
