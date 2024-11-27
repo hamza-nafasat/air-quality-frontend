@@ -36,7 +36,7 @@ const BuildingMap = () => {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        {buildingPositions.map((position, index) => (
+        {buildingPositions?.map((position, index) => (
           <Marker key={index} position={position} icon={buildingIcon}>
             <Popup>
               <BuildingPopup />
@@ -54,21 +54,13 @@ const BuildingPopup = () => {
   return (
     <div className="grid grid-cols-12 w-[300px] sm:w-[344px]">
       <div className="col-span-4">
-        <img
-          src={BuildingImage}
-          alt="image"
-          className="h-full object-cover rounded-l-[10px]"
-        />
+        <img src={BuildingImage} alt="image" className="h-full object-cover rounded-l-[10px]" />
       </div>
       <div className="col-span-8 bg-primary-lightBlue rounded-r-[10px] p-4">
-        <h4 className="text-xs md:text-sm text-white font-semibold">
-          Building 1
-        </h4>
+        <h4 className="text-xs md:text-sm text-white font-semibold">Building 1</h4>
         <div className="flex items-center gap-1 mt-1 mb-2">
           <PinIcon />
-          <div className="text-[10px] font-medium text-white">
-            1051 18th St NW, Washington, DC 20006
-          </div>
+          <div className="text-[10px] font-medium text-white">1051 18th St NW, Washington, DC 20006</div>
         </div>
         <div className="border border-white rounded-lg px-2 py-1 w-full md:w-[70%]">
           <div className="flex items-center justify-between gap-2">

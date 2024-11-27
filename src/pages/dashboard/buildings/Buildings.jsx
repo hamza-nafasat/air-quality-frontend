@@ -11,11 +11,9 @@ const Buildings = () => {
   const { data, isLoading, isSuccess } = useGetAllBuildingsQuery("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
-
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = buildings.slice(indexOfFirstItem, indexOfLastItem);
-
   const totalPages = Math.ceil(buildings.length / itemsPerPage);
 
   const handleNextPage = () => {
@@ -44,6 +42,7 @@ const Buildings = () => {
         twoDModelPublicId: building?.twoDModel?.public_id || "",
         tvoc: building?.tvoc || 0,
         co2: building?.co2 || 0,
+        twoDModelCoordinates: JSON.parse(building?.twoDModelCanvasData) || [],
       }));
 
       setBuildings(buildingsData);

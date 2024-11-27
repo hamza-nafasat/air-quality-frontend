@@ -1,10 +1,5 @@
 // Handle image upload and display on the canvas
-export const handleImageUpload = (
-  event,
-  setImageSrc,
-  setShowCropper,
-  setIsDrawingEnabled
-) => {
+export const handleImageUpload = (event, setImageSrc, setShowCropper, setIsDrawingEnabled) => {
   const file = event.target.files[0];
   if (file) {
     const reader = new FileReader();
@@ -18,13 +13,7 @@ export const handleImageUpload = (
 };
 //  -------------------------------------------------------__start
 //  Draw Canvas Content
-export const drawCanvas = ({
-  canvasRef,
-  isDrawingEnabled,
-  image,
-  polygons,
-  currentPolygon,
-}) => {
+export const drawCanvas = ({ canvasRef, isDrawingEnabled, image, polygons, currentPolygon }) => {
   const canvas = canvasRef.current;
   if (!canvas || !isDrawingEnabled) return;
 
@@ -260,15 +249,13 @@ export const exportSVG = async ({ canvasRef, image, polygons }) => {
     const fillColor = `${polygon.color}${90}` || "#03a5e060";
     const strokeColor = polygon.fillColor || polygon.color || "#03a5e060";
 
-    svgContent += `<polygon points="${polygon.points
-      .map((point) => `${point.x},${point.y}`)
-      .join(" ")}" id="${polygon.id}" sensorAttached="${
-      polygon.sensorAttached || ""
-    }" fill="${fillColor}" stroke="${strokeColor}" stroke-width="2"/>`;
+    svgContent += `<polygon points="${polygon.points.map((point) => `${point.x},${point.y}`).join(" ")}" id="${
+      polygon.id
+    }" sensorAttached="${polygon.sensorAttached || ""}" fill="${fillColor}" stroke="${strokeColor}" stroke-width="2"/>`;
 
-    svgContent += `<text x="${polygon.points[0].x}" y="${
-      polygon.points[0].y - 10
-    }" font-size="12" fill="black">${polygon.id}</text>`;
+    svgContent += `<text x="${polygon.points[0].x}" y="${polygon.points[0].y - 10}" font-size="12" fill="black">${
+      polygon.id
+    }</text>`;
   });
 
   svgContent += "</svg>";
@@ -300,13 +287,7 @@ export const handleDeleteMode = ({
 };
 
 // attaching sensor to the polygon
-export const updateSensorAttached = ({
-  polygonId,
-  sensor,
-  polygons,
-  setPolygons,
-  sensorAttached,
-}) => {
+export const updateSensorAttached = ({ polygonId, sensor, polygons, setPolygons, sensorAttached }) => {
   const updatedPolygons = polygons.map((polygon) => {
     return polygon?.id === polygonId
       ? // ? { ...polygon, sensorAttached: sensor }
@@ -405,12 +386,7 @@ export const handleDeletePolygon = (x, y, polygons, setPolygons, canvasRef) => {
 };
 
 // Polygon Label Position
-export const polygonsLabelHandler = (
-  selectedOption,
-  selectedPolygon,
-  polygons,
-  setPolygons
-) => {
+export const polygonsLabelHandler = (selectedOption, selectedPolygon, polygons, setPolygons) => {
   console.log("fjl;kasjdfl;kasjdfl;as", selectedOption, selectedPolygon);
   let selectedPolygonId = selectedPolygon.id;
   setPolygons(
@@ -430,7 +406,7 @@ export const sensorInfoSubmitHandler = (
   selectedSensor,
   color,
   setPolygons,
-  setSensorPopup,
+  setSensorPopup
 ) => {
   if (sensorIdInput) {
     const updatedPolygons = polygons.map((polygon) =>
@@ -441,7 +417,7 @@ export const sensorInfoSubmitHandler = (
             sensorAttached: selectedSensor || sensorIdInput,
             color: color,
             fillColor: color,
-            labelPoint:polygon.labelPoint||"first",
+            labelPoint: polygon.labelPoint || "first",
           }
         : polygon
     );
@@ -454,13 +430,7 @@ export const sensorInfoSubmitHandler = (
 };
 
 // Re-Edit Polygon
-export const handleReEditPolygon = ({
-  x,
-  y,
-  canvasRef,
-  polygons,
-  handlePolygonClick,
-}) => {
+export const handleReEditPolygon = ({ x, y, canvasRef, polygons, handlePolygonClick }) => {
   const canvas = canvasRef.current;
   const clickedPolygon = polygons.find((polygon) => {
     const path = new Path2D();
@@ -505,13 +475,10 @@ export const handleCancelPolygon = (
   setSelectedPolygon
 ) => {
   setSensorPopup(false);
-  setPolygons((prevPolygons) =>
-    prevPolygons.filter((polygon) => polygon.id !== selectedPolygon?.id)
-  );
+  setPolygons((prevPolygons) => prevPolygons.filter((polygon) => polygon.id !== selectedPolygon?.id));
   setCurrentPolygon([]);
   setSelectedPolygon(null);
 };
-
 
 export const convertImageSrcToFile = async (imageSrc, fileName = "image.png") => {
   const res = await fetch(imageSrc);

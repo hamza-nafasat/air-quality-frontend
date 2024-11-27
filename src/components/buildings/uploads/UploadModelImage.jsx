@@ -27,7 +27,7 @@ import {
   handleUpdateMode,
   polygonsLabelHandler,
   sensorInfoSubmitHandler,
-  sensorInfoUpdateHandler
+  sensorInfoUpdateHandler,
 } from "../../globalUtils/uploadFeatures";
 import Modal from "../../shared/modal/Modal";
 import Button from "../../shared/small/Button";
@@ -35,8 +35,7 @@ import Dropdown from "../../shared/small/Dropdown";
 import TextField from "../../shared/small/TextField";
 import { getCroppedImg } from "../utils/addBuildingFeature";
 
-const UploadModelImage = ({setFile, previewValue, setPreviewValue, polygons, setPolygons}) => {
-  console.log("chocho pocho ",previewValue,polygons)
+const UploadModelImage = ({ setFile, previewValue, setPreviewValue, polygons, setPolygons }) => {
   const canvasRef = useRef(null);
   const [isDrawingEnabled, setIsDrawingEnabled] = useState(false);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
@@ -80,8 +79,8 @@ const UploadModelImage = ({setFile, previewValue, setPreviewValue, polygons, set
       img.src = croppedImage;
       img.onload = () => setImage(img);
       setShowCropper(false);
-      // const file=await convertImageSrcToFile(croppedImage)
-      setFile(croppedImage)
+      const file = await convertImageSrcToFile(croppedImage);
+      setFile(file);
     } catch (error) {
       console.error("Crop failed:", error);
     }
@@ -113,7 +112,7 @@ const UploadModelImage = ({setFile, previewValue, setPreviewValue, polygons, set
   // Function to open modal with polygon ID
   const handlePolygonClick = (polygonId, polygonSensor) => {
     const polygonToEdit = polygons.find((polygon) => polygon.id === polygonId);
-    setSelectedPolygon(polygonToEdit); // Set the entire polygon object to selectedPolygon
+    setSelectedPolygon(polygonToEdit);
     setSelectedPolygonId(polygonId);
     setSelectedPolygonSensor(polygonSensor);
     setReEditModalOpen(true);
@@ -130,27 +129,13 @@ const UploadModelImage = ({setFile, previewValue, setPreviewValue, polygons, set
         color,
       });
     }
-  }, [
-    image,
-    polygons,
-    currentPolygon,
-    canvasRef,
-    color,
-    isDrawingEnabled,
-  ]);
+  }, [image, polygons, currentPolygon, canvasRef, color, isDrawingEnabled]);
 
   return (
     <div className="relative">
       {!isDrawingEnabled && (
         <BrowseFileBtn
-          onFileChange={(event) =>
-            handleImageUpload(
-              event,
-              setPreviewValue,
-              setShowCropper,
-              setIsDrawingEnabled
-            )
-          }
+          onFileChange={(event) => handleImageUpload(event, setPreviewValue, setShowCropper, setIsDrawingEnabled)}
         />
       )}
 
@@ -219,16 +204,10 @@ const UploadModelImage = ({setFile, previewValue, setPreviewValue, polygons, set
               onCropComplete={onCropComplete}
             />
             <div className="flex items-center gap-2 mt-4 z-[999] absolute bottom-6 right-6">
-              <button
-                onClick={() => setShowCropper(false)}
-                className="bg-gray-500 text-white px-4 py-2 rounded"
-              >
+              <button onClick={() => setShowCropper(false)} className="bg-gray-500 text-white px-4 py-2 rounded">
                 Cancel
               </button>
-              <button
-                onClick={handleCropConfirm}
-                className="bg-primary-lightBlue text-white px-4 py-2 rounded"
-              >
+              <button onClick={handleCropConfirm} className="bg-primary-lightBlue text-white px-4 py-2 rounded">
                 Crop
               </button>
             </div>
@@ -250,10 +229,7 @@ const UploadModelImage = ({setFile, previewValue, setPreviewValue, polygons, set
                 isEditMode ? "border-primary-lightBlue" : "border-[#565656]"
               }`}
             >
-              <LiaDrawPolygonSolid
-                fontSize={20}
-                color={isEditMode ? "rgba(3, 165, 224, 1)" : "#565656"}
-              />
+              <LiaDrawPolygonSolid fontSize={20} color={isEditMode ? "rgba(3, 165, 224, 1)" : "#565656"} />
             </button>
             <button
               onClick={() =>
@@ -271,10 +247,7 @@ const UploadModelImage = ({setFile, previewValue, setPreviewValue, polygons, set
                 isCopyMode ? "border-primary-lightBlue" : "border-[#565656]"
               }`}
             >
-              <VscCopy
-                fontSize={20}
-                color={isCopyMode ? "rgba(3, 165, 224, 1)" : "#565656"}
-              />
+              <VscCopy fontSize={20} color={isCopyMode ? "rgba(3, 165, 224, 1)" : "#565656"} />
             </button>
             <button
               onClick={() =>
@@ -292,10 +265,7 @@ const UploadModelImage = ({setFile, previewValue, setPreviewValue, polygons, set
                 isUpdateMode ? "border-primary-lightBlue" : "border-[#565656]"
               }`}
             >
-              <RiEditBoxFill
-                fontSize={20}
-                color={isUpdateMode ? "rgba(3, 165, 224, 1)" : "#565656"}
-              />
+              <RiEditBoxFill fontSize={20} color={isUpdateMode ? "rgba(3, 165, 224, 1)" : "#565656"} />
             </button>
             <button
               onClick={() =>
@@ -313,10 +283,7 @@ const UploadModelImage = ({setFile, previewValue, setPreviewValue, polygons, set
                 isMoveMode ? "border-primary-lightBlue" : "border-[#565656]"
               }`}
             >
-              <SlCursorMove
-                fontSize={20}
-                color={isMoveMode ? "rgba(3, 165, 224, 1)" : "#565656"}
-              />
+              <SlCursorMove fontSize={20} color={isMoveMode ? "rgba(3, 165, 224, 1)" : "#565656"} />
             </button>
             <button
               onClick={() =>
@@ -333,10 +300,7 @@ const UploadModelImage = ({setFile, previewValue, setPreviewValue, polygons, set
                 isDeleteMode ? "border-primary-lightBlue" : "border-[#565656]"
               }`}
             >
-              <AiOutlineDelete
-                fontSize={20}
-                color={isDeleteMode ? "rgba(3, 165, 224, 1)" : "#565656"}
-              />
+              <AiOutlineDelete fontSize={20} color={isDeleteMode ? "rgba(3, 165, 224, 1)" : "#565656"} />
             </button>
             <button
               className="border rounded-md border-[#565656] hover:border-primary-lightBlue p-2"
@@ -348,11 +312,7 @@ const UploadModelImage = ({setFile, previewValue, setPreviewValue, polygons, set
         </>
       )}
       {sensorPopup && selectedPolygon && (
-        <Modal
-          title="Add Sensor"
-          isCrossShow={false}
-          onClose={() => setSensorPopup(false)}
-        >
+        <Modal title="Add Sensor" isCrossShow={false} onClose={() => setSensorPopup(false)}>
           <div className="flex flex-col gap-2">
             <TextField
               type="text"
@@ -370,9 +330,7 @@ const UploadModelImage = ({setFile, previewValue, setPreviewValue, polygons, set
               ]}
               label="Sensor Name"
               // onChange={(e) => setSelectedSensor(e.target.value)}
-              onSelect={(selectedOption) =>
-                setSelectedSensor(selectedOption.value)
-              }
+              onSelect={(selectedOption) => setSelectedSensor(selectedOption.value)}
             />
 
             <Dropdown
@@ -385,22 +343,13 @@ const UploadModelImage = ({setFile, previewValue, setPreviewValue, polygons, set
               ]}
               label="Label Positioning of polygon"
               onSelect={(selectedOption) =>
-                polygonsLabelHandler(
-                  selectedOption,
-                  selectedPolygon,
-                  polygons,
-                  setPolygons
-                )
+                polygonsLabelHandler(selectedOption, selectedPolygon, polygons, setPolygons)
               }
             />
 
             <div className="flex items-center gap-4">
               <h1 className="font-bold text-xs">Select Color of Polygon</h1>
-              <input
-                type="color"
-                value={color}
-                onChange={(e) => setColor(e.target.value)}
-              />
+              <input type="color" value={color} onChange={(e) => setColor(e.target.value)} />
             </div>
 
             <div className="flex justify-center gap-3">
@@ -416,7 +365,7 @@ const UploadModelImage = ({setFile, previewValue, setPreviewValue, polygons, set
                     selectedSensor,
                     color,
                     setPolygons,
-                    setSensorPopup,
+                    setSensorPopup
                   );
                   setSensorPopup(false);
                 }}
@@ -457,9 +406,7 @@ const UploadModelImage = ({setFile, previewValue, setPreviewValue, polygons, set
               ]}
               label="Sensor Name"
               // onChange={(e) => setSelectedSensor(e.target.value)}
-              onSelect={(selectedOption) =>
-                setSelectedPolygonSensor(selectedOption.value)
-              }
+              onSelect={(selectedOption) => setSelectedPolygonSensor(selectedOption.value)}
             />
 
             <div className="flex justify-center">
@@ -491,11 +438,7 @@ const BrowseFileBtn = ({ onFileChange }) => {
   return (
     <button className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 px-4 py-2 cursor-pointer rounded-lg bg-primary-lightBlue text-white font-semibold">
       Browse File
-      <input
-        type="file"
-        className="absolute inset-0 cursor-pointer opacity-0"
-        onChange={onFileChange}
-      />
+      <input type="file" className="absolute inset-0 cursor-pointer opacity-0" onChange={onFileChange} />
     </button>
   );
 };

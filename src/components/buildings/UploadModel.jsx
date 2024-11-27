@@ -16,6 +16,9 @@ const UploadModel = ({ setCurrentStep }) => {
   const [twoDModelPreview, setTwoDModelPreview] = useState(null);
   const [twoDModelCoordinates, setTwoDModelCoordinates] = useState([]);
 
+  console.log("two d model ", twoDModel);
+  console.log("two d model preview ", twoDModelPreview);
+
   const submitHandler = () => {
     if (!twoDModel || !twoDModelPreview || twoDModelCoordinates?.length === 0) {
       toast.error("Please Upload 2D Model and draw canvas over image");
@@ -37,18 +40,14 @@ const UploadModel = ({ setCurrentStep }) => {
 
   useEffect(() => {
     if (buildingData?.twoDModel) setTwoDModel(buildingData?.twoDModel);
-    if (buildingData?.twoDModelPreview)
-      setTwoDModelPreview(buildingData?.twoDModelPreview);
-    if (buildingData?.twoDModelCoordinates)
-      setTwoDModelCoordinates(buildingData?.twoDModelCoordinates);
+    if (buildingData?.twoDModelPreview) setTwoDModelPreview(buildingData?.twoDModelPreview);
+    if (buildingData?.twoDModelCoordinates) setTwoDModelCoordinates(buildingData?.twoDModelCoordinates);
   }, [buildingData]);
 
   return (
     <div>
       <div className="flex items-center justify-between gap-4">
-        <h3 className="text-sm md:text-base font-semibold text-[rgba(6,6,6,0.8)]">
-          Upload 2D Model Of Building
-        </h3>
+        <h3 className="text-sm md:text-base font-semibold text-[rgba(6,6,6,0.8)]">Upload 2D Model Of Building</h3>
         <div className="flex items-center gap-3">
           <div className="cursor-pointer">
             <EditIcon />
@@ -60,7 +59,6 @@ const UploadModel = ({ setCurrentStep }) => {
       </div>
       <div className="flex justify-center">
         <UploadModelImage
-        // image={twoDModel}
           setFile={setTwoDModel}
           previewValue={twoDModelPreview}
           setPreviewValue={setTwoDModelPreview}
