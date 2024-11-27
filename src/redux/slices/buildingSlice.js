@@ -61,5 +61,4 @@ const buildingSlice = createSlice({
 });
 
 export const { setBuildingData, removeBuildingData } = buildingSlice.actions;
-
 export default buildingSlice;

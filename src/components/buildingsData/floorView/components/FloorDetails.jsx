@@ -15,38 +15,38 @@ const listStatuses = [
   },
 ];
 
-const FloorDetails = () => {
+const FloorDetails = ({floorDetails}) => {
   return (
     <div className="py-4 px-5 bg-white rounded-[16px]  shadow-dashboard h-full">
       <h5 className="mb-2">Building Details</h5>
       <section className="max-w-90 xl:w-90   overflow-hidden mx-auto xl:mx-0">
         <img
-          src={greyBuilding}
+          src={floorDetails?.buildingImg}
           alt="Description"
           className="max-w-full max-h-full object-contain rounded-lg"
         />
       </section>
 
       <section className="mt-2">
-        <h1 className="text-[16px] font-[600] text-[#060606CC] ">Building 1</h1>
+        <h1 className="text-[16px] font-[600] text-[#060606CC] ">{floorDetails?.name}</h1>
       </section>
 
       <section>
         <div className="flex justify-between mt-1">
           <h3 className="text-[12px] text-[#060606CC] font-[400]">Type</h3>
-          <h3 className="text-[12px] text-[#060606CC] font-[400]">
-            Commercial
+          <h3 className="text-[12px] text-[#060606CC] font-[400] capitalize">
+            {floorDetails?.type}
           </h3>
         </div>
         <div className="flex justify-between mt-1">
           <h3 className="text-[12px] text-[#060606CC] font-[400]">Rooms</h3>
-          <h3 className="text-[12px] text-[#060606CC] font-[400]">22</h3>
+          <h3 className="text-[12px] text-[#060606CC] font-[400]">{floorDetails?.rooms}</h3>
         </div>
         <div className="flex justify-between mt-1">
           <h3 className="text-[12px] text-[#060606CC] font-[400]">
             Total Sensors
           </h3>
-          <h3 className="text-[12px] text-[#060606CC] font-[400]">44</h3>
+          <h3 className="text-[12px] text-[#060606CC] font-[400]">{floorDetails?.sensors}</h3>
         </div>
       </section>
 

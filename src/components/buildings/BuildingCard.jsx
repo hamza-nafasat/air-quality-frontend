@@ -10,7 +10,6 @@ import { Link } from "react-router-dom";
 import greyBuilding from "../../assets/images/buildings/greyBuilding.png";
 
 const BuildingCard = ({ id, name, address, sensors, temperature, tvoc, thumbnail, co2, link }) => {
-  // console.log("hello", thumbnail);
   return (
     <div className="border-b-[1px] border-[#00000030] p-1">
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-3 py-2">
@@ -45,11 +44,11 @@ const BuildingInfo = ({ name, thumbnail, address, sensors }) => {
           <div>
             <h2 className="text-[14px] xl:text-[16px] font-[700] w-0 xl:min-w-[200px]">{name}</h2>
 
-            <div className="flex gap-1">
+            {/* <div className="flex gap-1">
               {" "}
               <LocationIcon />
               <h6 className="text-[10px] xl:text-[12px] font-[600] xl:min-w-[200px] "> {address}</h6>
-            </div>
+            </div> */}
           </div>
         </section>
         <section className="flex items-center gap-2">

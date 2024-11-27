@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { buildings, floorViewStatus } from "../../../data/data";
 import StatusCard from "../../shared/large/card/StatusCard";
 import AlarmsIcon from "../../../assets/svgs/dashboard/AlarmsIcon";
@@ -17,6 +17,8 @@ import CurrentHumidityChart from "./components/CurrentHumidityChart";
 import { useParams } from "react-router-dom";
 import heatMap from "../../../assets/images/floorView/heatmap.png";
 import floorLayout from "../../../assets/images/buildings/greyBuilding.png";
+import { useGetAllBuildingsQuery } from "../../../redux/apis/buildingApis";
+import ShowCanvasData from "../../buildings/ShowCanvasData";
 
 const icons = [
   <AlarmsIcon />,
@@ -29,10 +31,43 @@ const icons = [
   <LpgIcon />,
 ];
 
+let floorDetails = {
+  buildingImg: "",
+  name: "",
+  type: "",
+  rooms: "",
+  sensors: "",
+};
+
 const FloorView = () => {
   const [activeTab, setActiveTab] = useState("heat");
   const { id } = useParams();
-  const user = buildings.find((user) => user.id === id);
+  const [image, setImage] = useState('');
+  const [polygons, setPolygons] = useState([])
+  const { data, isSuccess, isLoading } = useGetAllBuildingsQuery();
+
+  useEffect(() => {
+    if (isSuccess) {
+      const building = data?.data?.find((building) =>
+        building?.floors?.some((floor) => floor?._id === id)
+      );
+      const singleFloor = building?.floors?.find((floor) => floor?._id === id);
+      floorDetails = {
+        ...floorDetails,
+        name: building?.name || '',
+        buildingImg: building?.thumbnail?.url || '',
+        type: building?.type || '',
+        rooms: singleFloor?.rooms || '',
+        sensors: singleFloor?.sensors?.length || 0,
+      };
+      setImage(singleFloor?.twoDModel?.url)
+      setPolygons(JSON.parse(singleFloor?.twoDModelCanvasData))
+      console.log("floorDetails", singleFloor);
+    }
+
+  },[data, isSuccess, id])
+
+
 
   return (
     <div>
@@ -50,12 +85,8 @@ const FloorView = () => {
 
       <section className="grid grid-cols-12 gap-4 mt-4 ">
         <div className="col-span-12 xl:col-span-8 flex flex-col">
-          <div className="grid grid-cols-1">
-            <img
-              src={polygonBuilding}
-              alt="Description"
-              className="max-w-full max-h-full object-cover"
-            />
+          <div className="grid grid-cols-1 rounded-[16px] p-5 bg-white shadow-dashboard">
+            <ShowCanvasData image={image} polygons={polygons} />
           </div>
           <div className="grid grid-cols-1 mt-4 rounded-[16px] p-5 bg-white shadow-dashboard">
             <DoubleAreaChart />
@@ -67,7 +98,7 @@ const FloorView = () => {
 
         <div className="col-span-12 xl:col-span-4 flex flex-col">
           <div className="grid grid-cols-1">
-            <FloorDetails />
+            <FloorDetails floorDetails={floorDetails} />
           </div>
           <div className="grid grid-cols-1 mt-4 rounded-[16px] p-8 bg-white shadow-dashboard">
             <CurrentHumidityChart />
