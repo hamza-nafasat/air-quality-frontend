@@ -131,6 +131,18 @@ const UploadModelImage = ({ setFile, previewValue, setPreviewValue, polygons, se
     }
   }, [image, polygons, currentPolygon, canvasRef, color, isDrawingEnabled]);
 
+  useEffect(() => {
+    if(previewValue) {
+      const img = new Image();
+      img.onload = () => {
+        setImage(img);
+        setIsDrawingEnabled(true);
+      }
+      img.onerror = (err) => console.log('Image failed to load', err)
+      img.src = previewValue;
+    }
+  }, [previewValue])
+
   return (
     <div className="relative">
       {!isDrawingEnabled && (

@@ -16,13 +16,10 @@ const UploadModel = ({ setCurrentStep }) => {
   const [twoDModelPreview, setTwoDModelPreview] = useState(null);
   const [twoDModelCoordinates, setTwoDModelCoordinates] = useState([]);
 
-  console.log("two d model ", twoDModel);
-  console.log("two d model preview ", twoDModelPreview);
 
   const submitHandler = () => {
     if (!twoDModel || !twoDModelPreview || twoDModelCoordinates?.length === 0) {
       toast.error("Please Upload 2D Model and draw canvas over image");
-      // console.log("clicked");
       return;
     }
     dispatch(
