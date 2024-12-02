@@ -1,19 +1,6 @@
 /* eslint-disable react/prop-types */
 
-const Button = ({
-  bg,
-  width,
-  height,
-  radius,
-  color,
-  text,
-  size,
-  weight,
-  cursor,
-  borderColor,
-  Icon,
-  ...rest
-}) => {
+const Button = ({ bg, width, height, radius, color, text, size, weight, cursor, borderColor, Icon, ...rest }) => {
   const style = {
     background: bg,
     borderRadius: radius,

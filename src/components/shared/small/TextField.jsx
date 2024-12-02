@@ -3,9 +3,7 @@
 const TextField = ({ label, Icon, ...rest }) => {
   return (
     <div className="flex flex-col gap-1 w-full">
-      {label && (
-        <label className="text-sm md:text-base font-[600]">{label}</label>
-      )}
+      {label && <label className="text-sm md:text-base font-[600]">{label}</label>}
       <section className="w-full border rounded-[10px] border-primary-lightGray px-4 flex items-center gap-3">
         {Icon && Icon}
         <input
