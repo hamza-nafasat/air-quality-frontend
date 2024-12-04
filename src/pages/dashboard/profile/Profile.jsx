@@ -8,7 +8,10 @@ import Button from "../../../components/shared/small/Button";
 import Dropdown from "../../../components/shared/small/Dropdown";
 import TextField from "../../../components/shared/small/TextField";
 import { country } from "../../../data/data";
-import { useGetMyProfileQuery, useUpdateMyProfileMutation } from "../../../redux/apis/authApis";
+import {
+  useGetMyProfileQuery,
+  useUpdateMyProfileMutation,
+} from "../../../redux/apis/authApis";
 import { userExist, userNotExist } from "../../../redux/slices/authSlice";
 
 const Profile = () => {
@@ -172,7 +175,7 @@ const Profile = () => {
             height="200px"
             overflow={"auto"}
             options={country}
-            onSelect={(value) => setFrom({ ...form, country: value })}
+            onSelect={(value) => setFrom({ ...form, country: value?.option })}
           />
           <TextField
             type="text"
@@ -187,11 +190,28 @@ const Profile = () => {
 
         <div className="flex justify-center lg:justify-end my-3 lg:my-0">
           {!editAble ? (
-            <Button text="Edit" width="w-fit" type="button" onClick={editClickHandler} />
+            <Button
+              text="Edit"
+              width="w-fit"
+              type="button"
+              onClick={editClickHandler}
+            />
           ) : (
             <div className="flex gap-2">
-              <Button disabled={isLoading} text="Save" width="w-fit" type="button" onClick={saveClickHandler} />
-              <Button disabled={isLoading} text="Cancel" width="w-fit" type="button" onClick={cancelClickHandler} />
+              <Button
+                disabled={isLoading}
+                text="Save"
+                width="w-fit"
+                type="button"
+                onClick={saveClickHandler}
+              />
+              <Button
+                disabled={isLoading}
+                text="Cancel"
+                width="w-fit"
+                type="button"
+                onClick={cancelClickHandler}
+              />
             </div>
           )}
         </div>
@@ -218,7 +238,11 @@ const ChangePhoto = ({ onChange }) => (
   >
     Change
     <IoCamera fontSize={20} />
-    <input type="file" onChange={onChange} className="absolute inset-0 z-50 cursor-pointer opacity-0" />
+    <input
+      type="file"
+      onChange={onChange}
+      className="absolute inset-0 z-50 cursor-pointer opacity-0"
+    />
   </button>
 );
 

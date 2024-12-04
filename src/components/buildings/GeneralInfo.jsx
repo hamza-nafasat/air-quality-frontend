@@ -32,7 +32,15 @@ const GeneralInfo = ({ setCurrentStep }) => {
   const { buildingData } = useSelector((state) => state.building);
 
   const submitHandler = () => {
-    if (!thumbnail || !thumbnailPreview || !name || !type || !area || !address || !floorsCount)
+    if (
+      !thumbnail ||
+      !thumbnailPreview ||
+      !name ||
+      !type ||
+      !area ||
+      !address ||
+      !floorsCount
+    )
       return toast.error("Please Enter all Fields");
     dispatch(
       setBuildingData({
@@ -51,17 +59,21 @@ const GeneralInfo = ({ setCurrentStep }) => {
 
   useEffect(() => {
     if (buildingData?.thumbnail) setThumbnail(buildingData?.thumbnail);
-    if (buildingData?.thumbnailPreview) setThumbNailPreview(buildingData?.thumbnailPreview);
+    if (buildingData?.thumbnailPreview)
+      setThumbNailPreview(buildingData?.thumbnailPreview);
     if (buildingData?.name) setName(buildingData?.name);
     if (buildingData?.type) setType(buildingData?.type);
     if (buildingData?.area) setArea(buildingData?.area);
     if (buildingData?.address) setAddress(buildingData?.address);
-    if (buildingData?.floorsCount) setFloorsCount(buildingData?.floorsCount | 0);
+    if (buildingData?.floorsCount)
+      setFloorsCount(buildingData?.floorsCount | 0);
   }, [buildingData]);
 
   return (
     <div>
-      <h3 className="text-sm md:text-base font-semibold text-[rgba(6,6,6,0.8)]">General Info</h3>
+      <h3 className="text-sm md:text-base font-semibold text-[rgba(6,6,6,0.8)]">
+        General Info
+      </h3>
       <BrowseFile
         setFile={setThumbnail}
         previewValue={thumbnailPreview}
@@ -117,7 +129,12 @@ const GeneralInfo = ({ setCurrentStep }) => {
               bg="bg-[#9caabe]"
               onClick={() => setCurrentStep((prevStep) => prevStep - 1)}
             />
-            <Button type="button" text="Next" width="w-[128px]" onClick={submitHandler} />
+            <Button
+              type="button"
+              text="Next"
+              width="w-[128px]"
+              onClick={submitHandler}
+            />
           </div>
         </div>
       </form>
