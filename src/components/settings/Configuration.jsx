@@ -1,32 +1,96 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Aside from "./Aside";
 import Button from "../shared/small/Button";
 import Modal from "../shared/modal/Modal";
 import TextField from "../shared/small/TextField";
 import Dropdown from "../shared/small/Dropdown";
+import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import { useGetMyProfileQuery, useUpdateMyProfileMutation } from "../../redux/apis/authApis";
+
+const intervalTimesInSeconds = [
+  { option: "3 minutes", value: "180000" },
+  { option: "2 minutes", value: "120000" },
+  { option: "1 minutes", value: "60000" },
+  { option: "10 seconds", value: "10000" },
+  { option: "30 seconds", value: "30000" },
+  { option: "5 seconds", value: "5000" },
+];
 
 const Configuration = () => {
+  const { user } = useSelector((state) => state.auth);
+  const { refetch } = useGetMyProfileQuery("");
+  const [updateProfile, { isLoading }] = useUpdateMyProfileMutation();
   const [activeButton, setActiveButton] = useState("configuration");
   const [modal, setModal] = useState(false);
-  const [selectedOption, setSelectedOption] = useState("Remote Cloud Database");
+  const [selectedOption, setSelectedOption] = useState("Remote Database");
   const [pendingOption, setPendingOption] = useState("");
+  const [timeInterval, setTimeInterval] = useState("30000");
+  const [defaultTextForInterval, setDefaultTextForInterval] = useState("3 minutes");
+  const [form, setForm] = useState({
+    hostName: "",
+    portName: "",
+    username: "",
+    password: "",
+    databaseName: "",
+  });
 
   const modalOpenHandler = () => setModal(true);
   const modalCloseHandler = () => setModal(false);
-
   const handleRadioChange = (event) => {
     setPendingOption(event.target.value);
     modalOpenHandler();
   };
-
   const handleConfirmChange = () => {
     setSelectedOption(pendingOption);
     modalCloseHandler();
   };
+  const handleButtonClick = (buttonName) => setActiveButton(buttonName);
 
-  const handleButtonClick = (buttonName) => {
-    setActiveButton(buttonName);
+  const updateProfileHandler = async () => {
+    try {
+      const formData = new FormData();
+      if (selectedOption === "Local Database") {
+        if (!form.databaseName || !form.hostName || !form.portName || !form.username || !form.password)
+          return toast.error("Please fill all the fields of local database");
+        formData.append("isCustomDb", "true");
+        formData.append("customDbHost", form.hostName);
+        formData.append("customDbPort", form.portName);
+        formData.append("customDbUsername", form.username);
+        formData.append("customDbPassword", form.password);
+        formData.append("customDbName", form.databaseName);
+      }
+      if (selectedOption === "Remote Database") formData.append("isCustomDb", "false");
+      if (timeInterval) formData.append("interval", timeInterval);
+
+      const response = await updateProfile(formData).unwrap();
+      if (response?.success) {
+        toast.success(response?.message);
+        await refetch();
+      }
+    } catch (error) {
+      toast.error(error?.data?.message || "Error while updating profile");
+      console.log("Error while updating profile", error);
+    }
   };
+
+  useEffect(() => {
+    if (user) {
+      setForm({
+        hostName: user?.customDbHost || "",
+        portName: user?.customDbPort || "",
+        username: user?.customDbUsername || "",
+        password: user?.customDbPassword || "",
+        databaseName: user?.customDbName || "",
+      });
+      setSelectedOption(user?.isCustomDb ? "Local Database" : "Remote Database");
+    }
+    if (user?.interval) {
+      const interval = intervalTimesInSeconds.find((item) => item.value == user?.interval);
+      console.log(interval, interval?.option, user?.interval);
+      setDefaultTextForInterval(interval?.option || "Select Time Interval");
+    }
+  }, [user]);
   return (
     <div className="parentContainer min-h-screen">
       <div className="piechart p-4 md:p-5">
@@ -34,39 +98,29 @@ const Configuration = () => {
           {/* Sidebar */}
 
           <div className="col-span-12 lg:col-span-2">
-            <Aside
-              activeButton={activeButton}
-              handleButtonClick={handleButtonClick}
-            />
+            <Aside activeButton={activeButton} handleButtonClick={handleButtonClick} />
           </div>
           <div className="col-span-12 xl:col-span-10 2xl:col-span-10">
             <div className="bg-white rounded-[15px]">
               <h3 className="text-base lg:text-xl font-bold">Pull Request Intervals</h3>
               <div className="pl-0 md:pl-8 mt-4 md:mt-6">
-                <label className="text-sm md:text-base font-medium mb-2 block">
-                  Select Time Intervals
-                </label>
+                <label className="text-sm md:text-base font-medium mb-2 block">Select Time Intervals</label>
                 <Dropdown
-                  defaultText="Select Time Interval"
-                  options={[
-                    { option: "3 minutes" },
-                    { option: "5 minutes" },
-                    { option: "10 minutes" },
-                  ]}
+                  onSelect={(option) => setTimeInterval(option?.value)}
+                  defaultText={defaultTextForInterval}
+                  options={intervalTimesInSeconds}
                 />
-                <h3 className="text-sm md:text-base font-medium mb-2 mt-4 md:mt-6">
-                  Database Type
-                </h3>
+                <h3 className="text-sm md:text-base font-medium mb-2 mt-4 md:mt-6">Database Type</h3>
                 <div className="flex items-center gap-4">
                   <label className="flex items-center gap-1 text-sm">
                     <input
                       type="radio"
                       name="database"
-                      value="Remote Cloud Database"
+                      value="Remote Database"
                       onChange={handleRadioChange}
-                      checked={selectedOption === "Remote Cloud Database"}
+                      checked={selectedOption === "Remote Database"}
                     />
-                    Remote Cloud Database
+                    Remote Database
                   </label>
                   <label className="flex items-center gap-1 text-sm">
                     <input
@@ -80,43 +134,64 @@ const Configuration = () => {
                   </label>
                 </div>
                 <div className="mt-4">
-                  {selectedOption === "Remote Cloud Database" && (
-                    <TextField type="text" placeholder="Database Name" />
-                  )}
                   {selectedOption === "Local Database" && (
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
                       <div className="lg:col-span-6">
-                        <TextField type="text" placeholder="Server Address" />
+                        <TextField
+                          type="text"
+                          placeholder="Host Name"
+                          onChange={(e) => setForm({ ...form, hostName: e.target.value })}
+                          value={form.hostName}
+                        />
                       </div>
                       <div className="lg:col-span-6">
-                        <TextField type="number" placeholder="Port Number" />
+                        <TextField
+                          type="number"
+                          placeholder="Port Number"
+                          onChange={(e) => setForm({ ...form, portName: e.target.value })}
+                          value={form.portName}
+                        />
                       </div>
                       <div className="lg:col-span-6">
-                        <TextField type="text" placeholder="Database Name" />
+                        <TextField
+                          type="text"
+                          placeholder="Database Name"
+                          onChange={(e) => setForm({ ...form, databaseName: e.target.value })}
+                          value={form.databaseName}
+                        />
                       </div>
                       <div className="lg:col-span-6">
-                        <TextField type="text" placeholder="Username" />
+                        <TextField
+                          type="text"
+                          placeholder="Username"
+                          onChange={(e) => setForm({ ...form, username: e.target.value })}
+                          value={form.username}
+                        />
                       </div>
                       <div className="lg:col-span-12">
-                        <TextField type="password" placeholder="Password" />
+                        <TextField
+                          type="text"
+                          placeholder="Password"
+                          onChange={(e) => setForm({ ...form, password: e.target.value })}
+                          value={form.password}
+                        />
                       </div>
                     </div>
                   )}
                 </div>
                 <div className="flex justify-end mt-4">
-                  <Button text="Save" width="w-[150px]" height='h-[40px] md:h-[50px]' />
+                  <Button
+                    type="submit"
+                    onClick={updateProfileHandler}
+                    text="Save"
+                    width="w-[150px]"
+                    height="h-[40px] md:h-[50px]"
+                  />
                 </div>
               </div>
               {modal && (
-                <Modal
-                  onClose={modalCloseHandler}
-                  title="Database Storage Confirmation"
-                  width="w-[320px] md:w-[450px]"
-                >
-                  <ConfirmationModal
-                    onClose={modalCloseHandler}
-                    onConfirm={handleConfirmChange}
-                  />
+                <Modal onClose={modalCloseHandler} title="Database Storage Confirmation" width="w-[320px] md:w-[450px]">
+                  <ConfirmationModal onClose={modalCloseHandler} onConfirm={handleConfirmChange} />
                 </Modal>
               )}
             </div>
@@ -137,20 +212,8 @@ const ConfirmationModal = ({ onClose, onConfirm }) => {
       </h6>
       <div className="mt-12 flex justify-end">
         <div className="flex flex-wrap items-center gap-4">
-          <Button
-            bg="#787878"
-            text="Cancel"
-            width="w-[120px]"
-            height="h-[40px] md:h-[50px]"
-            onClick={onClose}
-          />
-          <Button
-            bg="#0c67bc"
-            text="Change"
-            width="w-[120px]"
-            height="h-[40px] md:h-[50px]"
-            onClick={onConfirm}
-          />
+          <Button bg="#787878" text="Cancel" width="w-[120px]" height="h-[40px] md:h-[50px]" onClick={onClose} />
+          <Button bg="#0c67bc" text="Change" width="w-[120px]" height="h-[40px] md:h-[50px]" onClick={onConfirm} />
         </div>
       </div>
     </div>

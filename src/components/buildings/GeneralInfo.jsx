@@ -32,15 +32,7 @@ const GeneralInfo = ({ setCurrentStep }) => {
   const { buildingData } = useSelector((state) => state.building);
 
   const submitHandler = () => {
-    if (
-      !thumbnail ||
-      !thumbnailPreview ||
-      !name ||
-      !type ||
-      !area ||
-      !address ||
-      !floorsCount
-    )
+    if (!thumbnail || !thumbnailPreview || !name || !type || !area || !address || !floorsCount)
       return toast.error("Please Enter all Fields");
     dispatch(
       setBuildingData({
@@ -59,34 +51,21 @@ const GeneralInfo = ({ setCurrentStep }) => {
 
   useEffect(() => {
     if (buildingData?.thumbnail) setThumbnail(buildingData?.thumbnail);
-    if (buildingData?.thumbnailPreview)
-      setThumbNailPreview(buildingData?.thumbnailPreview);
+    if (buildingData?.thumbnailPreview) setThumbNailPreview(buildingData?.thumbnailPreview);
     if (buildingData?.name) setName(buildingData?.name);
     if (buildingData?.type) setType(buildingData?.type);
     if (buildingData?.area) setArea(buildingData?.area);
     if (buildingData?.address) setAddress(buildingData?.address);
-    if (buildingData?.floorsCount)
-      setFloorsCount(buildingData?.floorsCount | 0);
+    if (buildingData?.floorsCount) setFloorsCount(buildingData?.floorsCount | 0);
   }, [buildingData]);
 
   return (
     <div>
-      <h3 className="text-sm md:text-base font-semibold text-[rgba(6,6,6,0.8)]">
-        General Info
-      </h3>
-      <BrowseFile
-        setFile={setThumbnail}
-        previewValue={thumbnailPreview}
-        setPreviewValue={setThumbNailPreview}
-      />
+      <h3 className="text-sm md:text-base font-semibold text-[rgba(6,6,6,0.8)]">General Info</h3>
+      <BrowseFile setFile={setThumbnail} previewValue={thumbnailPreview} setPreviewValue={setThumbNailPreview} />
       <form className="mt-4 grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
         <div className="lg:col-span-6">
-          <TextField
-            type="text"
-            value={name}
-            placeholder="Building Name"
-            onChange={(e) => setName(e.target.value)}
-          />
+          <TextField type="text" value={name} placeholder="Building Name" onChange={(e) => setName(e.target.value)} />
         </div>
         <div className="lg:col-span-6">
           <Dropdown
@@ -97,12 +76,7 @@ const GeneralInfo = ({ setCurrentStep }) => {
           />
         </div>
         <div className="lg:col-span-6">
-          <TextField
-            type="text"
-            value={area}
-            placeholder="Area (Sq Ft)"
-            onChange={(e) => setArea(e.target.value)}
-          />
+          <TextField type="text" value={area} placeholder="Area (Sq Ft)" onChange={(e) => setArea(e.target.value)} />
         </div>
         <div className="lg:col-span-6">
           <TextField
@@ -113,12 +87,7 @@ const GeneralInfo = ({ setCurrentStep }) => {
           />
         </div>
         <div className="lg:col-span-6">
-          <TextField
-            type="text"
-            value={address}
-            placeholder="Address"
-            onChange={(e) => setAddress(e.target.value)}
-          />
+          <TextField type="text" value={address} placeholder="Address" onChange={(e) => setAddress(e.target.value)} />
         </div>
         <div className="lg:col-span-12 flex justify-end">
           <div className="flex items-center gap-4">
@@ -129,12 +98,7 @@ const GeneralInfo = ({ setCurrentStep }) => {
               bg="bg-[#9caabe]"
               onClick={() => setCurrentStep((prevStep) => prevStep - 1)}
             />
-            <Button
-              type="button"
-              text="Next"
-              width="w-[128px]"
-              onClick={submitHandler}
-            />
+            <Button type="button" text="Next" width="w-[128px]" onClick={submitHandler} />
           </div>
         </div>
       </form>

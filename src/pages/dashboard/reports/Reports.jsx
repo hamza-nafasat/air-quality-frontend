@@ -75,11 +75,7 @@ const Reports = () => {
       yPos += desiredHeight + 15;
 
       doc.setFontSize(10);
-      doc.text(
-        "Reports: Following are the reports of all sensors on all buildings",
-        14,
-        yPos
-      );
+      doc.text("Reports: Following are the reports of all sensors on all buildings", 14, yPos);
       yPos += 10;
     }
 
@@ -96,14 +92,7 @@ const Reports = () => {
       }
 
       if (buildingImgBase64) {
-        doc.addImage(
-          buildingImgBase64,
-          "PNG",
-          imageX,
-          yPos,
-          imageWidth,
-          imageHeight
-        );
+        doc.addImage(buildingImgBase64, "PNG", imageX, yPos, imageWidth, imageHeight);
 
         doc.setFontSize(14);
         doc.text(report.title, textX, yPos + 10);
@@ -115,16 +104,7 @@ const Reports = () => {
         yPos += imageHeight + 5;
       }
 
-      const tableColumn = [
-        "Date",
-        "Temperature",
-        "TVOC",
-        "CO2",
-        "Humidity",
-        "CO",
-        "CH4",
-        "Performance",
-      ];
+      const tableColumn = ["Date", "Temperature", "TVOC", "CO2", "Humidity", "CO", "CH4", "Performance"];
       const tableRows = report.listData.map((item) => [
         item.date,
         `${item.temperature}°F`,
@@ -195,28 +175,14 @@ const Reports = () => {
     <div>
       <div className="flex items-center flex-wrap justify-between gap-4">
         <div>
-          <h3 className="text-sm md:text-base font-bold text-[#2e2e2e]">
-            Access Your Reports Anytime
-          </h3>
+          <h3 className="text-sm md:text-base font-bold text-[#2e2e2e]">Access Your Reports Anytime</h3>
           <p className="text-xs font-medium text-[#2e2e2e]">
-            Quickly view and track your reports here. Stay updated with the
-            latest data and insights effortlessly.
+            Quickly view and track your reports here. Stay updated with the latest data and insights effortlessly.
           </p>
         </div>
         <div className="flex items-center gap-4">
-          <Button
-            text="Refresh Data"
-            bg="bg-transparent"
-            color="#03a5e0"
-            borderColor="#03a5e0"
-            height="h-[25px]"
-          />
-          <Button
-            text="Export"
-            height="h-[25px]"
-            borderColor="#03a5e0"
-            onClick={openModalHandler}
-          />
+          <Button text="Refresh Data" bg="bg-transparent" color="#03a5e0" borderColor="#03a5e0" height="h-[25px]" />
+          <Button text="Export" height="h-[25px]" borderColor="#03a5e0" onClick={openModalHandler} />
         </div>
       </div>
       <div className="my-4">
@@ -230,13 +196,8 @@ const Reports = () => {
         {modal === "upload-image" && (
           <Modal width="w-[300px] md:w-[500px]" onClose={closeModalHandler}>
             <div>
-              <h3 className="text-base md:text-lg font-semibold">
-                Upload Your Logo
-              </h3>
-              <p className="text-sm">
-                If no logo is uploaded, the Air Quality logo will be used by
-                default.
-              </p>
+              <h3 className="text-base md:text-lg font-semibold">Upload Your Logo</h3>
+              <p className="text-sm">If no logo is uploaded, the Air Quality logo will be used by default.</p>
               <BrowseFile setFile={setFile} />
               <div className="mt-4">
                 <Button text="Generate" onClick={generatePDF} />
@@ -256,11 +217,7 @@ const FilterSection = () => {
     <div className="flex items-center flex-wrap gap-4">
       <div className="flex items-center gap-1 border border-[#e7e7e7] rounded-lg h-[34px] bg-white px-3 basis-[35%] flex-1">
         <SearchIcon />
-        <input
-          type="search"
-          placeholder="Search"
-          className="focus:outline-none text-sm w-full"
-        />
+        <input type="search" placeholder="Search" className="focus:outline-none text-sm w-full" />
       </div>
       <div className="flex items-center justify-between gap-1 border border-[#e7e7e7] rounded-lg h-[34px] bg-white px-3 flex-1">
         <p className="text-sm text-[#7e7e7e]">Buildings:</p>

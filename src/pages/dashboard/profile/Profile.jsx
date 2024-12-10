@@ -8,10 +8,7 @@ import Button from "../../../components/shared/small/Button";
 import Dropdown from "../../../components/shared/small/Dropdown";
 import TextField from "../../../components/shared/small/TextField";
 import { country } from "../../../data/data";
-import {
-  useGetMyProfileQuery,
-  useUpdateMyProfileMutation,
-} from "../../../redux/apis/authApis";
+import { useGetMyProfileQuery, useUpdateMyProfileMutation } from "../../../redux/apis/authApis";
 import { userExist, userNotExist } from "../../../redux/slices/authSlice";
 
 const Profile = () => {
@@ -132,7 +129,6 @@ const Profile = () => {
             type="text"
             readOnly={!editAble}
             label="First Name"
-            labelWeight="font-semibold"
             placeHolder="Your First Name"
             value={form?.firstName}
             onChange={(e) => setFrom({ ...form, firstName: e.target.value })}
@@ -141,7 +137,6 @@ const Profile = () => {
             type="text"
             readOnly={!editAble}
             label="Last Name"
-            labelWeight="font-semibold"
             placeHolder="Your Last Name"
             value={form?.lastName}
             onChange={(e) => setFrom({ ...form, lastName: e.target.value })}
@@ -152,7 +147,6 @@ const Profile = () => {
             type="text"
             readOnly={!editAble}
             label="Address"
-            labelWeight="font-semibold"
             placeHolder="Your Address"
             value={form?.address}
             onChange={(e) => setFrom({ ...form, address: e.target.value })}
@@ -161,7 +155,6 @@ const Profile = () => {
             type="tel"
             readOnly={!editAble}
             label="Contact"
-            labelWeight="font-semibold"
             placeHolder="Your Contact"
             value={form?.contact}
             onChange={(e) => setFrom({ ...form, contact: e.target.value })}
@@ -181,7 +174,6 @@ const Profile = () => {
             type="text"
             label="State"
             readOnly={!editAble}
-            labelWeight="font-semibold"
             placeHolder="Your State"
             value={form?.state}
             onChange={(e) => setFrom({ ...form, state: e.target.value })}
@@ -190,28 +182,11 @@ const Profile = () => {
 
         <div className="flex justify-center lg:justify-end my-3 lg:my-0">
           {!editAble ? (
-            <Button
-              text="Edit"
-              width="w-fit"
-              type="button"
-              onClick={editClickHandler}
-            />
+            <Button text="Edit" width="w-fit" type="button" onClick={editClickHandler} />
           ) : (
             <div className="flex gap-2">
-              <Button
-                disabled={isLoading}
-                text="Save"
-                width="w-fit"
-                type="button"
-                onClick={saveClickHandler}
-              />
-              <Button
-                disabled={isLoading}
-                text="Cancel"
-                width="w-fit"
-                type="button"
-                onClick={cancelClickHandler}
-              />
+              <Button disabled={isLoading} text="Save" width="w-fit" type="button" onClick={saveClickHandler} />
+              <Button disabled={isLoading} text="Cancel" width="w-fit" type="button" onClick={cancelClickHandler} />
             </div>
           )}
         </div>
@@ -222,15 +197,6 @@ const Profile = () => {
 
 export default Profile;
 
-// const DetailList = ({ title, value }) => {
-//   return (
-//     <div className="flex items-center gap-6 mt-2">
-//       <p className="text-sm md:text-base text-[#00000099] md:basis-[25%]">{title}</p>
-//       <p className="text-sm md:text-base text-[#000000] font-medium">{value}</p>
-//     </div>
-//   );
-// };
-
 const ChangePhoto = ({ onChange }) => (
   <button
     type="button"
@@ -238,70 +204,6 @@ const ChangePhoto = ({ onChange }) => (
   >
     Change
     <IoCamera fontSize={20} />
-    <input
-      type="file"
-      onChange={onChange}
-      className="absolute inset-0 z-50 cursor-pointer opacity-0"
-    />
+    <input type="file" onChange={onChange} className="absolute inset-0 z-50 cursor-pointer opacity-0" />
   </button>
 );
-
-// const editAbleChild = () => {
-//   const [imgSrc, setImgSrc] = useState(null);
-//   const uploadImgHandler = (e) => {
-//     const file = e.target.files[0];
-//     if (file) {
-//       const reader = new FileReader();
-//       reader.onload = () => {
-//         setImgSrc(reader.result);
-//       };
-//       reader.readAsDataURL(file);
-//     }
-//   };
-//   return (
-//     <>
-//       <div className="flex justify-between items-center">
-//         <img src={imgSrc || profileImg} alt="" className="w-[150px]  h-[150px]  object-cover rounded-full mb-4" />
-
-//         <div>
-//           <ChangePhoto onChange={uploadImgHandler} />
-//         </div>
-//       </div>
-//       <form className="mt-4 md:mt-6">
-//         <div className="flex lg:flex-row flex-col gap-4 my-4">
-//           <TextField type="text" label="First Name" labelWeight="font-semibold" placeHolder="Your First Name" />
-//           <TextField type="text" label="Last Name" labelWeight="font-semibold" placeHolder="Your Last Name" />
-//         </div>
-//         <div className="flex lg:flex-row flex-col gap-4 my-4">
-//           <TextField type="text" label="Address" labelWeight="font-semibold" placeHolder="Your Address" />
-//           <TextField type="tel" label="Contact" labelWeight="font-semibold" placeHolder="Your Contact" />
-//         </div>
-//         <div className="flex lg:flex-row flex-col gap-4 my-4">
-//           <Dropdown label="Country" height="200px" overflow={"auto"} options={country} />
-//           <TextField type="text" label="State" labelWeight="font-semibold" placeHolder="Your State" />
-//         </div>
-//         <div className="flex justify-center lg:justify-end my-3 lg:my-0">
-//           <Button text="Update Profile" width="w-fit" />
-//         </div>
-
-//         {/* <div className="lg:col-span-8 flex justify-center sm:justify-end">
-//           <div className="flex items-center gap-4">
-//             <Button
-//               type="button"
-//               text="Cancel"
-//               color="#111111b3"
-//               bg="#76767640"
-//               width="w-[120px] sm:w-[150px]"
-//               height="h-[40px] sm:h-[60px]"
-//             />
-//             <Button
-//               text="Add"
-//               width="w-[120px] sm:w-[150px]"
-//               height="h-[40px] sm:h-[60px]"
-//             />
-//           </div>
-//         </div> */}
-//       </form>
-//     </>
-//   );
-// };

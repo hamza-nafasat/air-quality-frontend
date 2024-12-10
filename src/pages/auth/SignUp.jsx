@@ -102,14 +102,9 @@ const SignUp = () => {
               onChange={() => setChecked(!checked)}
               id="check"
             />
-            <p
-              className="select-none w-full text-[12px] xl:text-[1rem]"
-              onClick={() => setChecked(!checked)}
-            >
+            <p className="select-none w-full text-[12px] xl:text-[1rem]" onClick={() => setChecked(!checked)}>
               I’m agree with the{" "}
-              <span className="text-primary-lightBlue font-bold text-[12px] xl:text-[1rem]">
-                Terms & Conditions.
-              </span>
+              <span className="text-primary-lightBlue font-bold text-[12px] xl:text-[1rem]">Terms & Conditions.</span>
             </p>
           </div>
         </section>

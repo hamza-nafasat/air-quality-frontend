@@ -17,13 +17,8 @@ const ResetPassword = () => {
   };
   return (
     <article className="w-full flex flex-col gap-4">
-      <h2 className="text-center text-2xl xl:text-4xl  font-[700] ">
-        Reset Password
-      </h2>
-      <form
-        className="flex flex-col w-full gap-5 "
-        onSubmit={formSubmitHandler}
-      >
+      <h2 className="text-center text-2xl xl:text-4xl  font-[700] ">Reset Password</h2>
+      <form className="flex flex-col w-full gap-5 " onSubmit={formSubmitHandler}>
         <TextField
           Icon={<Lock />}
           type="password"

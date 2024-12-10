@@ -65,10 +65,7 @@ const Login = () => {
               onChange={() => setChecked(!checked)}
               id="check"
             />
-            <p
-              className="select-none text-[12px] xl:text-[1rem]"
-              onClick={() => setChecked(!checked)}
-            >
+            <p className="select-none text-[12px] xl:text-[1rem]" onClick={() => setChecked(!checked)}>
               Remember Me
             </p>
           </div>
@@ -80,12 +77,7 @@ const Login = () => {
             Forget Password?
           </Link>
         </section>
-        <Button
-          disabled={isLoading}
-          height="h-[4 8px]"
-          text="Login"
-          bg="bg-primary-lightBlue"
-        />
+        <Button disabled={isLoading} height="h-[4 8px]" text="Login" bg="bg-primary-lightBlue" />
       </form>
 
       <section className="flex w-full items-center justify-center gap-4 text-[12px] xl:text-[1rem]">

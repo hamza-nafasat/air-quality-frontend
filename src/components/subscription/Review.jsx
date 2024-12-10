@@ -1,10 +1,9 @@
 /* eslint-disable react/prop-types */
 import { FaMapMarkerAlt } from "react-icons/fa";
-import { GrCheckboxSelected } from "react-icons/gr";
-
-import { loadStripe } from "@stripe/stripe-js";
-import Button from "../shared/small/Button";
 import { GoDotFill } from "react-icons/go";
+import Button from "../shared/small/Button";
+import getEnv from "../../config/config";
+import { stripePromise } from "../../utils/stripe";
 
 const Review = ({ plan }) => {
   const totalAmount = parseFloat(plan.price.replace("$", ""));
@@ -14,49 +13,28 @@ const Review = ({ plan }) => {
   const price = totalAmount + flooredTax;
   const totalPrice = price.toFixed(2);
 
-  const stripePromise = loadStripe(
-    "pk_test_51PvZ4iP7RHPHbi3M9KECn35fLuLIc2dgUCJaxS8MvTnBmlSnBhJPJ119LRCh4KzBe6l764GjmScizm5itxW6aTND00mu2NTCE0"
-  );
   const makePaymentStripe = async (e) => {
     e.preventDefault();
-    console.log(plan);
-
     try {
-      const response = await fetch(
-        "http://localhost:5000/api/create-checkout-session",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          // body: JSON.stringify({product: plan}),
-          body: JSON.stringify({
-            product: {
-              title: plan.title,
-              price: Number(totalPrice),
-            },
-          }),
-        }
-      );
-
+      const response = await fetch(`${getEnv("SERVER_URL")}/api/subscription/create-session`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          plan: plan?.type,
+        }),
+      });
       const data = await response.json();
-
-      console.log("Response", data);
-
-      if (data.sessionId) {
+      console.log("Response FROM STRIPE CHECKOUT SESSION", data);
+      if (data?.sessionId) {
         const stripe = await stripePromise;
-
-        // Redirect to Stripe checkout
         const result = await stripe.redirectToCheckout({
           sessionId: data.sessionId,
         });
-
-        if (result.error) {
-          console.error(result.error.message);
-        }
-      } else {
-        console.error("Failed to retrieve session ID");
-      }
+        if (result?.error) console.error(result.error.message);
+      } else if (data?.redirect_url) {
+        window.location.replace(data?.redirect_url);
+      } else console.error("Failed to retrieve session ID");
     } catch (error) {
       console.error("Error creating checkout session", error);
     }
@@ -70,9 +48,7 @@ const Review = ({ plan }) => {
             <FaMapMarkerAlt fontSize={22} />
             <p className="text-sm md:text-base font-[600]">Billing Address</p>
           </div>
-          <p className="text-sm md:text-md font-semibold my-2 md:my-4">
-            5678 Maple Avenue, Anytown, CA, 90210, USA
-          </p>
+          <p className="text-sm md:text-md font-semibold my-2 md:my-4">5678 Maple Avenue, Anytown, CA, 90210, USA</p>
           <PriceList title="Plan Selected:" value={plan.title} />
           <PriceList title="Monthly Fee:" value={plan.price} />
           <PriceList title="Tax:" value={`$${tax}`} />
@@ -84,12 +60,8 @@ const Review = ({ plan }) => {
           className="px-4 py-4 md:py-6 rounded-[10px] shadow-dashboard bg-white"
           //   style={{ background: plan.bg }}
         >
-          <h6 className="text-base md:text-xl text-black font-[600] ">
-            {plan.title}
-          </h6>
-          <p className="text-[10px] lg:text-xs text-[#414141]">
-            {plan.subtitle}
-          </p>
+          <h6 className="text-base md:text-xl text-black font-[600] ">{plan.title}</h6>
+          <p className="text-[10px] lg:text-xs text-[#414141]">{plan.subtitle}</p>
           <p className="text-lg lg:text-3xl text-[#03A5E0] font-[600] mt-1">
             ${plan.price}
             <span className="font-normal text-sm md:text-lg">/month</span>
@@ -104,31 +76,18 @@ const Review = ({ plan }) => {
                 </div>
               ))}
               <div className="mt-6 mb-8">
-                <p className="text-[#414141B2] text-[11px] md:text-xs">
-                  Description
-                </p>
-                <p className="text-black text-xs md:text-sm mt-3">
-                  {plan.description}
-                </p>
+                <p className="text-[#414141B2] text-[11px] md:text-xs">Description</p>
+                <p className="text-black text-xs md:text-sm mt-3">{plan.description}</p>
               </div>
               <div>
-                <Button
-                  text="Buy Plan"
-                  width="w-[150px] md:w-[200px]"
-                  bg={plan.btnBg}
-                  onClick={() => onSelectPlan(plan)}
-                />
+                <Button text="Buy Plan" width="w-[150px] md:w-[200px]" bg={plan.btnBg} />
               </div>
             </div>
           </div>
         </div>
       </div>
       <div className="flex justify-end mt-5">
-        <Button
-          text="Confirm & Subscribe"
-          width="w-[160px] md:w-[268px]"
-          onClick={makePaymentStripe}
-        />
+        <Button text="Confirm & Subscribe" width="w-[160px] md:w-[268px]" onClick={makePaymentStripe} />
       </div>
     </div>
   );

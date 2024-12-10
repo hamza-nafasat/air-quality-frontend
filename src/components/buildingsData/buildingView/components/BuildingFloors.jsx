@@ -34,11 +34,7 @@ const FilterSection = () => {
     <div className="flex flex-wrap  gap-4 sm:mt-0 mt-2">
       <div className="flex items-center gap-1 border border-[#e7e7e7] rounded-lg h-[34px] bg-white px-3 basis-[35%] flex-1">
         <SearchIcon />
-        <input
-          type="search"
-          placeholder="Search"
-          className="focus:outline-none text-sm w-full"
-        />
+        <input type="search" placeholder="Search" className="focus:outline-none text-sm w-full" />
       </div>
       <div className="flex items-center justify-between gap-1 border border-[#e7e7e7] rounded-lg h-[34px] bg-white px-3 ">
         <p className="text-sm text-[#7e7e7e]">Sort By:</p>

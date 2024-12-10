@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 import Button from "../../../components/shared/small/Button";
 import PricePlans from "../../../components/subscription/PricePlans";
-import PriceCard from "../../../components/subscription/PriceCard";
 import Review from "../../../components/subscription/Review";
 
 const Subscription = () => {

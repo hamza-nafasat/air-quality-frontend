@@ -31,9 +31,7 @@ const Mapping = ({ setCurrentStep }) => {
   return (
     <div>
       <div className="flex items-center justify-between gap-4">
-        <h3 className="text-sm md:text-base font-semibold text-[rgba(6,6,6,0.8)]">
-          Upload 2D Model Of Building
-        </h3>
+        <h3 className="text-sm md:text-base font-semibold text-[rgba(6,6,6,0.8)]">Upload 2D Model Of Building</h3>
         <div className="cursor-pointer">
           <DeleteIcon />
         </div>
