@@ -30,7 +30,7 @@ const Login = () => {
       }
     } catch (error) {
       console.log(" Error While Logging In", error);
-      toast.error(error?.data?.message || "Error ocurred while logging in");
+      toast.error(error?.data?.message || "Error occurred while logging in");
     }
   };
 

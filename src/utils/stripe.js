@@ -1,4 +1,5 @@
 import { loadStripe } from "@stripe/stripe-js";
+import getEnv from "../config/config";
 
 const countryToCurrency = {
   AF: "AFN", // Afghanistan
@@ -188,21 +189,18 @@ const countryToCurrency = {
   ZM: "ZMW", // Zambia
   ZW: "ZWL", // Zimbabwe
 };
-const COUNTRY_TOKEN = import.meta.env.VITE_GET_COUNTRY_TOKEN;
-const CURRENCY_TOKEN = import.meta.env.VITE_GET_CURRENCY_TOKEN;
-const STRIPE_SECRET_KEY = import.meta.env.VITE_STRIPE_SECRET_KEY;
 
-export const stripePromise = loadStripe(STRIPE_SECRET_KEY);
+export const stripePromise = loadStripe(getEnv("STRIPE_SECRET_KEY"));
 
-async function getUserCountry() {
-  const API_URL = `https://ipinfo.io/json?token=${COUNTRY_TOKEN}`;
+async function getUserData() {
+  const API_URL = `https://ipinfo.io/json?token=${getEnv("COUNTRY_TOKEN")}`;
   try {
     const response = await fetch(API_URL);
     if (!response.ok) {
       throw new Error(`Error: ${response.status}`);
     }
     const data = await response.json();
-    return data.country;
+    return data;
   } catch (error) {
     console.error("Failed to fetch user country:", error);
     return "US";
@@ -211,7 +209,9 @@ async function getUserCountry() {
 
 async function getExchangeRates(baseCurrency = "USD") {
   try {
-    const response = await fetch(`https://v6.exchangerate-api.com/v6/${CURRENCY_TOKEN}/latest/${baseCurrency}`);
+    const response = await fetch(
+      `https://v6.exchangerate-api.com/v6/${getEnv("CURRENCY_TOKEN")}/latest/${baseCurrency}`
+    );
     const data = await response.json();
     console.log(data); // Check what the API returns
     return data.conversion_rates;
@@ -221,8 +221,7 @@ async function getExchangeRates(baseCurrency = "USD") {
   }
 }
 async function getLocalizedPrice(basePrice, baseCurrency = "USD") {
-  if (!COUNTRY_TOKEN || !CURRENCY_TOKEN) throw new Error("Missing env variables");
-  const userCountry = await getUserCountry();
+  const userCountry = await getUserData().then((data) => data?.country || "US");
   const userCurrency = countryToCurrency[userCountry] || baseCurrency;
 
   // Get exchange rates
@@ -239,4 +238,4 @@ async function getLocalizedPrice(basePrice, baseCurrency = "USD") {
   };
 }
 
-export { getLocalizedPrice };
+export { getLocalizedPrice, getUserData };

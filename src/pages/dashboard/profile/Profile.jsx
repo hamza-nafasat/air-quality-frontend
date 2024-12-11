@@ -10,10 +10,11 @@ import TextField from "../../../components/shared/small/TextField";
 import { country } from "../../../data/data";
 import { useGetMyProfileQuery, useUpdateMyProfileMutation } from "../../../redux/apis/authApis";
 import { userExist, userNotExist } from "../../../redux/slices/authSlice";
+import Loader from "../../../components/shared/small/Loader";
 
 const Profile = () => {
   const dispatch = useDispatch();
-  const { data, isSuccess, isError, refetch } = useGetMyProfileQuery("");
+  const { data, isSuccess, isError, refetch, isLoading: loading } = useGetMyProfileQuery("");
   const { user } = useSelector((state) => state.auth);
   const [updateMyProfile, { isLoading }] = useUpdateMyProfileMutation();
   const [image, setImage] = useState("");
@@ -34,9 +35,7 @@ const Profile = () => {
     const reader = new FileReader();
     setImage(e.target.files[0]);
     reader.onload = () => {
-      if (reader.readyState === 2) {
-        setPreviewImage(reader.result);
-      }
+      if (reader.readyState === 2) setPreviewImage(reader.result);
     };
     reader.readAsDataURL(e.target.files[0]);
   };
@@ -100,7 +99,9 @@ const Profile = () => {
     else if (isError) dispatch(userNotExist());
   }, [isSuccess, isError, dispatch, data]);
 
-  return (
+  return loading ? (
+    <Loader />
+  ) : (
     <div className=" bg-white rounded-[15px] p-4 lg:p-8 mt-4">
       <div className="grid grid-cols-1 lg:grid-cols-2 mt-4 mx-auto items-center">
         <div className="flex lg:flex-row flex-col items-center gap-5 relative ">

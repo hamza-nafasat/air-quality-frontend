@@ -26,6 +26,25 @@ const authApis = createApi({
       }),
     }),
 
+    // forget password
+    // ---------------
+    forgetPassword: builder.mutation({
+      query: ({ email }) => ({
+        url: "/forget-password",
+        method: "POST",
+        body: { email },
+      }),
+    }),
+    // reset password
+    // ---------------
+    resetPassword: builder.mutation({
+      query: (data) => ({
+        url: "/reset-password",
+        method: "POST",
+        body: data,
+      }),
+    }),
+
     // get my profile
     // --------------
     getMyProfile: builder.query({
@@ -47,7 +66,7 @@ const authApis = createApi({
 
     // logout
     // ------
-    logout: builder.query({
+    logout: builder.mutation({
       query: () => ({
         url: "/logout",
         method: "GET",
@@ -60,7 +79,9 @@ export const {
   useRegisterMutation,
   useLoginMutation,
   useGetMyProfileQuery,
-  useLogoutQuery,
+  useLogoutMutation,
   useUpdateMyProfileMutation,
+  useForgetPasswordMutation,
+  useResetPasswordMutation,
 } = authApis;
 export default authApis;

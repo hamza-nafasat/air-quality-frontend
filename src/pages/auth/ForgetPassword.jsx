@@ -1,16 +1,28 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import TextField from "../../components/shared/small/TextField";
+import { toast } from "react-toastify";
 import Mail from "../../assets/svgs/auth/Mail";
 import Button from "../../components/shared/small/Button";
+import TextField from "../../components/shared/small/TextField";
+import { useForgetPasswordMutation } from "../../redux/apis/authApis";
 
 const ForgetPassword = () => {
   const [email, setEmail] = useState("");
+  const [forgetPassword, { isLoading }] = useForgetPasswordMutation();
 
-  const formSubmitHandler = (e) => {
+  const formSubmitHandler = async (e) => {
     e.preventDefault();
-    // console.log(email);
-    setEmail("");
+    if (!email) return toast.error("Please Enter Email first");
+    try {
+      const response = await forgetPassword({ email }).unwrap();
+      console.log("response while forget password ", response);
+      if (response.success) {
+        toast.success(response?.message);
+      }
+    } catch (error) {
+      console.log(" Error While Forgetting Password In", error);
+      toast.error(error?.data?.message || "Error occurred while logging in");
+    }
   };
 
   return (
@@ -29,7 +41,7 @@ const ForgetPassword = () => {
           autoFocus
           required
         />
-        <Button height="h-[48px]" text="Submit" bg="bg-primary-lightBlue" />
+        <Button disabled={isLoading} height="h-[48px]" text="Submit" bg="bg-primary-lightBlue" />
       </form>
 
       <section className="flex w-full items-center justify-center gap-4 text-[12px] xl:text-[1rem]">
