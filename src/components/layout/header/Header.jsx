@@ -1,14 +1,19 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { IoMenuOutline } from "react-icons/io5";
-import NotificationIcon from "../../../assets/svgs/pages/NotificationIcon";
-import profilePic from "../../../assets/images/header/profilepic.png";
+import { useEffect, useRef, useState } from "react";
 import { FaChevronDown } from "react-icons/fa";
-import { IoIosArrowForward } from "react-icons/io";
-import { IoIosLogOut } from "react-icons/io";
+import { IoIosArrowForward, IoIosLogOut } from "react-icons/io";
+import { IoMenuOutline } from "react-icons/io5";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import profilePic from "../../../assets/images/header/profilepic.png";
+import NotificationIcon from "../../../assets/svgs/pages/NotificationIcon";
+import { useLogoutMutation } from "../../../redux/apis/authApis";
 import Aside from "../aside/Aside";
+import { useDispatch } from "react-redux";
+import { userNotExist } from "../../../redux/slices/authSlice";
 
 const Header = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [profileActive, setProfileActive] = useState(false);
   const [notificationActive, setNotificationActive] = useState(false);
   const [mobileNav, setMobileNav] = useState(false);
@@ -17,8 +22,9 @@ const Header = () => {
   const location = useLocation();
   const pathname = location.pathname.split("/");
   const path = pathname[pathname.length - 1].replaceAll("-", " ");
+  const [logout, { isLoading }] = useLogoutMutation();
 
-  const mobileNavHander = () => setMobileNav(!mobileNav);
+  const mobileNavHandler = () => setMobileNav(!mobileNav);
 
   const handleProfile = () => {
     setProfileActive(!profileActive);
@@ -28,6 +34,21 @@ const Header = () => {
   const handleNotification = () => {
     setNotificationActive(!notificationActive);
     setProfileActive(false);
+  };
+
+  const logoutHandler = async () => {
+    try {
+      const response = await logout().unwrap();
+      console.log("response while logout ", response);
+      if (response?.success) {
+        toast.success("Logout Successfully");
+        await dispatch(userNotExist());
+        return navigate("/login");
+      }
+    } catch (error) {
+      console.log("Error while logout", error);
+      toast.error(error?.data?.message || "Error while logout");
+    }
   };
 
   useEffect(() => {
@@ -52,7 +73,7 @@ const Header = () => {
     <>
       <div className="px-2 sm:px-6 py-3 sm:py-4 flex flex-col justify-between gap-3 bg-[url('assets/images/header/header-bg.png')] bg-no-repeat bg-cover bg-center h-[202px]">
         <div className="flex items-center justify-between">
-          <div className="opacity-100 lg:opacity-0 cursor-pointer" onClick={mobileNavHander}>
+          <div className="opacity-100 lg:opacity-0 cursor-pointer" onClick={mobileNavHandler}>
             <IoMenuOutline color="#fff" size={30} />
           </div>
           {/* profile and notification */}
@@ -91,8 +112,10 @@ const Header = () => {
                       <IoIosArrowForward />
                     </Link>
                     <div
-                      className="flex items-center justify-between px-3 py-2 cursor-pointer"
-                      onClick={() => setProfileActive(false)}
+                      className={`flex cursor-pointer items-center justify-between px-3 py-2 cursor-pointer1${
+                        isLoading ? " opacity-50 cursor-not-allowed" : ""
+                      } `}
+                      onClick={logoutHandler}
                     >
                       logout
                       <IoIosLogOut />
@@ -202,10 +225,7 @@ const Notifications = () => {
       <div className="mt-1">
         {notificationLists.length > 0 ? (
           notificationLists?.map((notification, i) => (
-            <div
-              key={i}
-              className="border-b py-1 px-2 flex items-center justify-between gap-1 cursor-pointer"
-            >
+            <div key={i} className="border-b py-1 px-2 flex items-center justify-between gap-1 cursor-pointer">
               <div className="flex items-center gap-1">
                 <img
                   src={notification.userProfile}
