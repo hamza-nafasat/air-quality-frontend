@@ -31,7 +31,11 @@ const Aside = () => {
     {
       title: url.includes("add-building") ? "add-building" : "buildings",
       link: "/dashboard/buildings",
-      icon: <BuildingIcon activeLink={url.includes("buildings") || url.includes("add-building")} />,
+      icon: (
+        <BuildingIcon
+          activeLink={url.includes("buildings") || url.includes("add-building")}
+        />
+      ),
     },
     {
       title: "devices",
@@ -47,6 +51,11 @@ const Aside = () => {
       title: "reports",
       link: "/dashboard/reports",
       icon: <ReportsIcon activeLink={url === "reports"} />,
+    },
+    {
+      title: "alert type",
+      link: "/dashboard/alerts",
+      icon: <ReportsIcon activeLink={url === "alerts"} />,
     },
     {
       title: "subscription",
@@ -66,9 +75,14 @@ const Aside = () => {
         isNavOpen ? "w-[200px]" : "w-[65px]"
       }`}
     >
-      <div className="absolute top-[6%] right-[-11px] cursor-pointer z-10" onClick={handleNavOpen}>
+      <div
+        className="absolute top-[6%] right-[-11px] cursor-pointer z-10"
+        onClick={handleNavOpen}
+      >
         <div
-          className={`hidden lg:block transition-all duration-500 ${isNavOpen ? "rotate-0" : "rotate-180"}`}
+          className={`hidden lg:block transition-all duration-500 ${
+            isNavOpen ? "rotate-0" : "rotate-180"
+          }`}
         >
           <ArrowbackIcon />
         </div>
@@ -84,7 +98,11 @@ const Aside = () => {
             Air Quality
           </p>
         </div>
-        <div className={`flex flex-col justify-center gap-2 ${isNavOpen ? "items-start" : "items-center"}`}>
+        <div
+          className={`flex flex-col justify-center gap-2 ${
+            isNavOpen ? "items-start" : "items-center"
+          }`}
+        >
           {pages?.map((page, i) => (
             <Link
               key={i}
@@ -94,7 +112,9 @@ const Aside = () => {
               } ${page.title === url ? "bg-primary-lightBlue rounded-md" : ""}`}
             >
               <div
-                className={`text-[20px] ${page.title === url ? "text-primary-lightBlue" : "text-white"}`}
+                className={`text-[20px] ${
+                  page.title === url ? "text-primary-lightBlue" : "text-white"
+                }`}
               >
                 {page.icon}
               </div>

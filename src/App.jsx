@@ -19,19 +19,25 @@ import { useDispatch, useSelector } from "react-redux";
 import { useGetMyProfileQuery } from "./redux/apis/authApis";
 import { userExist, userNotExist } from "./redux/slices/authSlice";
 import ProtectedRoute from "./components/ProtectedRoutes";
+import Alerts from "./pages/dashboard/alerts";
+import AlertType from "./pages/dashboard/alerts";
 
 const Dashboard = lazy(() => import("./pages/dashboard/index"));
 const Buildings = lazy(() => import("./pages/dashboard/buildings/Buildings"));
 const Devices = lazy(() => import("./pages/dashboard/devices/Devices"));
 const Reports = lazy(() => import("./pages/dashboard/reports/Reports"));
 const Sensors = lazy(() => import("./pages/dashboard/sensors/Sensors"));
-const SensorDetail = lazy(() => import("./pages/dashboard/sensors/SensorDetail"));
+const SensorDetail = lazy(() =>
+  import("./pages/dashboard/sensors/SensorDetail")
+);
 const Settings = lazy(() => import("./pages/dashboard/settings/Settings"));
 const Login = lazy(() => import("./pages/auth/Login"));
 const ForgetPassword = lazy(() => import("./pages/auth/ForgetPassword"));
 const SignUp = lazy(() => import("./pages/auth/SignUp"));
 const ResetPassword = lazy(() => import("./pages/auth/ResetPassword"));
-const BuildingStepper = lazy(() => import("./components/buildings/BuildingStepper"));
+const BuildingStepper = lazy(() =>
+  import("./components/buildings/BuildingStepper")
+);
 
 function App() {
   const dispatch = useDispatch();
@@ -58,8 +64,14 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route path="/forget-password" element={<AuthBg Form={ForgetPassword} />} />
-        <Route path="/reset-password" element={<AuthBg Form={ResetPassword} />} />
+        <Route
+          path="/forget-password"
+          element={<AuthBg Form={ForgetPassword} />}
+        />
+        <Route
+          path="/reset-password"
+          element={<AuthBg Form={ResetPassword} />}
+        />
         <Route path="/signup" element={<AuthBg Form={SignUp} />} />
 
         {/* Protecting dashboard-related routes */}
@@ -79,11 +91,15 @@ function App() {
           <Route path="devices" element={<Devices />} />
           <Route path="reports" element={<Reports />} />
           <Route path="sensors" element={<Sensors />} />
+          <Route path="alerts" element={<AlertType />} />
           <Route path="sensors/sensor-detail/:id" element={<SensorDetail />} />
           <Route path="settings" element={<Settings />} />
           <Route path="add-building" element={<BuildingStepper />} />
           <Route path="subscription" element={<Subscription />} />
-          <Route path="subscription-history" element={<SubscriptionHistory />} />
+          <Route
+            path="subscription-history"
+            element={<SubscriptionHistory />}
+          />
           <Route path="configuration" element={<Configuration />} />
           <Route path="change-password" element={<ChangePassword />} />
           <Route path="profile" element={<Profile />} />
