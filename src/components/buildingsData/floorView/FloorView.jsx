@@ -42,8 +42,8 @@ let floorDetails = {
 const FloorView = () => {
   const [activeTab, setActiveTab] = useState("heat");
   const { id } = useParams();
-  const [image, setImage] = useState('');
-  const [polygons, setPolygons] = useState([])
+  const [image, setImage] = useState("");
+  const [polygons, setPolygons] = useState([]);
   const { data, isSuccess, isLoading } = useGetAllBuildingsQuery();
 
   useEffect(() => {
@@ -54,20 +54,17 @@ const FloorView = () => {
       const singleFloor = building?.floors?.find((floor) => floor?._id === id);
       floorDetails = {
         ...floorDetails,
-        name: building?.name || '',
-        buildingImg: building?.thumbnail?.url || '',
-        type: building?.type || '',
-        rooms: singleFloor?.rooms || '',
+        name: building?.name || "",
+        buildingImg: building?.thumbnail?.url || "",
+        type: building?.type || "",
+        rooms: singleFloor?.rooms || "",
         sensors: singleFloor?.sensors?.length || 0,
       };
-      setImage(singleFloor?.twoDModel?.url)
-      setPolygons(JSON.parse(singleFloor?.twoDModelCanvasData))
+      setImage(singleFloor?.twoDModel?.url);
+      setPolygons(JSON.parse(singleFloor?.twoDModelCanvasData));
       console.log("floorDetails", singleFloor);
     }
-
-  },[data, isSuccess, id])
-
-
+  }, [data, isSuccess, id]);
 
   return (
     <div>
@@ -138,11 +135,11 @@ const FloorView = () => {
             </button>
           </div>
 
-          <div className="flex justify-center h-[40vh]">
+          <div className="flex justify-center">
             {activeTab === "heat" ? (
-              <img src={heatMap} alt="Heat Map" />
+              <img src={heatMap} alt="Heat Map" className="h-[400px]" />
             ) : (
-              <img src={floorLayout} alt="Floor Layout" />
+              <ShowCanvasData image={image} polygons={polygons} />
             )}
           </div>
         </div>

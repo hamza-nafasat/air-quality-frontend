@@ -30,7 +30,7 @@ const Buildings = () => {
 
   useEffect(() => {
     if (isSuccess) {
-      const buildingsData = data.data.map((building) => ({
+      const buildingsData = data?.data?.map((building) => ({
         id: building?._id,
         name: building?.name,
         address: building?.address,
@@ -78,7 +78,9 @@ const Buildings = () => {
 
       <section className="p-3">
         {buildings?.length === 0 ? (
-          <div className="text-gray-500 font-medium text-base">No buildings data</div>
+          <div className="text-gray-500 font-medium text-base">
+            No buildings data
+          </div>
         ) : (
           currentItems?.map((building, i) => (
             <BuildingCard

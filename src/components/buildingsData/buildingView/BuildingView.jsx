@@ -114,7 +114,11 @@ const BuildingView = () => {
         <div className="col-span-12 xl:col-span-8 flex flex-col">
           <div className="grid grid-cols-1">
             <section className="rounded-[16px] p-5 bg-white shadow-dashboard">
-              <ShowCanvasData image={previewValue} polygons={polygons} />
+              <ShowCanvasData
+                image={previewValue}
+                polygons={polygons}
+                view="building-view"
+              />
             </section>
           </div>
           <div className="grid grid-cols-1 mt-4 rounded-[16px] p-5 bg-white shadow-dashboard">
