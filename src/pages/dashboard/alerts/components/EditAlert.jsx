@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { Fragment, useState } from "react";
 import { toast } from "react-toastify";
 import TextField from "../../../../components/shared/small/TextField";
@@ -21,7 +22,7 @@ const severityType = [
   { option: "low" },
 ];
 
-const AddAlert = ({ onClose }) => {
+const EditAlert = ({ onClose }) => {
   const [inputEmail, setInputEmail] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
@@ -178,4 +179,4 @@ const AddAlert = ({ onClose }) => {
   );
 };
 
-export default AddAlert;
+export default EditAlert;

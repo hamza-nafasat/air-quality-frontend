@@ -6,6 +6,7 @@ import { MdAddBox, MdDelete } from "react-icons/md";
 import { FiEdit } from "react-icons/fi";
 import { CgArrowTopRightO } from "react-icons/cg";
 import AddAlert from "./components/AddAlert";
+import EditAlert from "./components/EditAlert";
 
 const Alerts = () => {
   const [modalType, setModalType] = useState(null);
@@ -135,7 +136,7 @@ const Alerts = () => {
           <span className="text-black text-sm">{row.status}</span>
           <input
             type="checkbox"
-            readOnly
+            // readOnly
             checked={row.status === "enable"}
             className="cursor-pointer"
           />
@@ -195,7 +196,7 @@ const Alerts = () => {
       </div>
       {modalType === "edit" && (
         <Modal title="Edit Alert" onClose={handleCloseModal}>
-          Edit Alert Component
+          <EditAlert />
         </Modal>
       )}
       {modalType === "add" && (

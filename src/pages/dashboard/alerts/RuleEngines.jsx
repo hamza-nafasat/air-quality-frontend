@@ -8,6 +8,8 @@ import { MdAddBox, MdDelete } from "react-icons/md";
 import { RiEditBoxFill } from "react-icons/ri";
 import { FiEdit } from "react-icons/fi";
 import { CgArrowTopRightO } from "react-icons/cg";
+import AddRuleEngine from "./components/AddRuleEngine";
+import EditRuleEngine from "./components/EditRuleEngine";
 
 const RuleEngines = () => {
   const [modalType, setModalType] = useState(null);
@@ -190,10 +192,14 @@ const RuleEngines = () => {
         )}
       </div>
       {modalType === "edit" && (
-        <Modal onClose={handleCloseModal}>Edit Alert Component</Modal>
+        <Modal title="Edit Rule Engine" onClose={handleCloseModal}>
+          <EditRuleEngine />
+        </Modal>
       )}
       {modalType === "add" && (
-        <Modal onClose={handleCloseModal}>Add Alert Component</Modal>
+        <Modal title="Add Rule Engine" onClose={handleCloseModal}>
+          <AddRuleEngine />
+        </Modal>
       )}
     </Fragment>
   );
