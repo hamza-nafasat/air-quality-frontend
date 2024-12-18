@@ -19,6 +19,7 @@ import heatMap from "../../../assets/images/floorView/heatmap.png";
 import floorLayout from "../../../assets/images/buildings/greyBuilding.png";
 import { useGetAllBuildingsQuery } from "../../../redux/apis/buildingApis";
 import ShowCanvasData from "../../buildings/ShowCanvasData";
+import ShowHeatmapData from "../../buildings/ShowHeatmapData";
 
 const icons = [
   <AlarmsIcon />,
@@ -137,7 +138,7 @@ const FloorView = () => {
 
           <div className="flex justify-center">
             {activeTab === "heat" ? (
-              <img src={heatMap} alt="Heat Map" className="h-[400px]" />
+              <ShowHeatmapData image={image} polygons={polygons} />
             ) : (
               <ShowCanvasData image={image} polygons={polygons} />
             )}

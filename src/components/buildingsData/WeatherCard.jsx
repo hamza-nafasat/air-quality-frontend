@@ -8,10 +8,27 @@ import getEnv from "../../config/config";
 
 const boxShadow = { boxShadow: "0px 3px 0px 0px rgba(100, 198, 234, 0.4)" };
 
+const getWeatherIcon = (weather) => {
+  switch (weather) {
+    case "Clear":
+      return <SunIcon />;
+    case "Clouds":
+      return <WeatherCloudIcon />;
+    default:
+      return <SunIcon />;
+  }
+};
+
+const getDay = (day) => {
+  const date = new Date(day);
+  return date.toLocaleDateString("en-US", { weekday: "short" });
+};
+
 const WeatherCard = () => {
   const [weatherData, setWeatherData] = useState(null);
+  const [forcastData, setForcastData] = useState(null);
 
-  console.log("weatherData", weatherData);
+  console.log("forCastdata", forcastData);
   const getWeatherData = useCallback(async () => {
     let userDAta = await getUserData();
     let city = userDAta?.city;
@@ -19,6 +36,7 @@ const WeatherCard = () => {
     const apiKey = getEnv("WEATHER_API_KEY");
     if (!city || !apiKey) return alert("Something went wrong");
     const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&&units=metric`;
+    const forcastApiUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&&units=metric`;
 
     try {
       const response = await fetch(apiUrl);
@@ -26,6 +44,16 @@ const WeatherCard = () => {
       if (!response.ok) throw new Error(`Error: ${response.status}`);
       const data = await response.json();
       setWeatherData({ ...data, city: city, country: country });
+
+      // fetch forcast
+      const forcastRes = await fetch(forcastApiUrl);
+      console.log("forcast res", forcastRes);
+      if (!forcastRes.ok) throw new Error(`Error: ${forcastRes.status}`);
+      const forcastData = await forcastRes.json();
+      const dailyForcast = forcastData?.list?.filter((item) =>
+        item?.dt_txt.includes("12:00:00")
+      );
+      setForcastData(dailyForcast);
     } catch (error) {
       console.error("Failed to fetch weather data:", error);
     }
@@ -37,11 +65,13 @@ const WeatherCard = () => {
   return (
     <div>
       <div
-        className="bg-primary-lightBlue rounded-xl p-4 md:p-6 lg:p-8 flex items-center justify-between gap-4"
+        className="bg-primary-lightBlue rounded-xl px-4 md:px-6 py-4 flex items-center justify-between gap-4"
         style={boxShadow}
       >
         <div>
-          <h2 className="text-2xl md:text-[38px] font-semibold text-white">{Math.round(weatherData?.main?.temp)}°</h2>
+          <h2 className="text-2xl md:text-[38px] font-semibold text-white">
+            {Math.round(weatherData?.main?.temp)}°
+          </h2>
           <div className="flex items-center gap-2 my-1">
             <p className="text-sm text-white">
               H: <span>{Math.round(weatherData?.main?.temp_max)}°</span>
@@ -57,13 +87,21 @@ const WeatherCard = () => {
         <div className="flex flex-col items-center gap-1">
           <img src={ThunderImage} alt="image" className="w-[120px] " />
 
-          <p className="text-sm text-white font-bold">{weatherData?.weather[0]?.main}</p>
+          <p className="text-sm text-white font-bold">
+            {weatherData?.weather[0]?.main}
+          </p>
         </div>
       </div>
       <div className="mt-4 md:mt-6 flex items-center justify-center gap-4 pb-4">
-        <WeatherBoxes icon={<WindIcon />} value="36 km/h" />
-        <WeatherBoxes icon={<WeatherCloudIcon />} value="83 %" />
-        <WeatherBoxes icon={<SunIcon />} value="2 of 10" />
+        {forcastData &&
+          forcastData.map((list, i) => (
+            <WeatherBoxes
+              key={i}
+              day={getDay(list?.dt_txt)}
+              icon={getWeatherIcon(list?.weather[0].main)}
+              value={Math.round(list?.main?.temp)}
+            />
+          ))}
       </div>
     </div>
   );
@@ -71,11 +109,12 @@ const WeatherCard = () => {
 
 export default WeatherCard;
 
-const WeatherBoxes = ({ icon, value }) => {
+const WeatherBoxes = ({ day, icon, value }) => {
   return (
     <div className="bg-[#03a5e01a] w-[80px] rounded-lg p-4 border-[0.6px] border-primary-lightBlue flex flex-col items-center justify-center gap-2">
+      <div className="text-sm text-primary-lightBlue font-medium">{day}</div>
       {icon}
-      <div className="text-xs text-primary-lightBlue font-medium">{value}</div>
+      <div className="text-sm text-primary-lightBlue font-bold">{value}°</div>
     </div>
   );
 };
