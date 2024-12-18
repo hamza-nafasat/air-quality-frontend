@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-key */
 import React, { useEffect, useState } from "react";
 import { buildings, floorViewStatus } from "../../../data/data";
 import StatusCard from "../../shared/large/card/StatusCard";
@@ -138,7 +139,12 @@ const FloorView = () => {
 
           <div className="flex justify-center">
             {activeTab === "heat" ? (
-              <ShowHeatmapData image={image} polygons={polygons} />
+              // <img src={heatMap} alt="Heat Map" className="h-[400px]" />
+              <ShowCanvasData
+                image={image}
+                polygons={polygons}
+                heatmap={true}
+              />
             ) : (
               <ShowCanvasData image={image} polygons={polygons} />
             )}
