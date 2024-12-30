@@ -21,7 +21,13 @@ const AddSensor = ({ onClose, refetch }) => {
       if (!form?.name || !form?.type || !form?.uniqueId || !form?.url) {
         return toast.error("Please fill all the fields");
       }
-      const response = await addSensor(form).unwrap();
+      const response = await addSensor({
+        name: form.name,
+        type: form.type,
+        uniqueId: form.uniqueId,
+        url: form.url,
+        location: form.location,
+      }).unwrap();
       if (response?.success) {
         await refetch();
         toast.success(response?.message);

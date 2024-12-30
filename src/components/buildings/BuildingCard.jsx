@@ -1,9 +1,9 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import CloudIcon from "../../assets/svgs/buildings/CloudIcon";
 import SensorIcon from "../../assets/svgs/buildings/SensorIcon";
 import TemperatureIcon from "../../assets/svgs/buildings/TemperatureIcon";
 import TvocIcon from "../../assets/svgs/buildings/TvocIcon";
-import LocationIcon from "../../assets/svgs/pages/LocationIcon";
 import Button from "../shared/small/Button";
 
 import { Link } from "react-router-dom";
@@ -13,14 +13,7 @@ const BuildingCard = ({ id, name, address, sensors, temperature, tvoc, thumbnail
   return (
     <div className="border-b-[1px] border-[#00000030] p-1">
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-3 py-2">
-        <BuildingInfo
-          id={id}
-          name={name}
-          address={address}
-          sensors={sensors}
-          thumbnail={thumbnail}
-          link={link}
-        />
+        <BuildingInfo id={id} name={name} address={address} sensors={sensors} thumbnail={thumbnail} link={link} />
         <SensorInfo id={id} temperature={temperature} tvoc={tvoc} co2={co2} link={link} />
       </div>
     </div>
@@ -33,11 +26,7 @@ const BuildingInfo = ({ name, thumbnail, address, sensors }) => {
   return (
     <div className="flex flex-col xl:flex-row gap-2">
       <section className="w-[248px] h-[118px] border-[1px] rounded-lg  border-black flex-none">
-        <img
-          src={thumbnail || greyBuilding}
-          alt="Description"
-          className="w-full h-full object-cover rounded-lg "
-        />
+        <img src={thumbnail || greyBuilding} alt="Description" className="w-full h-full object-cover rounded-lg " />
       </section>
       <div className="flex flex-col gap-5">
         <section className="flex justify-between  ">

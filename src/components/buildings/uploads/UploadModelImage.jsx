@@ -144,7 +144,7 @@ const UploadModelImage = ({ setFile, previewValue, setPreviewValue, polygons, se
   }, [previewValue]);
 
   return (
-    <div className="relative">
+    <div className="relative inline-block">
       {!isDrawingEnabled && (
         <BrowseFileBtn
           onFileChange={(event) => handleImageUpload(event, setPreviewValue, setShowCropper, setIsDrawingEnabled)}

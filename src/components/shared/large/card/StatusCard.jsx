@@ -1,4 +1,4 @@
-import React from "react";
+/* eslint-disable react/prop-types */
 
 const StatusCard = ({ icon, type, status, from, progressIcon }) => {
   return (
@@ -6,11 +6,7 @@ const StatusCard = ({ icon, type, status, from, progressIcon }) => {
       className="min-w-[182px] p-4 bg-[white] text-black rounded-[16px] flex flex-col justify-center min-h-[131px] 
       transition duration-300 ease-in-out shadow-md hover:shadow-md hover:shadow-black/30"
     >
-      <div
-        className={`flex ${
-          progressIcon && "items-center justify-between gap-2"
-        }`}
-      >
+      <div className={`flex ${progressIcon && "items-center justify-between gap-2"}`}>
         <div>
           <div className="flex items-center gap-3">
             <div>{icon}</div>

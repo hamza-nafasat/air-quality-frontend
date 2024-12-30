@@ -4,7 +4,6 @@ import AddIcon from "../../../assets/svgs/pages/AddIcon";
 import Modal from "../../../components/shared/modal/Modal";
 import { useEffect, useState } from "react";
 import EditIcon from "../../../assets/svgs/stepper/EditIcon";
-// import { sensorData } from "../../../data/data";
 import AddSensor from "./AddSensor";
 import EditSensor from "./EditSensor";
 import ToggleButton from "../../../components/shared/small/ToggleButton";
@@ -20,23 +19,9 @@ import { toast } from "react-toastify";
 import Loader from "../../../components/shared/small/Loader";
 
 const columns = (modalOpenHandler, navigate, statusToggleHandler, deleteHandler) => [
-  {
-    name: "Name",
-    selector: (row) => row.name,
-    // width: "10%",
-  },
-  {
-    name: "URL",
-    selector: (row) => row.url,
-  },
-  {
-    name: "Type",
-    selector: (row) => row.type,
-  },
-  {
-    name: "Location",
-    selector: (row) => row.location,
-  },
+  { name: "Name", selector: (row) => row.name },
+  { name: "URL", selector: (row) => row.url },
+  { name: "Type", selector: (row) => row.type },
   {
     name: "Status",
     selector: (row) => (

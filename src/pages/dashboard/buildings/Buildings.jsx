@@ -17,28 +17,22 @@ const Buildings = () => {
   const totalPages = Math.ceil(buildings.length / itemsPerPage);
 
   const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage((prevPage) => prevPage + 1);
-    }
+    if (currentPage < totalPages) setCurrentPage((prevPage) => prevPage + 1);
   };
 
   const handlePrevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage((prevPage) => prevPage - 1);
-    }
+    if (currentPage > 1) setCurrentPage((prevPage) => prevPage - 1);
   };
 
   useEffect(() => {
     if (isSuccess) {
+      // console.log("data", data.data);
       const buildingsData = data?.data?.map((building) => ({
+        ...building,
         id: building?._id,
         name: building?.name,
         address: building?.address,
-        sensors:
-          building?.floors?.reduce(
-            (sensors, floor) => sensors + floor?.sensors?.length,
-            0
-          ) || 0,
+        sensors: building?.floors?.reduce((sensors, floor) => sensors + floor?.sensors?.length, 0) || 0,
         temperature: building?.temperature || 0,
         thumbnail: building?.thumbnail?.url || "",
         thumbnailPublicId: building?.tumbnail?.public_id || "",
@@ -78,9 +72,7 @@ const Buildings = () => {
 
       <section className="p-3">
         {buildings?.length === 0 ? (
-          <div className="text-gray-500 font-medium text-base">
-            No buildings data
-          </div>
+          <div className="text-gray-500 font-medium text-base">No buildings data</div>
         ) : (
           currentItems?.map((building, i) => (
             <BuildingCard
@@ -129,11 +121,7 @@ const FilterSection = () => {
     <div className="flex flex-wrap  gap-4">
       <div className="flex items-center gap-1 border border-[#e7e7e7] rounded-lg h-[34px] bg-white px-3 basis-[35%] flex-1">
         <SearchIcon />
-        <input
-          type="search"
-          placeholder="Search"
-          className="focus:outline-none text-sm w-full"
-        />
+        <input type="search" placeholder="Search" className="focus:outline-none text-sm w-full" />
       </div>
       <div className="flex items-center justify-between gap-1 border border-[#e7e7e7] rounded-lg h-[34px] bg-white px-3 ">
         <p className="text-sm text-[#7e7e7e]">Sort By:</p>

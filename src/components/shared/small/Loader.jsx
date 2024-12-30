@@ -1,4 +1,3 @@
-import React from "react";
 import LoaderIcon from "../../../assets/svgs/pages/LoaderIcon";
 
 const Loader = () => {

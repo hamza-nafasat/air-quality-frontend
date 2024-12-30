@@ -1,41 +1,30 @@
-import React, { useEffect, useState } from "react";
-import { buildings, buildingViewStatus } from "../../../data/data";
-import StatusCard from "../../shared/large/card/StatusCard";
+/* eslint-disable react/jsx-key */
+import { useEffect, useState } from "react";
 import AlarmsIcon from "../../../assets/svgs/dashboard/AlarmsIcon";
 import Co2Icon from "../../../assets/svgs/dashboard/Co2Icon";
+import { buildingViewStatus } from "../../../data/data";
+import StatusCard from "../../shared/large/card/StatusCard";
 
+import { Link, useParams } from "react-router-dom";
 import EnergyIcon from "../../../assets/svgs/dashboard/EnergyIcon";
 import EquipmentIcon from "../../../assets/svgs/dashboard/EquipmentIcon";
 import OccupancyIcon from "../../../assets/svgs/dashboard/OccupancyIcon";
 import TemperatureIcon from "../../../assets/svgs/dashboard/TemperatureIcon";
-import polygonBuilding from "../../../assets/images/buildings/polygonBuilding.png";
-import BuildingDetails from "./components/BuildingDetails";
-import SensorDetails from "./components/SensorDetails";
-import Alert from "../../shared/large/alert/Alert";
-import Alerts from "./components/Alerts";
-import BuildingCard from "../../buildings/BuildingCard";
-import BuildingFloors from "./components/BuildingFloors";
-import DoubleAreaChart from "../../charts/areaChart/DoubleAreaChart";
-import BuildingHumidityChart from "./components/BuildingHumidityChart";
-import { Link, useParams } from "react-router-dom";
 import DeleteIcon from "../../../assets/svgs/pages/DeleteIcon";
-import DeleteConfirmation from "../../shared/large/modal/DeleteConfirmation";
-import Modal from "../../shared/large/modal/Modal";
-import Floors from "../floorView/components/Floors";
-import BuildingDeleteWithId from "../../shared/large/modal/BuildingDeleteWithId";
+import EditIcon from "../../../assets/svgs/stepper/EditIcon";
 import { useGetSingleBuildingQuery } from "../../../redux/apis/buildingApis";
-import Loader from "../../shared/small/Loader";
-import UploadModelImage from "../../buildings/uploads/UploadModelImage";
 import ShowCanvasData from "../../buildings/ShowCanvasData";
+import DoubleAreaChart from "../../charts/areaChart/DoubleAreaChart";
+import BuildingDeleteWithId from "../../shared/large/modal/BuildingDeleteWithId";
+import Modal from "../../shared/large/modal/Modal";
+import Loader from "../../shared/small/Loader";
+import Floors from "../floorView/components/Floors";
+import Alerts from "./components/Alerts";
+import BuildingDetails from "./components/BuildingDetails";
+import BuildingHumidityChart from "./components/BuildingHumidityChart";
+import SensorDetails from "./components/SensorDetails";
 
-const icons = [
-  <AlarmsIcon />,
-  <TemperatureIcon />,
-  <EquipmentIcon />,
-  <EnergyIcon />,
-  <Co2Icon />,
-  <OccupancyIcon />,
-];
+const icons = [<AlarmsIcon />, <TemperatureIcon />, <EquipmentIcon />, <EnergyIcon />, <Co2Icon />, <OccupancyIcon />];
 
 const BuildingView = () => {
   const [buildingData, setBuildingData] = useState({});
@@ -58,11 +47,7 @@ const BuildingView = () => {
           twoDModel: building?.twoDModel?.url || "",
           type: building?.type || "",
           area: building?.area || "",
-          totalSensors:
-            building?.floors.reduce(
-              (sensors, floor) => sensors + floor?.sensors.length,
-              0
-            ) || 0,
+          totalSensors: building?.floors.reduce((sensors, floor) => sensors + floor?.sensors.length, 0) || 0,
           twoDModelCanvasData: JSON.parse(building?.twoDModelCanvasData) || [],
         });
         setPreviewValue(building?.twoDModel?.url);
@@ -85,21 +70,18 @@ const BuildingView = () => {
     <div className="">
       <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-6 gap-4">
         {buildingViewStatus.map((item, i) => (
-          <StatusCard
-            key={i}
-            status={item.status}
-            from={item.from}
-            type={item.type}
-            icon={icons[i % icons.length]}
-          />
+          <StatusCard key={i} status={item.status} from={item.from} type={item.type} icon={icons[i % icons.length]} />
         ))}
       </section>
       <section className="mt-4 flex justify-end">
-        <button onClick={handleOpenDeleteModal}>
-          <Link to="">
-            <DeleteIcon />
+        <div className="flex items-center gap-4">
+          <Link to={`/dashboard/edit-building/${id}`}>
+            <EditIcon />
           </Link>
-        </button>
+          <button onClick={handleOpenDeleteModal}>
+            <DeleteIcon />
+          </button>
+        </div>
       </section>
       {deleteModal && (
         <Modal onClose={handleCloseDeleteModal} title="Confirmation">
@@ -114,11 +96,7 @@ const BuildingView = () => {
         <div className="col-span-12 xl:col-span-8 flex flex-col">
           <div className="grid grid-cols-1">
             <section className="rounded-[16px] p-5 bg-white shadow-dashboard">
-              <ShowCanvasData
-                image={previewValue}
-                polygons={polygons}
-                view="building-view"
-              />
+              <ShowCanvasData image={previewValue} polygons={polygons} view="building-view" />
             </section>
           </div>
           <div className="grid grid-cols-1 mt-4 rounded-[16px] p-5 bg-white shadow-dashboard">

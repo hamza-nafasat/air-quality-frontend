@@ -45,6 +45,13 @@ const authApis = createApi({
       }),
     }),
 
+    getMyProfileFirstTime: builder.mutation({
+      query: () => ({
+        url: "/my-profile",
+        method: "GET",
+      }),
+    }),
+
     // get my profile
     // --------------
     getMyProfile: builder.query({
@@ -83,5 +90,19 @@ export const {
   useUpdateMyProfileMutation,
   useForgetPasswordMutation,
   useResetPasswordMutation,
+  useGetMyProfileFirstTimeMutation,
 } = authApis;
 export default authApis;
+
+// export const getMyProfile = async () => {
+//   try {
+//     const response = await fetch(`${getEnv("SERVER_URL")}/api/auth/my-profile`, {
+//       headers: { "Content-Type": "application/json" },
+//       credentials: "include",
+//     });
+//     const data = await response.json();
+//     return data;
+//   } catch (error) {
+//     console.error("Error while getting my profile", error);
+//   }
+// };
