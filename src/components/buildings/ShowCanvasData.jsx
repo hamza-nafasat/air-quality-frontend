@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Button from "../shared/small/Button";
+import { FaXmark } from "react-icons/fa6";
 
 // Helper function to convert hex to rgba with opacity
 const convertHexToRgba = (hex, opacity) => {
@@ -11,12 +13,11 @@ const convertHexToRgba = (hex, opacity) => {
   return `rgba(${r}, ${g}, ${b}, ${opacity})`;
 };
 
-const ShowCanvasData = ({ image, polygons, view }) => {
+const ShowCanvasData = ({ image, polygons, view, heatmap = false }) => {
   const navigate = useNavigate();
   const canvasRef = useRef(null);
   const [selectedPolygon, setSelectedPolygon] = useState(null);
   const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
-
   console.log("polygons", polygons);
 
   // Function to handle polygon click detection
@@ -60,80 +61,119 @@ const ShowCanvasData = ({ image, polygons, view }) => {
     img.onload = () => {
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-      // Draw each polygon
-      polygons.forEach((polygon) => {
-        if (!polygon || !polygon.points) return;
+      if (heatmap) {
+        // Draw heatmap-style polygons
+        polygons.forEach((polygon) => {
+          if (!polygon || !polygon.points) return;
 
-        ctx.beginPath();
-        ctx.moveTo(polygon.points[0].x, polygon.points[0].y);
-        polygon.points.forEach((point) => ctx.lineTo(point.x, point.y));
-        ctx.closePath();
+          // Calculate the center of the polygon
+          const centerX =
+            polygon.points.reduce((sum, p) => sum + p.x, 0) /
+            polygon.points.length;
+          const centerY =
+            polygon.points.reduce((sum, p) => sum + p.y, 0) /
+            polygon.points.length;
 
-        // Fill polygon with a semi-transparent color
-        ctx.fillStyle = polygon.fillColor
-          ? convertHexToRgba(polygon.fillColor, 0.5)
-          : "rgba(255, 255, 255, 0.5)";
-        ctx.fill();
+          // Define gradient size based on polygon's intensity or a default radius
+          const radius = polygon.radius || 50; // Default radius if not provided
 
-        // Draw border of the polygon
-        ctx.strokeStyle = polygon.color || "#000000";
-        ctx.lineWidth = 2;
-        ctx.stroke();
+          // Create radial gradient with polygon color in the center and yellow at the edges
+          const gradient = ctx.createRadialGradient(
+            centerX,
+            centerY,
+            0,
+            centerX,
+            centerY,
+            radius
+          );
 
-        // Add event listener for the polygon click detection
-        canvas.addEventListener("click", (e) => handlePolygonClick(e, polygon));
+          // Set color stops:
+          // - center: polygon's color
+          // - outer edge: semi-transparent yellow for blur effect
+          gradient.addColorStop(0, polygon.fillColor || "red"); // Center with the polygon color
+          gradient.addColorStop(1, "rgba(255, 255, 0, 0.3)"); // Outer edges with semi-transparent yellow for blur effect
 
-        // Draw label for the polygon (ID)
-        const labelX = polygon.points[0]?.x;
-        const labelY = polygon.points[0]?.y - 10;
-        if (labelX && labelY) {
-          const padding = 5;
-          const text = polygon.id;
-          ctx.font = "12px Arial";
-          const textWidth = ctx.measureText(text).width;
-          const textHeight = 14;
-          const boxWidth = textWidth + padding * 2;
-          const boxHeight = textHeight + padding * 2;
-          const boxX = labelX - padding;
-          const boxY = labelY - textHeight - padding;
-
-          // Draw label box background
-          ctx.fillStyle = "#FFFFFF";
+          // Draw the gradient
           ctx.beginPath();
-          ctx.moveTo(boxX + 4, boxY);
-          ctx.arcTo(
-            boxX + boxWidth,
-            boxY,
-            boxX + boxWidth,
-            boxY + boxHeight,
-            4
-          );
-          ctx.arcTo(
-            boxX + boxWidth,
-            boxY + boxHeight,
-            boxX,
-            boxY + boxHeight,
-            4
-          );
-          ctx.arcTo(boxX, boxY + boxHeight, boxX, boxY, 4);
-          ctx.arcTo(boxX, boxY, boxX + boxWidth, boxY, 4);
+          ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+          ctx.fillStyle = gradient;
+          ctx.fill();
+        });
+      } else {
+        // Draw normal polygons
+        polygons.forEach((polygon) => {
+          if (!polygon || !polygon.points) return;
+
+          ctx.beginPath();
+          ctx.moveTo(polygon.points[0].x, polygon.points[0].y);
+          polygon.points.forEach((point) => ctx.lineTo(point.x, point.y));
           ctx.closePath();
+
+          // Fill polygon with a semi-transparent color
+          ctx.fillStyle = polygon.fillColor
+            ? convertHexToRgba(polygon.fillColor, 0.5)
+            : "rgba(255, 255, 255, 0.5)";
           ctx.fill();
 
-          // Draw the polygon ID inside the label box
-          ctx.fillStyle = "#000000";
-          ctx.fillText(text, boxX + padding, boxY + padding + textHeight - 4);
-        }
-      });
+          // Draw border of the polygon
+          ctx.strokeStyle = polygon.color || "#000000";
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          // Add event listener for the polygon click detection
+          canvas.addEventListener("click", (e) =>
+            handlePolygonClick(e, polygon)
+          );
+
+          // Draw label for the polygon (ID)
+          const labelX = polygon.points[0]?.x;
+          const labelY = polygon.points[0]?.y - 10;
+          if (labelX && labelY) {
+            const padding = 5;
+            const text = polygon.id;
+            ctx.font = "12px Arial";
+            const textWidth = ctx.measureText(text).width;
+            const textHeight = 14;
+            const boxWidth = textWidth + padding * 2;
+            const boxHeight = textHeight + padding * 2;
+            const boxX = labelX - padding;
+            const boxY = labelY - textHeight - padding;
+
+            // Draw label box background
+            ctx.fillStyle = "#FFFFFF";
+            ctx.beginPath();
+            ctx.moveTo(boxX + 4, boxY);
+            ctx.arcTo(
+              boxX + boxWidth,
+              boxY,
+              boxX + boxWidth,
+              boxY + boxHeight,
+              4
+            );
+            ctx.arcTo(
+              boxX + boxWidth,
+              boxY + boxHeight,
+              boxX,
+              boxY + boxHeight,
+              4
+            );
+            ctx.arcTo(boxX, boxY + boxHeight, boxX, boxY, 4);
+            ctx.arcTo(boxX, boxY, boxX + boxWidth, boxY, 4);
+            ctx.closePath();
+            ctx.fill();
+
+            // Draw the polygon ID inside the label box
+            ctx.fillStyle = "#000000";
+            ctx.fillText(text, boxX + padding, boxY + padding + textHeight - 4);
+          }
+        });
+      }
     };
     img.src = image;
 
-    // Cleanup event listener when the component is unmounted
     return () => {
       canvas.removeEventListener("click", handlePolygonClick);
     };
-  }, [image, polygons]);
-
+  }, [image, polygons, heatmap]);
   return (
     <div style={{ position: "relative" }}>
       <canvas
@@ -144,7 +184,11 @@ const ShowCanvasData = ({ image, polygons, view }) => {
       />
       {selectedPolygon && (
         <div
-          className="absolute bg-white p-4 shadow-lg rounded-md w-[300px]"
+          className={`absolute  ${
+            view === "building-view"
+              ? "bg-[#929292] text-white"
+              : "bg-primary-lightBlue text-white"
+          } p-4 shadow-xl rounded-md w-[300px]`}
           style={{
             top: `${popupPosition.top}px`,
             left: `${popupPosition.left}px`,
@@ -153,52 +197,61 @@ const ShowCanvasData = ({ image, polygons, view }) => {
         >
           {view === "building-view" ? (
             <div>
-              <h6 className="text-base font-semibold text-center">
-                Floor Details
-              </h6>
-              <div className="my-4">
-                <h6 className="text-sm font-medium">Sensors List:</h6>
-                <ul className="text-sm my-1">
-                  <li className="list-disc text-gray-700 ml-4">
-                    Floor Temperature: 20° C
+              <div className="flex justify-between items-center">
+                <h6 className="text-2xl font-bold text-center  grow">
+                  Floor Details
+                </h6>
+                <FaXmark
+                  fontSize={25}
+                  className="cursor-pointer"
+                  onClick={() => setSelectedPolygon(null)}
+                />
+              </div>
+              <div className="my-4 space-y-2">
+                <h6 className="text-lg font-bold">Sensors List:</h6>
+                <ul className="text-sm my-1 space-y-2">
+                  <li className="list-disc ml-4">
+                    <span className="font-bold text-base">
+                      Floor Temperature:
+                    </span>{" "}
+                    20° C
                   </li>
-                  <li className="list-disc text-gray-700 ml-4">CO2: 12 ppm</li>
-                  <li className="list-disc text-gray-700 ml-4">
-                    Occupancy: 20° C
+                  <li className="list-disc ml-4">
+                    {" "}
+                    <span className="font-bold text-base">CO2:</span> 12 ppm
                   </li>
-                  <li className="list-disc text-gray-700 ml-4">
-                    Energy: 21 kWh
+                  <li className="list-disc ml-4">
+                    <span className="font-bold text-base">Occupancy:</span> 20°
+                    C
+                  </li>
+                  <li className="list-disc ml-4">
+                    <span className="font-bold text-base">Energy:</span> 21 kWh
                   </li>
                 </ul>
-                <p className="text-sm mt-3">Total sensors: 12</p>
+                <p className="text-lg mt-3 font-bold">Total sensors: 12</p>
               </div>
               <div className="flex items-center gap-4">
-                <button
-                  className="bg-primary-lightBlue px-4 py-1 rounded-md text-white font-semibold w-full"
+                <Button
+                  text="Go to Floor"
                   // onClick={() => navigate(`/dashboard/floor-view/`)}
-                >
-                  Go to Floor
-                </button>
-                <button
-                  className="bg-red-500 hover:bg-red-600 px-4 py-1 rounded-md text-white font-semibold w-full"
-                  onClick={() => setSelectedPolygon(null)}
-                >
-                  Close
-                </button>
+                />
               </div>
             </div>
           ) : (
             <div>
-              <h6 className="text-base font-semibold text-center">
-                Sensor Details
-              </h6>
-              <div className="my-4">
-                <h6 className="text-sm">Sensor name: Sensor one</h6>
-                <p className="text-sm">CO2: 23 ppm</p>
+              <h6 className="text-xl font-bold text-center">Sensor Details</h6>
+              <div className="my-4 space-y-2">
+                <h6 className="text-base">
+                  <span className="font-bold text-base">Sensor Name:</span>{" "}
+                  Sensor one
+                </h6>
+                <p className="text-base">
+                  <span className="font-bold text-base">CO2:</span> 23 ppm
+                </p>
               </div>
               <div className="flex justify-end">
                 <button
-                  className="bg-red-500 hover:bg-red-600 px-4 py-1 rounded-md text-white font-semibold w-full"
+                  className="bg-white hover:bg-[#a5a5a5] hover:text-white px-4 py-1 rounded-md text-primary-lightBlue font-semibold w-full transition-all "
                   onClick={() => setSelectedPolygon(null)}
                 >
                   Close
