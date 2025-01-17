@@ -14,9 +14,6 @@ const Subscription = () => {
   return (
     <div className="parentContainer">
       <div className="bg-white rounded-[15px] p-4 lg:p-6">
-        {/* <div>
-        <Title title="Subscription Plan" />
-      </div> */}
         <div className="mt-4 md:mt-5">
           <div className="flex item-center gap-4">
             <Button
