@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+/* eslint-disable react/prop-types */
+import { useEffect, useState } from "react";
 import Aside from "./Aside";
 import Button from "../shared/small/Button";
 import Modal from "../shared/modal/Modal";
@@ -25,7 +26,7 @@ const Configuration = () => {
   const [modal, setModal] = useState(false);
   const [selectedOption, setSelectedOption] = useState("Remote Database");
   const [pendingOption, setPendingOption] = useState("");
-  const [timeInterval, setTimeInterval] = useState("30000");
+  const [timeInterval, setTimeInterval] = useState("");
   const [defaultTextForInterval, setDefaultTextForInterval] = useState("3 minutes");
   const [form, setForm] = useState({
     hostName: "",
@@ -60,7 +61,7 @@ const Configuration = () => {
         formData.append("customDbPassword", form.password);
         formData.append("customDbName", form.databaseName);
       }
-      if (selectedOption === "Remote Database") formData.append("isCustomDb", "false");
+      if (selectedOption == "Remote Database") formData.append("isCustomDb", "false");
       if (timeInterval) formData.append("interval", timeInterval);
 
       const response = await updateProfile(formData).unwrap();
@@ -75,6 +76,7 @@ const Configuration = () => {
   };
 
   useEffect(() => {
+    console.log("this is user", user);
     if (user) {
       setForm({
         hostName: user?.customDbHost || "",
@@ -86,7 +88,7 @@ const Configuration = () => {
       setSelectedOption(user?.isCustomDb ? "Local Database" : "Remote Database");
     }
     if (user?.interval) {
-      const interval = intervalTimesInSeconds.find((item) => item.value == user?.interval);
+      const interval = intervalTimesInSeconds.find((item) => item.value == String(user?.interval));
       console.log(interval, interval?.option, user?.interval);
       setDefaultTextForInterval(interval?.option || "Select Time Interval");
     }
@@ -181,6 +183,7 @@ const Configuration = () => {
                 </div>
                 <div className="flex justify-end mt-4">
                   <Button
+                    disabled={isLoading}
                     type="submit"
                     onClick={updateProfileHandler}
                     text="Save"
