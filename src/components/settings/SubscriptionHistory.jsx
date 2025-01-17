@@ -4,8 +4,11 @@ import DataTable from "react-data-table-component";
 
 import { AiOutlineDownload } from "react-icons/ai";
 import { subscriptionHistoryData } from "../../data/data";
+import { useGetAllSubscriptionsQuery } from "../../redux/apis/subscriptionApis";
 
 const SubscriptionHistory = () => {
+  const { data, isLoading, refetch } = useGetAllSubscriptionsQuery();
+
   const [activeButton, setActiveButton] = useState("profile");
 
   const handleButtonClick = (buttonName) => {
@@ -14,41 +17,47 @@ const SubscriptionHistory = () => {
 
   const columns = [
     {
-      name: "Date",
-      selector: (row) => row.date,
+      name: "Name",
+      selector: (row) => row.user.firstName + " " + row.user.lastName,
     },
     {
       name: "Plan",
-      selector: (row) => row.plan,
-    },
-    {
-      name: "Amount",
-      selector: (row) => row.amount,
+      selector: (row) => row?.plan,
     },
     {
       name: "Status",
       cell: (row) =>
-        row.status === "active" ? (
+        row.subscriptionStatus === "active" || row.subscriptionStatus === "trialing" ? (
           <div className="bg-[#B2FFB0] rounded-[6px] text-sm w-[90px] h-8 grid place-items-center capitalize">
-            {row.status}
+            {row.subscriptionStatus}
           </div>
-        ) : row.status === "expired" ? (
+        ) : row.subscriptionStatus === "expired" ? (
           <div className="bg-[#D3D3D3] rounded-[6px] text-sm w-[90px] h-8 grid place-items-center  capitalize">
-            {row.status}
+            {row.subscriptionStatus}
           </div>
         ) : (
           <div className="bg-[#FF7A7F] rounded-[6px] text-sm w-[90px] h-8 grid place-items-center capitalize">
-            {row.status}
+            {row.subscriptionStatus}
           </div>
         ),
     },
     {
-      name: "Invoice",
-      selector: () => (
-        <div className="cursor-pointer">
-          <AiOutlineDownload fontSize={22} fontWeight={700} />
-        </div>
-      ),
+      name: "Last Updated",
+      selector: (row) =>
+        row?.updatedAt?.split("T")[0]?.split("-")[1] +
+        "/" +
+        row?.updatedAt?.split("T")[0]?.split("-")[2] +
+        "/" +
+        row?.updatedAt?.split("T")[0]?.split("-")[0],
+    },
+    {
+      name: "CreatedAt",
+      selector: (row) =>
+        row?.createdAt?.split("T")[0]?.split("-")[1] +
+        "/" +
+        row?.createdAt?.split("T")[0]?.split("-")[2] +
+        "/" +
+        row?.createdAt?.split("T")[0]?.split("-")[0],
     },
   ];
 
@@ -59,15 +68,10 @@ const SubscriptionHistory = () => {
           {/* Sidebar */}
 
           <div className="col-span-12 lg:col-span-2">
-            <Aside
-              activeButton={activeButton}
-              handleButtonClick={handleButtonClick}
-            />
+            <Aside activeButton={activeButton} handleButtonClick={handleButtonClick} />
           </div>
           <div className="col-span-12 xl:col-span-10 2xl:col-span-10">
-            <h3 className="text-base lg:text-lg font-[500] mb-4 xl:mb-0">
-              Subscription Plan
-            </h3>
+            <h3 className="text-base lg:text-lg font-[500] mb-4 xl:mb-0">Subscription Plan</h3>
 
             <div className="bg-white rounded-[15px] mt-4 p-4 lg:p-6 h-[calc(100vh-80px)] overflow-hidden">
               <div className="flex items-center justify-between">
@@ -78,7 +82,7 @@ const SubscriptionHistory = () => {
               <div className="mt-5">
                 <DataTable
                   columns={columns}
-                  data={subscriptionHistoryData}
+                  data={data?.data}
                   selectableRows
                   selectableRowsHighlight
                   customStyles={tableStyles}
