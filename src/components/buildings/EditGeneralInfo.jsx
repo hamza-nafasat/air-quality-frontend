@@ -68,7 +68,7 @@ const EditGeneralInfo = ({ setCurrentStep, building,formDataHandler }) => {
         </div>
         <div className="lg:col-span-6">
           <Dropdown
-            value={type}
+            value={building.type}
             defaultText="Building Type"
             options={buildingTypesOptions}
             onSelect={(option) => setType(option?.value)}
@@ -80,7 +80,7 @@ const EditGeneralInfo = ({ setCurrentStep, building,formDataHandler }) => {
         <div className="lg:col-span-6">
           <TextField
             type="number"
-            value={floorsCount}
+            value={building.floors}
             placeholder="Floors Count"
             onChange={(e) => setFloorsCount(e.target.value)}
           />
