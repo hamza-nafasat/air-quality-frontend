@@ -2,7 +2,7 @@
 
 const TextField = ({ label, Icon, ...rest }) => {
   return (
-    <div className="flex flex-col gap-1 w-full">
+    <div className="flex flex-col bg-white gap-1 w-full">
       {label && (
         <label className="text-sm md:text-base font-[600]">{label}</label>
       )}

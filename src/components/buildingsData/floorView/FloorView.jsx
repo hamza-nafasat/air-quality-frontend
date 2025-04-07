@@ -15,12 +15,14 @@ import FloorSensorDetails from "./components/FloorSensorDetails";
 import Alerts from "./components/Alerts";
 import DoubleAreaChart from "../../charts/areaChart/DoubleAreaChart";
 import CurrentHumidityChart from "./components/CurrentHumidityChart";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import heatMap from "../../../assets/images/floorView/heatmap.png";
 import floorLayout from "../../../assets/images/buildings/greyBuilding.png";
 import { useGetAllBuildingsQuery } from "../../../redux/apis/buildingApis";
 import ShowCanvasData from "../../buildings/ShowCanvasData";
 import ShowHeatmapData from "../../buildings/ShowHeatmapData";
+import EditIcon from "../../../assets/svgs/stepper/EditIcon";
+import DeleteIcon from "../../../assets/svgs/pages/DeleteIcon";
 
 const icons = [
   <AlarmsIcon />,
@@ -67,6 +69,9 @@ const FloorView = () => {
       console.log("floorDetails", singleFloor);
     }
   }, [data, isSuccess, id]);
+  const handleOpenDeleteModal = () => {
+    setDeleteModal(true);
+  };
 
   return (
     <div>
@@ -82,8 +87,9 @@ const FloorView = () => {
         ))}
       </section>
 
-      <section className="grid grid-cols-12 gap-4 mt-4 ">
+      <section className="grid grid-cols-12 gap-4 mt-4  ">
         <div className="col-span-12 xl:col-span-8 flex flex-col">
+          <div className="my-5"></div>
           <div className="grid grid-cols-1 rounded-[16px] p-5 bg-white shadow-dashboard">
             <ShowCanvasData image={image} polygons={polygons} />
           </div>
@@ -96,6 +102,17 @@ const FloorView = () => {
         </div>
 
         <div className="col-span-12 xl:col-span-4 flex flex-col">
+          <section className="p-2 flex justify-end">
+            <div className="flex items-center gap-4 ">
+              <Link title="Edit Floor" to={`/dashboard/edit-floor/${id}`}>
+                <EditIcon />
+              </Link>
+              <button title="Delete Floor" onClick={handleOpenDeleteModal}>
+                <DeleteIcon />
+              </button>
+            </div>
+          </section>
+
           <div className="grid grid-cols-1">
             <FloorDetails floorDetails={floorDetails} />
           </div>
@@ -114,11 +131,10 @@ const FloorView = () => {
           <div className="flex border  w-fit border-none  px-1 py-2 rounded-lg relative h-[40px] sm:h-[60px] mb-6">
             {/* Heat Map button */}
             <button
-              className={`absolute  w-[120px] bg-[#03A5E040] px-4 py-2  text-sm font-medium transition-colors duration-300 ${
-                activeTab === "heat"
-                  ? "bg-white text-[#03A5E0] shadow-[4px_0_10px_rgba(0,0,0,0.25)] rounded-lg font-[700] z-[1]"
-                  : "bg-[#03A5E040] text-gray-500 rounded-l-lg z-[0]"
-              }`}
+              className={`absolute  w-[120px] bg-[#03A5E040] px-4 py-2  text-sm font-medium transition-colors duration-300 ${activeTab === "heat"
+                ? "bg-white text-[#03A5E0] shadow-[4px_0_10px_rgba(0,0,0,0.25)] rounded-lg font-[700] z-[1]"
+                : "bg-[#03A5E040] text-gray-500 rounded-l-lg z-[0]"
+                }`}
               onClick={() => setActiveTab("heat")}
             >
               Heat Map
@@ -126,11 +142,10 @@ const FloorView = () => {
 
             {/* Floor Layout button */}
             <button
-              className={`w-[120px] px-4 py-2 text-sm font-medium transition-colors duration-300 absolute left-[120px]  ${
-                activeTab === "floor"
-                  ? "bg-white text-[#03A5E0] shadow-[-5px_5px_15px_rgba(0,0,0,0.25)] rounded-lg font-[700] z-[1]"
-                  : "bg-[#03A5E040] text-gray-500 rounded-r-lg z-[0]"
-              }`}
+              className={`w-[120px] px-4 py-2 text-sm font-medium transition-colors duration-300 absolute left-[120px]  ${activeTab === "floor"
+                ? "bg-white text-[#03A5E0] shadow-[-5px_5px_15px_rgba(0,0,0,0.25)] rounded-lg font-[700] z-[1]"
+                : "bg-[#03A5E040] text-gray-500 rounded-r-lg z-[0]"
+                }`}
               onClick={() => setActiveTab("floor")}
             >
               Floor Layout

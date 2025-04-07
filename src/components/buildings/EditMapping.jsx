@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import TextField from "../shared/small/TextField";
 import StepperMap from "./StepperMap";
 
-const EditMapping = () => {
+const EditMapping = ({building,formDataHandler}) => {
   const dispatch = useDispatch();
   const { buildingData } = useSelector((state) => state.building);
   const [lat, setLat] = useState();
@@ -28,14 +28,14 @@ const EditMapping = () => {
       </div>
       <form className="grid grid-cols-1 lg:grid-cols-12 gap-4 mt-4">
         <div className="lg:col-span-6">
-          <TextField value={lat} type="number" placeholder="Latitude" onChange={(e) => latHandler(e)} />
+          <TextField value={building.latitude} type="number" placeholder="Latitude" onChange={formDataHandler} />
         </div>
         <div className="lg:col-span-6">
-          <TextField value={lng} type="number" placeholder="Longitude" onChange={(e) => lngHandler(e)} />
+          <TextField value={building.longitude} type="number" placeholder="Longitude" onChange={formDataHandler} />
         </div>
         <div className="lg:col-span-12">
           <div className="h-[325px] rounded-lg shadow-md">
-            <StepperMap lat={lat} lng={lng} />
+            <StepperMap lat={building.latitude} lng={building.longitude} />
           </div>
         </div>
       </form>

@@ -35,14 +35,14 @@ import Dropdown from "../../shared/small/Dropdown";
 import TextField from "../../shared/small/TextField";
 import { getCroppedImg } from "../utils/addBuildingFeature";
 
-const UploadModelImage = ({ setFile, previewValue, setPreviewValue, polygons, setPolygons }) => {
+const UploadModelImage = ({ setFile, previewValue, setPreviewValue, polygons, setPolygons ,twoDModel }) => {
   const canvasRef = useRef(null);
   const [isDrawingEnabled, setIsDrawingEnabled] = useState(false);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [showCropper, setShowCropper] = useState(false);
-  const [image, setImage] = useState(null);
+  const [image, setImage] = useState(twoDModel);
   const [currentPolygon, setCurrentPolygon] = useState([]);
   const [polygonCount, setPolygonCount] = useState(1);
   const [isEditMode, setIsEditMode] = useState(true);

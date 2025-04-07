@@ -21,6 +21,7 @@ import Profile from "./pages/dashboard/profile/Profile";
 import Subscription from "./pages/dashboard/subscription/Subscription";
 import { useGetMyProfileFirstTimeMutation } from "./redux/apis/authApis";
 import { userExist, userNotExist } from "./redux/slices/authSlice";
+import FloorEdit from "./components/buildingsData/floorEdit/FloorEdit";
 
 const Dashboard = lazy(() => import("./pages/dashboard/index"));
 const Buildings = lazy(() => import("./pages/dashboard/buildings/Buildings"));
@@ -83,6 +84,7 @@ function App() {
           >
             <Route path="building-view/:id" element={<BuildingView />} />
             <Route path="edit-building/:id" element={<EditBuilding />} />
+            <Route path="edit-floor/:id" element={<FloorEdit />} />
             <Route path="floor-view/:id" element={<FloorView />} />
             <Route path="buildings" element={<Buildings />} />
             <Route path="devices" element={<Devices />} />

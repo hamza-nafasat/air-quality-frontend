@@ -17,7 +17,7 @@ const buildingTypesOptions = [
   { option: "Other", value: "other" },
 ];
 
-const EditGeneralInfo = ({ setCurrentStep }) => {
+const EditGeneralInfo = ({ setCurrentStep, building,formDataHandler }) => {
   const dispatch = useDispatch();
 
   const [name, setName] = useState("");
@@ -61,10 +61,10 @@ const EditGeneralInfo = ({ setCurrentStep }) => {
   return (
     <div>
       <h3 className="text-sm md:text-base font-semibold text-[rgba(6,6,6,0.8)]">General Info</h3>
-      <BrowseFile setFile={setThumbnail} previewValue={thumbnailPreview} setPreviewValue={setThumbNailPreview} />
+      <BrowseFile setFile={setThumbnail} previewValue={building.thumbnail} setPreviewValue={setThumbNailPreview} />
       <form className="mt-4 grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
         <div className="lg:col-span-6">
-          <TextField type="text" value={name} placeholder="Building Name" onChange={(e) => setName(e.target.value)} />
+          <TextField type="text" value={building.name} placeholder="Building Name" onChange={formDataHandler} />
         </div>
         <div className="lg:col-span-6">
           <Dropdown
@@ -75,7 +75,7 @@ const EditGeneralInfo = ({ setCurrentStep }) => {
           />
         </div>
         <div className="lg:col-span-6">
-          <TextField type="text" value={area} placeholder="Area (Sq Ft)" onChange={(e) => setArea(e.target.value)} />
+          <TextField type="text" value={building.area} placeholder="Area (Sq Ft)" onChange={formDataHandler} />
         </div>
         <div className="lg:col-span-6">
           <TextField
@@ -86,7 +86,7 @@ const EditGeneralInfo = ({ setCurrentStep }) => {
           />
         </div>
         <div className="lg:col-span-6">
-          <TextField type="text" value={address} placeholder="Address" onChange={(e) => setAddress(e.target.value)} />
+          <TextField type="text" value={building.address} placeholder="Address" onChange={formDataHandler} />
         </div>
       </form>
     </div>
