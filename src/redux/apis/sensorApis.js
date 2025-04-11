@@ -14,6 +14,7 @@ const sensorApis = createApi({
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["sensor"],
     }),
 
     // get all sensors
@@ -23,6 +24,7 @@ const sensorApis = createApi({
         url: "/all",
         method: "GET",
       }),
+      providesTags: ["sensor"],
     }),
 
     // get single sensors
@@ -32,6 +34,7 @@ const sensorApis = createApi({
         url: `/single/${sensorId}`,
         method: "GET",
       }),
+      providesTags: ["sensor"],
     }),
 
     // update sensor
@@ -42,6 +45,7 @@ const sensorApis = createApi({
         method: "PUT",
         body: data,
       }),
+      invalidatesTags: ["sensor"],
     }),
 
     // delete sensor
@@ -51,6 +55,7 @@ const sensorApis = createApi({
         url: `/single/${sensorId}`,
         method: "DELETE",
       }),
+      invalidatesTags: ["sensor"],
     }),
   }),
 });
