@@ -13,7 +13,6 @@ import TemperatureIcon from "../../../assets/svgs/dashboard/TemperatureIcon";
 import DeleteIcon from "../../../assets/svgs/pages/DeleteIcon";
 import EditIcon from "../../../assets/svgs/stepper/EditIcon";
 import { useGetSingleBuildingQuery } from "../../../redux/apis/buildingApis";
-import ShowCanvasData from "../../buildings/ShowCanvasData";
 import DoubleAreaChart from "../../charts/areaChart/DoubleAreaChart";
 import BuildingDeleteWithId from "../../shared/large/modal/BuildingDeleteWithId";
 import Modal from "../../shared/large/modal/Modal";
@@ -30,9 +29,8 @@ const BuildingView = () => {
   const [buildingData, setBuildingData] = useState({});
   const { id } = useParams();
   const { data, isSuccess, isLoading } = useGetSingleBuildingQuery(id);
-  const [previewValue, setPreviewValue] = useState("");
-  const [polygons, setPolygons] = useState([]);
 
+  console.log("buildingdata", buildingData);
   useEffect(() => {
     if (isSuccess) {
       const building = data?.data;
@@ -44,14 +42,10 @@ const BuildingView = () => {
           name: building?.name || "",
           position: building?.position || "",
           thumbnail: building?.thumbnail?.url || "",
-          twoDModel: building?.twoDModel?.url || "",
           type: building?.type || "",
           area: building?.area || "",
           totalSensors: building?.floors.reduce((sensors, floor) => sensors + floor?.sensors.length, 0) || 0,
-          twoDModelCanvasData: JSON.parse(building?.twoDModelCanvasData) || [],
         });
-        setPreviewValue(building?.twoDModel?.url);
-        setPolygons(JSON.parse(building?.twoDModelCanvasData));
       }
     }
   }, [data, id, isSuccess]);
@@ -96,7 +90,7 @@ const BuildingView = () => {
         <div className="col-span-12 xl:col-span-8 flex flex-col">
           <div className="grid grid-cols-1">
             <section className="rounded-[16px] p-5 bg-white shadow-dashboard">
-              <ShowCanvasData image={previewValue} polygons={polygons} view="building-view" />
+              <img src={buildingData?.thumbnail} className="w-full" alt="Image" />
             </section>
           </div>
           <div className="grid grid-cols-1 mt-4 rounded-[16px] p-5 bg-white shadow-dashboard">

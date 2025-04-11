@@ -30,18 +30,12 @@ const Buildings = () => {
         temperature: building?.temperature || 0,
         thumbnail: building?.thumbnail?.url || "",
         thumbnailPublicId: building?.tumbnail?.public_id || "",
-        twoDModel: building?.twoDModel?.url || "",
-        twoDModelPublicId: building?.twoDModel?.public_id || "",
         tvoc: building?.tvoc || 0,
         co2: building?.co2 || 0,
-        twoDModelCoordinates: JSON.parse(building?.twoDModelCanvasData) || [],
       }));
-
       setBuildings(buildingsData);
     }
   }, [isSuccess, data]);
-
-  console.log("buildingsData", buildings);
 
   return isLoading ? (
     <Loader />
@@ -75,7 +69,6 @@ const Buildings = () => {
               sensors={building?.sensors}
               temperature={building?.temperature}
               thumbnail={building?.thumbnail}
-              twoDModel={building?.twoDModel}
               tvoc={building?.tvoc}
               co2={building?.co2}
               link={`/dashboard/building-view/${building?.id}`}
