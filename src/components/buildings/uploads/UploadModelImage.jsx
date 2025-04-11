@@ -35,7 +35,7 @@ import Dropdown from "../../shared/small/Dropdown";
 import TextField from "../../shared/small/TextField";
 import { getCroppedImg } from "../utils/addBuildingFeature";
 
-const UploadModelImage = ({ setFile, previewValue, setPreviewValue, polygons, setPolygons ,twoDModel }) => {
+const UploadModelImage = ({ setFile, previewValue, setPreviewValue, polygons, setPolygons, twoDModel }) => {
   const canvasRef = useRef(null);
   const [isDrawingEnabled, setIsDrawingEnabled] = useState(false);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
@@ -55,7 +55,7 @@ const UploadModelImage = ({ setFile, previewValue, setPreviewValue, polygons, se
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [sensorPopup, setSensorPopup] = useState(false);
   const [selectedPolygon, setSelectedPolygon] = useState(null);
-  const [sensorIdInput, setSensorIdInput] = useState("");
+  const [floorName, setFloorName] = useState("");
   const [selectedSensor, setSelectedSensor] = useState("No sensor");
   const [color, setColor] = useState("#ffff00");
   const [reEditModalOpen, setReEditModalOpen] = useState(false);
@@ -65,13 +65,9 @@ const UploadModelImage = ({ setFile, previewValue, setPreviewValue, polygons, se
   const openSensorPopup = (polygon) => {
     setSelectedPolygon(polygon);
     setSensorPopup(true);
-    setSensorIdInput("");
+    setFloorName("");
   };
-
-  const onCropComplete = (croppedArea, croppedAreaPixels) => {
-    setCroppedAreaPixels(croppedAreaPixels);
-  };
-
+  const onCropComplete = (croppedArea, croppedAreaPixels) => setCroppedAreaPixels(croppedAreaPixels);
   const handleCropConfirm = async () => {
     try {
       const croppedImage = await getCroppedImg(previewValue, croppedAreaPixels);
@@ -85,11 +81,9 @@ const UploadModelImage = ({ setFile, previewValue, setPreviewValue, polygons, se
       console.error("Crop failed:", error);
     }
   };
-
   // Enable Polygon Copying
   const handlePolygonCopy = (event) => {
     if (!isCopyMode) return;
-
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
     const x = event.clientX - rect.left;
@@ -100,15 +94,10 @@ const UploadModelImage = ({ setFile, previewValue, setPreviewValue, polygons, se
       path.moveTo(polygon.points[0].x, polygon.points[0].y);
       polygon.points.forEach((point) => path.lineTo(point.x, point.y));
       path.closePath();
-
       return canvas.getContext("2d").isPointInPath(path, x, y);
     });
-
-    if (selectedPolygon) {
-      setDraggedPolygon(selectedPolygon);
-    }
+    if (selectedPolygon) setDraggedPolygon(selectedPolygon);
   };
-
   // Function to open modal with polygon ID
   const handlePolygonClick = (polygonId, polygonSensor) => {
     const polygonToEdit = polygons.find((polygon) => polygon.id === polygonId);
@@ -117,7 +106,6 @@ const UploadModelImage = ({ setFile, previewValue, setPreviewValue, polygons, se
     setSelectedPolygonSensor(polygonSensor);
     setReEditModalOpen(true);
   };
-
   useEffect(() => {
     if (isDrawingEnabled && canvasRef.current) {
       drawCanvas({
@@ -263,24 +251,6 @@ const UploadModelImage = ({ setFile, previewValue, setPreviewValue, polygons, se
             </button>
             <button
               onClick={() =>
-                handleUpdateMode({
-                  setIsCopyMode,
-                  setIsEditMode,
-                  setIsMoveMode,
-                  setIsDeleteMode,
-                  setIsUpdateMode,
-                  setDraggedPolygon,
-                  isCopyMode,
-                })
-              }
-              className={`p-2 border rounded-md text-white ${
-                isUpdateMode ? "border-primary-lightBlue" : "border-[#565656]"
-              }`}
-            >
-              <RiEditBoxFill fontSize={20} color={isUpdateMode ? "rgba(3, 165, 224, 1)" : "#565656"} />
-            </button>
-            <button
-              onClick={() =>
                 handleMoveMode({
                   setIsMoveMode,
                   setIsEditMode,
@@ -328,13 +298,12 @@ const UploadModelImage = ({ setFile, previewValue, setPreviewValue, polygons, se
           <div className="flex flex-col gap-2">
             <TextField
               type="text"
-              placeholder="Sensor Id"
-              label="Sensor Id"
-              value={sensorIdInput}
-              onChange={(e) => setSensorIdInput(e.target.value)}
+              placeholder="Floor Name"
+              label="Floor Name"
+              value={floorName}
+              onChange={(e) => setFloorName(e.target.value)}
             />
-
-            <Dropdown
+            {/* <Dropdown
               defaultText={selectedSensor}
               options={[
                 { option: "Sensor 1", value: "sensor-1" },
@@ -343,7 +312,7 @@ const UploadModelImage = ({ setFile, previewValue, setPreviewValue, polygons, se
               label="Sensor Name"
               // onChange={(e) => setSelectedSensor(e.target.value)}
               onSelect={(selectedOption) => setSelectedSensor(selectedOption.value)}
-            />
+            /> */}
 
             <Dropdown
               defaultText={"first"}
@@ -366,12 +335,12 @@ const UploadModelImage = ({ setFile, previewValue, setPreviewValue, polygons, se
 
             <div className="flex justify-center gap-3">
               <Button
-                disabled={!sensorIdInput}
+                disabled={!floorName}
                 text="Add"
                 width="w-fit"
                 onClick={() => {
                   sensorInfoSubmitHandler(
-                    sensorIdInput,
+                    floorName,
                     polygons,
                     selectedPolygon,
                     selectedSensor,
@@ -392,47 +361,6 @@ const UploadModelImage = ({ setFile, previewValue, setPreviewValue, polygons, se
                     selectedPolygon,
                     setCurrentPolygon,
                     setSelectedPolygon
-                  )
-                }
-              />
-            </div>
-          </div>
-        </Modal>
-      )}
-      {reEditModalOpen && (
-        <Modal title="Add Sensor" onClose={() => setReEditModalOpen(false)}>
-          <div className="flex flex-col gap-2">
-            <TextField
-              type="text"
-              placeholder="Sensor Id"
-              label="Sensor Id"
-              value={selectedPolygonId}
-              onChange={(e) => setSelectedPolygonId(e.target.value)}
-            />
-            <Dropdown
-              defaultText={selectedPolygonSensor || selectedSensor}
-              options={[
-                { option: "No sensor", value: "no-sensor" },
-                { option: "Sensor 1", value: "sensor-1" },
-                { option: "Sensor 2", value: "sensor-2" },
-              ]}
-              label="Sensor Name"
-              // onChange={(e) => setSelectedSensor(e.target.value)}
-              onSelect={(selectedOption) => setSelectedPolygonSensor(selectedOption.value)}
-            />
-
-            <div className="flex justify-center">
-              <Button
-                text="Update"
-                width="w-fit"
-                onClick={() =>
-                  sensorInfoUpdateHandler(
-                    setPolygons,
-                    selectedPolygon,
-                    selectedPolygonId,
-                    selectedPolygonSensor,
-                    selectedSensor,
-                    setReEditModalOpen
                   )
                 }
               />
