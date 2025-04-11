@@ -1,39 +1,27 @@
 /* eslint-disable react/jsx-key */
 import React, { useEffect, useState } from "react";
-import { buildings, floorViewStatus } from "../../../data/data";
-import StatusCard from "../../shared/large/card/StatusCard";
-import AlarmsIcon from "../../../assets/svgs/dashboard/AlarmsIcon";
-import HumidityIcon from "../../../assets/svgs/buildings/HumidityIcon";
-import MethaneIcon from "../../../assets/svgs/buildings/MethaneIcon";
 import CarbonMonoxideIcon from "../../../assets/svgs/buildings/CarbonMonoxideIcon";
 import CoIcon from "../../../assets/svgs/buildings/CoIcon";
+import HumidityIcon from "../../../assets/svgs/buildings/HumidityIcon";
 import LpgIcon from "../../../assets/svgs/buildings/LpgIcon";
-import polygonBuilding from "../../../assets/images/buildings/polygonBuilding.png";
+import MethaneIcon from "../../../assets/svgs/buildings/MethaneIcon";
+import AlarmsIcon from "../../../assets/svgs/dashboard/AlarmsIcon";
+import { floorViewStatus } from "../../../data/data";
+import StatusCard from "../../shared/large/card/StatusCard";
 
+import { Link, useParams } from "react-router-dom";
+import DeleteIcon from "../../../assets/svgs/pages/DeleteIcon";
+import EditIcon from "../../../assets/svgs/stepper/EditIcon";
+import { useGetAllBuildingsQuery } from "../../../redux/apis/buildingApis";
+import { useDeleteSingleFloorMutation } from "../../../redux/apis/floorApis";
+import ShowCanvasData from "../../buildings/ShowCanvasData";
+import DoubleAreaChart from "../../charts/areaChart/DoubleAreaChart";
+import Alerts from "./components/Alerts";
+import CurrentHumidityChart from "./components/CurrentHumidityChart";
 import FloorDetails from "./components/FloorDetails";
 import FloorSensorDetails from "./components/FloorSensorDetails";
-import Alerts from "./components/Alerts";
-import DoubleAreaChart from "../../charts/areaChart/DoubleAreaChart";
-import CurrentHumidityChart from "./components/CurrentHumidityChart";
-import { Link, useParams } from "react-router-dom";
-import heatMap from "../../../assets/images/floorView/heatmap.png";
-import floorLayout from "../../../assets/images/buildings/greyBuilding.png";
-import { useGetAllBuildingsQuery } from "../../../redux/apis/buildingApis";
-import ShowCanvasData from "../../buildings/ShowCanvasData";
-import ShowHeatmapData from "../../buildings/ShowHeatmapData";
-import EditIcon from "../../../assets/svgs/stepper/EditIcon";
-import DeleteIcon from "../../../assets/svgs/pages/DeleteIcon";
 
-const icons = [
-  <AlarmsIcon />,
-  <HumidityIcon />,
-  <MethaneIcon />,
-  <CarbonMonoxideIcon />,
-
-  <CoIcon />,
-
-  <LpgIcon />,
-];
+const icons = [<AlarmsIcon />, <HumidityIcon />, <MethaneIcon />, <CarbonMonoxideIcon />, <CoIcon />, <LpgIcon />];
 
 let floorDetails = {
   buildingImg: "",
@@ -49,12 +37,11 @@ const FloorView = () => {
   const [image, setImage] = useState("");
   const [polygons, setPolygons] = useState([]);
   const { data, isSuccess, isLoading } = useGetAllBuildingsQuery();
+  const [deleteFloor] = useDeleteSingleFloorMutation();
 
   useEffect(() => {
     if (isSuccess) {
-      const building = data?.data?.find((building) =>
-        building?.floors?.some((floor) => floor?._id === id)
-      );
+      const building = data?.data?.find((building) => building?.floors?.some((floor) => floor?._id === id));
       const singleFloor = building?.floors?.find((floor) => floor?._id === id);
       floorDetails = {
         ...floorDetails,
@@ -69,21 +56,16 @@ const FloorView = () => {
       console.log("floorDetails", singleFloor);
     }
   }, [data, isSuccess, id]);
-  const handleOpenDeleteModal = () => {
-    setDeleteModal(true);
+  const handleOpenDeleteModal = async () => {
+    const res = await deleteFloor(id);
+    console.log("res", res);
   };
 
   return (
     <div>
       <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-6 gap-4">
         {floorViewStatus.map((item, i) => (
-          <StatusCard
-            key={i}
-            status={item.status}
-            from={item.from}
-            type={item.type}
-            icon={icons[i % icons.length]}
-          />
+          <StatusCard key={i} status={item.status} from={item.from} type={item.type} icon={icons[i % icons.length]} />
         ))}
       </section>
 
@@ -131,10 +113,11 @@ const FloorView = () => {
           <div className="flex border  w-fit border-none  px-1 py-2 rounded-lg relative h-[40px] sm:h-[60px] mb-6">
             {/* Heat Map button */}
             <button
-              className={`absolute  w-[120px] bg-[#03A5E040] px-4 py-2  text-sm font-medium transition-colors duration-300 ${activeTab === "heat"
-                ? "bg-white text-[#03A5E0] shadow-[4px_0_10px_rgba(0,0,0,0.25)] rounded-lg font-[700] z-[1]"
-                : "bg-[#03A5E040] text-gray-500 rounded-l-lg z-[0]"
-                }`}
+              className={`absolute  w-[120px] bg-[#03A5E040] px-4 py-2  text-sm font-medium transition-colors duration-300 ${
+                activeTab === "heat"
+                  ? "bg-white text-[#03A5E0] shadow-[4px_0_10px_rgba(0,0,0,0.25)] rounded-lg font-[700] z-[1]"
+                  : "bg-[#03A5E040] text-gray-500 rounded-l-lg z-[0]"
+              }`}
               onClick={() => setActiveTab("heat")}
             >
               Heat Map
@@ -142,10 +125,11 @@ const FloorView = () => {
 
             {/* Floor Layout button */}
             <button
-              className={`w-[120px] px-4 py-2 text-sm font-medium transition-colors duration-300 absolute left-[120px]  ${activeTab === "floor"
-                ? "bg-white text-[#03A5E0] shadow-[-5px_5px_15px_rgba(0,0,0,0.25)] rounded-lg font-[700] z-[1]"
-                : "bg-[#03A5E040] text-gray-500 rounded-r-lg z-[0]"
-                }`}
+              className={`w-[120px] px-4 py-2 text-sm font-medium transition-colors duration-300 absolute left-[120px]  ${
+                activeTab === "floor"
+                  ? "bg-white text-[#03A5E0] shadow-[-5px_5px_15px_rgba(0,0,0,0.25)] rounded-lg font-[700] z-[1]"
+                  : "bg-[#03A5E040] text-gray-500 rounded-r-lg z-[0]"
+              }`}
               onClick={() => setActiveTab("floor")}
             >
               Floor Layout
@@ -155,11 +139,7 @@ const FloorView = () => {
           <div className="flex justify-center">
             {activeTab === "heat" ? (
               // <img src={heatMap} alt="Heat Map" className="h-[400px]" />
-              <ShowCanvasData
-                image={image}
-                polygons={polygons}
-                heatmap={true}
-              />
+              <ShowCanvasData image={image} polygons={polygons} heatmap={true} />
             ) : (
               <ShowCanvasData image={image} polygons={polygons} />
             )}
