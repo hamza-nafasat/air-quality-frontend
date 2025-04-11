@@ -16,17 +16,11 @@ const Buildings = () => {
   const currentItems = buildings.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(buildings.length / itemsPerPage);
 
-  const handleNextPage = () => {
-    if (currentPage < totalPages) setCurrentPage((prevPage) => prevPage + 1);
-  };
-
-  const handlePrevPage = () => {
-    if (currentPage > 1) setCurrentPage((prevPage) => prevPage - 1);
-  };
+  const handleNextPage = () => (currentPage < totalPages ? setCurrentPage((prevPage) => prevPage + 1) : null);
+  const handlePrevPage = () => (currentPage > 1 ? setCurrentPage((prevPage) => prevPage - 1) : null);
 
   useEffect(() => {
     if (isSuccess) {
-      // console.log("data", data.data);
       const buildingsData = data?.data?.map((building) => ({
         ...building,
         id: building?._id,
@@ -69,7 +63,6 @@ const Buildings = () => {
           </div>
         </div>
       </section>
-
       <section className="p-3">
         {buildings?.length === 0 ? (
           <div className="text-gray-500 font-medium text-base">No buildings data</div>
@@ -90,7 +83,6 @@ const Buildings = () => {
           ))
         )}
       </section>
-
       <div className="flex justify-between items-center mt-4">
         <button
           onClick={handlePrevPage}
