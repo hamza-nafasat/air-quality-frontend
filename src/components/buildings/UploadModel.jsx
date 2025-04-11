@@ -16,25 +16,12 @@ const UploadModel = ({ setCurrentStep }) => {
   const [twoDModelPreview, setTwoDModelPreview] = useState(null);
   const [twoDModelCoordinates, setTwoDModelCoordinates] = useState([]);
 
-
   const submitHandler = () => {
-    if (!twoDModel || !twoDModelPreview || twoDModelCoordinates?.length === 0) {
-      toast.error("Please Upload 2D Model and draw canvas over image");
-      return;
-    }
-    dispatch(
-      setBuildingData({
-        ...buildingData,
-        twoDModel,
-        twoDModelCoordinates,
-        twoDModelPreview,
-      })
-    );
+    if (!twoDModel || !twoDModelPreview || twoDModelCoordinates?.length === 0)
+      return toast.error("Please Upload 2D Model and draw canvas over image");
+    dispatch(setBuildingData({ ...buildingData, twoDModel, twoDModelCoordinates, twoDModelPreview }));
     setCurrentStep((prevStep) => prevStep + 1);
   };
-
-  console.log("buildings data", buildingData);
-
   useEffect(() => {
     if (buildingData?.twoDModel) setTwoDModel(buildingData?.twoDModel);
     if (buildingData?.twoDModelPreview) setTwoDModelPreview(buildingData?.twoDModelPreview);
