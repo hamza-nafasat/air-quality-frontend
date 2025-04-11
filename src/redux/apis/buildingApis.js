@@ -14,6 +14,7 @@ const buildingApis = createApi({
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["building"],
     }),
 
     // get all buildings
@@ -23,6 +24,7 @@ const buildingApis = createApi({
         url: "/all",
         method: "GET",
       }),
+      providesTags: ["building"],
     }),
 
     // get single building
@@ -32,6 +34,7 @@ const buildingApis = createApi({
         url: `/single/${buildingId}`,
         method: "GET",
       }),
+      providesTags: ["building"],
     }),
 
     // update single building
@@ -42,6 +45,7 @@ const buildingApis = createApi({
         method: "PUT",
         body: data,
       }),
+      invalidatesTags: ["building"],
     }),
 
     // delete single building
@@ -51,6 +55,7 @@ const buildingApis = createApi({
         url: `/single/${buildingId}`,
         method: "DELETE",
       }),
+      invalidatesTags: ["building"],
     }),
   }),
 });
