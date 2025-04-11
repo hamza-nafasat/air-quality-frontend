@@ -2,11 +2,9 @@ import { useState } from "react";
 import AddfloorsIcon from "../../assets/svgs/stepper/AddfloorsIcon";
 import GeneralInfoIcon from "../../assets/svgs/stepper/GeneralInfoIcon";
 import MappingIcon from "../../assets/svgs/stepper/MappingIcon";
-import TwoDIcon from "../../assets/svgs/stepper/TwoDIcon";
 import AddFloors from "./AddFloors";
 import GeneralInfo from "./GeneralInfo";
 import Mapping from "./Mapping";
-import UploadModel from "./UploadModel";
 
 const BuildingStepper = () => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -14,35 +12,21 @@ const BuildingStepper = () => {
   const renderStepContent = (step) => {
     switch (step) {
       case 0:
-        return <UploadModel setCurrentStep={setCurrentStep} />;
-      case 1:
         return <GeneralInfo setCurrentStep={setCurrentStep} />;
-      case 2:
+      case 1:
         return <Mapping setCurrentStep={setCurrentStep} />;
-      case 3:
+      case 2:
         return <AddFloors setCurrentStep={setCurrentStep} />;
       default:
         return null;
     }
   };
-
+  // return <UploadModel setCurrentStep={setCurrentStep} />;
+  // { label: "Upload 2D Model", icon: <TwoDIcon /> },
   const steps = [
-    {
-      label: "Upload 2D Model",
-      icon: <TwoDIcon />,
-    },
-    {
-      label: "General Info",
-      icon: <GeneralInfoIcon />,
-    },
-    {
-      label: "Mapping",
-      icon: <MappingIcon />,
-    },
-    {
-      label: "Add Floors",
-      icon: <AddfloorsIcon />,
-    },
+    { label: "General Info", icon: <GeneralInfoIcon /> },
+    { label: "Mapping", icon: <MappingIcon /> },
+    { label: "Add Floors", icon: <AddfloorsIcon /> },
   ];
   return (
     <div className="bg-white rounded-[18px] p-4 h-full">
@@ -50,9 +34,9 @@ const BuildingStepper = () => {
         {steps.map((step, index) => (
           <div
             key={index}
-            className={`flex items-center cursor-default ${
-              currentStep >= index ? "opacity-100" : "opacity-50"
-            } ${index < steps.length - 1 ? "flex-1" : ""}`}
+            className={`flex items-center cursor-default ${currentStep >= index ? "opacity-100" : "opacity-50"} ${
+              index < steps.length - 1 ? "flex-1" : ""
+            }`}
           >
             <div className="flex items-center gap-1 bg-primary-lightBlue rounded-xl p-[6px] w-[185px] text-white">
               {step.icon}
