@@ -1,60 +1,42 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import AddIcon from "../../assets/svgs/stepper/AddIcon";
 import DeleteIcon from "../../assets/svgs/stepper/DeleteIcon";
 import EditIcon from "../../assets/svgs/stepper/EditIcon";
-import TemperatureIcon from "../../assets/svgs/stepper/TemperatureIcon";
-import TvocIcon from "../../assets/svgs/stepper/TvocIcon";
 import {
   useCreateBuildingMutation,
   useDeleteSingleBuildingMutation,
   useUpdateSingleBuildingMutation,
 } from "../../redux/apis/buildingApis";
 import { useCreateFloorMutation } from "../../redux/apis/floorApis";
-import { useGetAllSensorsQuery } from "../../redux/apis/sensorApis";
-import BrowseFile from "../shared/large/BrowseFile";
-import Button from "../shared/small/Button";
-import Dropdown from "../shared/small/Dropdown";
-import TextField from "../shared/small/TextField";
 import { removeBuildingData } from "../../redux/slices/buildingSlice";
+import Button from "../shared/small/Button";
+import TextField from "../shared/small/TextField";
 import UploadAddFloors from "./uploads/UploadAddFloors";
 
 const AddFloors = ({ setCurrentStep }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [addBuilding, { isLoading: isAddBuilding }] =
-    useCreateBuildingMutation("");
-  const [deleteBuilding, { isLoading: isDeleteBuilding }] =
-    useDeleteSingleBuildingMutation("");
-  const [updateBuilding, { isLoading: isUpdateBuilding }] =
-    useUpdateSingleBuildingMutation("");
+
+  const [addBuilding, { isLoading: isAddBuilding }] = useCreateBuildingMutation("");
+  const [deleteBuilding, { isLoading: isDeleteBuilding }] = useDeleteSingleBuildingMutation("");
+  const [updateBuilding, { isLoading: isUpdateBuilding }] = useUpdateSingleBuildingMutation("");
   const [addFloor, { isLoading: isAddFloor }] = useCreateFloorMutation();
+
   const { buildingData } = useSelector((state) => state.building);
-  const { data, isSuccess } = useGetAllSensorsQuery("");
   const [floorsCount, setFloorsCount] = useState([{}]);
   const [floorsState, setFloorsState] = useState([]);
-  const [sensorsOptions, setSensorsOptions] = useState([
-    { option: "", value: "", icon: "" },
-  ]);
   const [accordionState, setAccordionState] = useState([]);
   const [buildingId, setBuildingId] = useState("");
 
-  // Toggle specific accordion
-  const toggleAccordion = (index) => {
-    setAccordionState((prev) =>
-      prev.map((isOpen, i) => (i === index ? !isOpen : isOpen))
-    );
-  };
+  console.log("building Data", buildingData);
 
+  const toggleAccordion = (index) =>
+    setAccordionState((prev) => prev.map((isOpen, i) => (i === index ? !isOpen : isOpen)));
   const openNextAccordion = (index) =>
-    setAccordionState((prev) =>
-      prev.map((isOpen, i) => (i === index + 1 ? true : false))
-    );
-
+    setAccordionState((prev) => prev.map((isOpen, i) => (i === index + 1 ? true : false)));
   // Check if all floors are filled to enable the Next button
   const allFloorsFilled =
     floorsState.length === floorsCount.length &&
@@ -76,19 +58,14 @@ const AddFloors = ({ setCurrentStep }) => {
       formData.append("address", buildingData?.address);
       formData.append("position", buildingData?.position);
       formData.append("thumbnail", buildingData?.thumbnail);
-      formData.append("2dModel", buildingData?.twoDModel);
-      formData.append(
-        "twoDModelCanvasData",
-        JSON.stringify(buildingData?.twoDModelCoordinates)
-      );
       const addBuildingResponse = await addBuilding(formData).unwrap();
-
       if (addBuildingResponse?.success) {
         const buildingId = addBuildingResponse?.buildingId;
         setBuildingId(String(buildingId));
         const floorPromises = [];
         for (let i = 0; i < floorsState.length; i++) {
           const floor = floorsState[i];
+          console.log("floor data", floor);
           if (
             !floor?.floorName ||
             !floor?.roomsCount ||
@@ -107,10 +84,7 @@ const AddFloors = ({ setCurrentStep }) => {
           formData.append("rooms", floor?.roomsCount);
           formData.append("file", floor?.twoDModal);
           formData.append("sensors", sensors);
-          formData.append(
-            "twoDModelCanvasData",
-            JSON.stringify(floor.twoDModelCoordinates)
-          );
+          formData.append("twoDModelCanvasData", JSON.stringify(floor.twoDModelCoordinates));
           formData.append("buildingId", buildingId);
           floorPromises.push(addFloor(formData).unwrap());
         }
@@ -147,26 +121,9 @@ const AddFloors = ({ setCurrentStep }) => {
         floorsCounts.push({});
       }
       setFloorsCount(floorsCounts);
-      // Initialize accordion state for each floor
       setAccordionState(Array(length).fill(false));
     }
   }, [buildingData]);
-
-  useEffect(() => {
-    if (isSuccess && data?.data?.length) {
-      const sensorsOptions = [];
-      data?.data?.forEach((sensor) => {
-        if (!sensor?.isConnected) {
-          sensorsOptions.push({
-            option: sensor?.name,
-            value: sensor?._id,
-            icon: sensor?.type === "tvoc" ? <TvocIcon /> : <TemperatureIcon />,
-          });
-        }
-      });
-      setSensorsOptions(sensorsOptions);
-    }
-  }, [data, isSuccess]);
 
   return (
     <div>
@@ -181,8 +138,6 @@ const AddFloors = ({ setCurrentStep }) => {
             floorsState={floorsState}
             setFloorsState={setFloorsState}
             floorIndex={i}
-            sensorsOptions={sensorsOptions}
-            setSensorsOptions={setSensorsOptions}
             openNextAccordion={() => openNextAccordion(i)}
           />
         </Accordion>
@@ -200,13 +155,7 @@ const AddFloors = ({ setCurrentStep }) => {
           text="Add Building"
           width="w-[128px]"
           onClick={mainSaveHandler}
-          disabled={
-            !allFloorsFilled ||
-            isAddBuilding ||
-            isAddFloor ||
-            isUpdateBuilding ||
-            isDeleteBuilding
-          }
+          disabled={!allFloorsFilled || isAddBuilding || isAddFloor || isUpdateBuilding || isDeleteBuilding}
         />
       </div>
     </div>
@@ -216,32 +165,13 @@ const AddFloors = ({ setCurrentStep }) => {
 export default AddFloors;
 
 // Reusing your AddFloor Component
-const AddFloor = ({
-  floorsState,
-  setFloorsState,
-  floorIndex,
-  sensorsOptions,
-  setSensorsOptions,
-  openNextAccordion,
-}) => {
+const AddFloor = ({ floorsState, setFloorsState, floorIndex, openNextAccordion }) => {
   const [twoDModal, setTwoDModal] = useState();
   const [twoDModalPreview, setTwoDModalPreview] = useState();
   const [floorName, setFloorName] = useState("");
   const [roomsCount, setRoomsCount] = useState(1);
   const [selectedSensors, setSelectedSensors] = useState([]);
   const [twoDModelCoordinates, setTwoDModelCoordinates] = useState([]);
-
-  const deleteSensorHandler = (value) => {
-    setSelectedSensors(selectedSensors.filter((sensor) => sensor !== value));
-    setSensorsOptions([...sensorsOptions, value]);
-  };
-
-  const selectSensorHandler = (value) => {
-    setSensorsOptions(
-      sensorsOptions.filter((sensor) => sensor?.value !== value?.value)
-    );
-    setSelectedSensors([...selectedSensors, value]);
-  };
 
   const saveStateHandler = () => {
     if (
@@ -275,16 +205,12 @@ const AddFloor = ({
       twoDModelCoordinates,
     };
     setFloorsState(newFloorState);
-
-    // Open the next accordion
     openNextAccordion();
   };
 
   return (
     <div>
-      <h3 className="text-sm font-semibold text-[rgba(6,6,6,0.8)]">
-        Add Floors
-      </h3>
+      <h3 className="text-sm font-semibold text-[rgba(6,6,6,0.8)]">Add Floors</h3>
       <form className="grid grid-cols-1 lg:grid-cols-12 gap-4 my-4">
         <div className="lg:col-span-6">
           <TextField
@@ -304,9 +230,7 @@ const AddFloor = ({
         </div>
       </form>
       <div className="flex items-center justify-between gap-4">
-        <h3 className="text-sm md:text-base font-semibold text-[rgba(6,6,6,0.8)]">
-          Upload 2D Model Of Floor
-        </h3>
+        <h3 className="text-sm md:text-base font-semibold text-[rgba(6,6,6,0.8)]">Upload 2D Model Of Floor</h3>
         <div className="flex items-center gap-4">
           <div className="cursor-pointer">
             <EditIcon />
@@ -323,9 +247,12 @@ const AddFloor = ({
           setPreviewValue={setTwoDModalPreview}
           polygons={twoDModelCoordinates}
           setPolygons={setTwoDModelCoordinates}
+          selectedSensor={selectedSensors}
+          setSelectedSensor={setSelectedSensors}
         />
       </div>
-      <div>
+      {/* add sensor section */}
+      {/* <div>
         <Dropdown
           defaultText="Add Sensor"
           options={sensorsOptions}
@@ -333,8 +260,6 @@ const AddFloor = ({
           onSelect={(value) => selectSensorHandler(value)}
         />
       </div>
-
-      {/* Sensors list */}
       <div className="my-4">
         {selectedSensors?.length > 0 ? (
           <ul className="space-y-2">
@@ -345,15 +270,10 @@ const AddFloor = ({
               >
                 <div className="flex items-center gap-2">
                   <div>{sensor?.icon}</div>
-                  <span className="text-[#0a87b5] text-sm md:text-base font-semibold">
-                    {sensor?.option}
-                  </span>
+                  <span className="text-[#0a87b5] text-sm md:text-base font-semibold">{sensor?.option}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => deleteSensorHandler(sensor)}
-                  >
+                  <button type="button" onClick={() => deleteSensorHandler(sensor)}>
                     <DeleteIcon />
                   </button>
                 </div>
@@ -363,15 +283,9 @@ const AddFloor = ({
         ) : (
           <p>No sensors added yet.</p>
         )}
-      </div>
-
+      </div> */}
       <div className="flex items-center justify-end gap-4">
-        <Button
-          type="button"
-          text="Save"
-          width="w-[128px]"
-          onClick={saveStateHandler}
-        />
+        <Button type="button" text="Save" width="w-[128px]" onClick={saveStateHandler} />
       </div>
     </div>
   );
