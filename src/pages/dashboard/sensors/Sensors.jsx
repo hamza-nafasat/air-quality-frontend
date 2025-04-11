@@ -19,9 +19,10 @@ import { toast } from "react-toastify";
 import Loader from "../../../components/shared/small/Loader";
 
 const columns = (modalOpenHandler, navigate, statusToggleHandler, deleteHandler) => [
-  { name: "Name", selector: (row) => row.name },
-  { name: "URL", selector: (row) => row.url },
-  { name: "Type", selector: (row) => row.type },
+  { name: "Name", selector: (row) => row?.name },
+  { name: "Type", selector: (row) => row?.type },
+  { name: "Created At", selector: (row) => new Date(row?.createdAt).toLocaleString() },
+  { name: "Is Connected", selector: (row) => (row?.isConnected ? "Yes" : "No") },
   {
     name: "Status",
     selector: (row) => (
@@ -140,12 +141,12 @@ const Sensors = () => {
       </div>
       {modal === "add" && (
         <Modal title="Add Sensor" width="w-[300px] md:w-[750px]" onClose={modalCloseHandler}>
-          <AddSensor refetch={refetch} onClose={modalCloseHandler} />
+          <AddSensor onClose={modalCloseHandler} />
         </Modal>
       )}
       {modal === "edit" && (
         <Modal title="Edit Sensor" width="w-[300px] md:w-[650px]" onClose={modalCloseHandler}>
-          <EditSensor refetch={refetch} selectedSensor={selectedSensor} onClose={modalCloseHandler} />
+          <EditSensor selectedSensor={selectedSensor} onClose={modalCloseHandler} />
         </Modal>
       )}
     </div>
