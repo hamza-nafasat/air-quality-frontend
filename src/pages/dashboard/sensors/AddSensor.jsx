@@ -6,30 +6,23 @@ import { sensorTypes } from "./sensorOptions";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { useCreateSensorMutation } from "../../../redux/apis/sensorApis";
+import { v4 as uuidv4 } from "uuid";
 
-const AddSensor = ({ onClose, refetch }) => {
+const AddSensor = ({ onClose }) => {
   const [addSensor, { isLoading }] = useCreateSensorMutation();
-  const [form, setForm] = useState({
-    name: "",
-    type: "",
-    uniqueId: "",
-    url: "",
-    location: "",
-  });
+  const [form, setForm] = useState({ name: "", type: "", uniqueId: uuidv4() });
+
   const handleAddSensor = async () => {
     try {
-      if (!form?.name || !form?.type || !form?.uniqueId || !form?.url) {
+      if (!form?.name || !form?.type || !form?.uniqueId) {
         return toast.error("Please fill all the fields");
       }
       const response = await addSensor({
         name: form.name,
         type: form.type,
         uniqueId: form.uniqueId,
-        url: form.url,
-        location: form.location,
       }).unwrap();
       if (response?.success) {
-        await refetch();
         toast.success(response?.message);
       }
     } catch (error) {
@@ -39,6 +32,7 @@ const AddSensor = ({ onClose, refetch }) => {
       onClose();
     }
   };
+
   return (
     <div>
       <h6 className="text-base md:text-lg text-[#000]">General Info</h6>
@@ -63,22 +57,6 @@ const AddSensor = ({ onClose, refetch }) => {
           value={form?.uniqueId}
           onChange={(e) => setForm({ ...form, uniqueId: e.target.value })}
         />
-        <TextField
-          label="Location"
-          type="text"
-          placeholder="Device Location"
-          value={form?.location}
-          onChange={(e) => setForm({ ...form, location: e.target.value })}
-        />
-        <div className="col-span-2">
-          <TextField
-            label=" Url"
-            type="text"
-            placeholder="Device Url"
-            value={form?.url}
-            onChange={(e) => setForm({ ...form, url: e.target.value })}
-          />
-        </div>
       </div>
       <div className="flex justify-end mt-4">
         <Button
