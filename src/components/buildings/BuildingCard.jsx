@@ -32,12 +32,6 @@ const BuildingInfo = ({ name, thumbnail, address, sensors }) => {
         <section className="flex justify-between  ">
           <div>
             <h2 className="text-[14px] xl:text-[16px] font-[700] w-0 xl:min-w-[200px]">{name}</h2>
-
-            {/* <div className="flex gap-1">
-              {" "}
-              <LocationIcon />
-              <h6 className="text-[10px] xl:text-[12px] font-[600] xl:min-w-[200px] "> {address}</h6>
-            </div> */}
           </div>
         </section>
         <section className="flex items-center gap-2">
@@ -53,7 +47,6 @@ const BuildingInfo = ({ name, thumbnail, address, sensors }) => {
 };
 
 const SensorInfo = ({ temperature, tvoc, co2, link }) => {
-  // const navigate = useNavigate();
   return (
     <div className="flex justify-end">
       <div className="flex  flex-col-reverse xl:flex-col items-end gap-5">
