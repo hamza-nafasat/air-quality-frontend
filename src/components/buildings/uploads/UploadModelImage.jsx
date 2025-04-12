@@ -6,7 +6,6 @@ import Cropper from "react-easy-crop";
 import { AiOutlineDelete } from "react-icons/ai";
 import { CiExport } from "react-icons/ci";
 import { LiaDrawPolygonSolid } from "react-icons/lia";
-import { RiEditBoxFill } from "react-icons/ri";
 import { SlCursorMove } from "react-icons/sl";
 import { VscCopy } from "react-icons/vsc";
 import {
@@ -24,18 +23,29 @@ import {
   handleImageUpload,
   handleMoveMode,
   handleReEditPolygon,
-  handleUpdateMode,
   polygonsLabelHandler,
   sensorInfoSubmitHandler,
-  sensorInfoUpdateHandler,
 } from "../../globalUtils/uploadFeatures";
 import Modal from "../../shared/modal/Modal";
 import Button from "../../shared/small/Button";
 import Dropdown from "../../shared/small/Dropdown";
 import TextField from "../../shared/small/TextField";
 import { getCroppedImg } from "../utils/addBuildingFeature";
+import { useGetAllSensorsQuery } from "../../../redux/apis/sensorApis";
 
-const UploadModelImage = ({ setFile, previewValue, setPreviewValue, polygons, setPolygons, twoDModel }) => {
+const UploadModelImage = ({
+  setFile,
+  previewValue,
+  setPreviewValue,
+  polygons,
+  setPolygons,
+  twoDModel,
+  selectedSensor,
+  setSelectedSensor,
+}) => {
+  const { data } = useGetAllSensorsQuery();
+  const [availableSensors, setAvailableSensors] = useState([]);
+
   const canvasRef = useRef(null);
   const [isDrawingEnabled, setIsDrawingEnabled] = useState(false);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
@@ -55,17 +65,30 @@ const UploadModelImage = ({ setFile, previewValue, setPreviewValue, polygons, se
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [sensorPopup, setSensorPopup] = useState(false);
   const [selectedPolygon, setSelectedPolygon] = useState(null);
-  const [floorName, setFloorName] = useState("");
-  const [selectedSensor, setSelectedSensor] = useState("No sensor");
+  const [roomName, setRoomName] = useState("");
   const [color, setColor] = useState("#ffff00");
   const [reEditModalOpen, setReEditModalOpen] = useState(false);
   const [selectedPolygonId, setSelectedPolygonId] = useState("");
   const [selectedPolygonSensor, setSelectedPolygonSensor] = useState("");
 
+  useEffect(() => {
+    if (data?.data) {
+      const availableSensors = [];
+      data?.data?.forEach((sensor) => {
+        if (!sensor?.isConnected) availableSensors.push({ option: sensor?.name, value: sensor?._id });
+      });
+      setAvailableSensors(availableSensors);
+    }
+  }, [data]);
+  const sensorOnSelectHandler = (selectedOption) => {
+    setSelectedSensor([...selectedSensor, selectedOption?.value]);
+    setAvailableSensors(availableSensors.filter((sensor) => sensor.value !== selectedOption.value));
+  };
+
   const openSensorPopup = (polygon) => {
     setSelectedPolygon(polygon);
     setSensorPopup(true);
-    setFloorName("");
+    setRoomName("");
   };
   const onCropComplete = (croppedArea, croppedAreaPixels) => setCroppedAreaPixels(croppedAreaPixels);
   const handleCropConfirm = async () => {
@@ -298,29 +321,26 @@ const UploadModelImage = ({ setFile, previewValue, setPreviewValue, polygons, se
           <div className="flex flex-col gap-2">
             <TextField
               type="text"
-              placeholder="Floor Name"
-              label="Floor Name"
-              value={floorName}
-              onChange={(e) => setFloorName(e.target.value)}
+              placeholder="Room Name"
+              label="Room Name"
+              value={roomName}
+              onChange={(e) => setRoomName(e.target.value)}
             />
-            {/* <Dropdown
-              defaultText={selectedSensor}
-              options={[
-                { option: "Sensor 1", value: "sensor-1" },
-                { option: "Sensor 2", value: "sensor-2" },
-              ]}
-              label="Sensor Name"
-              // onChange={(e) => setSelectedSensor(e.target.value)}
-              onSelect={(selectedOption) => setSelectedSensor(selectedOption.value)}
-            /> */}
 
             <Dropdown
-              defaultText={"first"}
+              defaultText={"Select Sensor"}
+              options={availableSensors}
+              label="Sensor Name"
+              onSelect={(selectedOption) => sensorOnSelectHandler(selectedOption)}
+            />
+
+            <Dropdown
+              defaultText={"Top-Left"}
               options={[
-                { option: "First-Point", value: "first" },
-                { option: "Second-Point", value: "second" },
-                { option: "Third-Point", value: "third" },
-                { option: "Fourth-Point", value: "fourth" },
+                { option: "Top Left", value: "first" },
+                { option: "Top Right", value: "second" },
+                { option: "Bottom Right", value: "third" },
+                { option: "Bottom Left", value: "fourth" },
               ]}
               label="Label Positioning of polygon"
               onSelect={(selectedOption) =>
@@ -335,12 +355,12 @@ const UploadModelImage = ({ setFile, previewValue, setPreviewValue, polygons, se
 
             <div className="flex justify-center gap-3">
               <Button
-                disabled={!floorName}
+                disabled={!roomName}
                 text="Add"
                 width="w-fit"
                 onClick={() => {
                   sensorInfoSubmitHandler(
-                    floorName,
+                    roomName,
                     polygons,
                     selectedPolygon,
                     selectedSensor,
@@ -378,7 +398,12 @@ const BrowseFileBtn = ({ onFileChange }) => {
   return (
     <button className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 px-4 py-2 cursor-pointer rounded-lg bg-primary-lightBlue text-white font-semibold">
       Browse File
-      <input type="file" className="absolute inset-0 cursor-pointer opacity-0" onChange={onFileChange} />
+      <input
+        type="file"
+        accept="image/*"
+        className="absolute inset-0 cursor-pointer opacity-0"
+        onChange={onFileChange}
+      />
     </button>
   );
 };
