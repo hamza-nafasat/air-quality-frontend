@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-key */
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import CarbonMonoxideIcon from "../../../assets/svgs/buildings/CarbonMonoxideIcon";
 import CoIcon from "../../../assets/svgs/buildings/CoIcon";
 import HumidityIcon from "../../../assets/svgs/buildings/HumidityIcon";
@@ -8,67 +8,81 @@ import MethaneIcon from "../../../assets/svgs/buildings/MethaneIcon";
 import AlarmsIcon from "../../../assets/svgs/dashboard/AlarmsIcon";
 import { floorViewStatus } from "../../../data/data";
 import StatusCard from "../../shared/large/card/StatusCard";
-
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import DeleteIcon from "../../../assets/svgs/pages/DeleteIcon";
 import EditIcon from "../../../assets/svgs/stepper/EditIcon";
-import { useGetAllBuildingsQuery } from "../../../redux/apis/buildingApis";
-import { useDeleteSingleFloorMutation } from "../../../redux/apis/floorApis";
+import { useDeleteSingleFloorMutation, useGetSingleFloorQuery } from "../../../redux/apis/floorApis";
 import ShowCanvasData from "../../buildings/ShowCanvasData";
 import DoubleAreaChart from "../../charts/areaChart/DoubleAreaChart";
 import Alerts from "./components/Alerts";
 import CurrentHumidityChart from "./components/CurrentHumidityChart";
 import FloorDetails from "./components/FloorDetails";
 import FloorSensorDetails from "./components/FloorSensorDetails";
+import { toast } from "react-toastify";
+import { confirmAlert } from "react-confirm-alert";
 
 const icons = [<AlarmsIcon />, <HumidityIcon />, <MethaneIcon />, <CarbonMonoxideIcon />, <CoIcon />, <LpgIcon />];
-
-let floorDetails = {
-  buildingImg: "",
-  name: "",
-  type: "",
-  rooms: "",
-  sensors: "",
-};
+let floorDetails = { buildingImg: "", name: "", type: "", rooms: "", sensors: "" };
 
 const FloorView = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("heat");
   const { id } = useParams();
   const [image, setImage] = useState("");
   const [polygons, setPolygons] = useState([]);
-  const { data, isSuccess, isLoading } = useGetAllBuildingsQuery();
+  const { data: floor } = useGetSingleFloorQuery(id);
   const [deleteFloor] = useDeleteSingleFloorMutation();
 
   useEffect(() => {
-    if (isSuccess) {
-      const building = data?.data?.find((building) => building?.floors?.some((floor) => floor?._id === id));
-      const singleFloor = building?.floors?.find((floor) => floor?._id === id);
+    if (floor?.data) {
+      const singleFloor = floor?.data;
       floorDetails = {
         ...floorDetails,
-        name: building?.name || "",
-        buildingImg: building?.thumbnail?.url || "",
-        type: building?.type || "",
+        name: singleFloor?.building?.name || "",
+        buildingImg: singleFloor?.building?.thumbnail?.url || "",
+        type: singleFloor?.building?.type || "",
         rooms: singleFloor?.rooms || "",
         sensors: singleFloor?.sensors?.length || 0,
       };
       setImage(singleFloor?.twoDModel?.url);
-      setPolygons(JSON.parse(singleFloor?.twoDModelCanvasData));
+      setPolygons(singleFloor?.twoDModelCanvasData ? JSON.parse(singleFloor?.twoDModelCanvasData) : []);
       console.log("floorDetails", singleFloor);
     }
-  }, [data, isSuccess, id]);
-  const handleOpenDeleteModal = async () => {
-    const res = await deleteFloor(id);
-    console.log("res", res);
+  }, [floor?.data]);
+
+  const handleOpenDeleteModal = () => {
+    confirmAlert({
+      title: "Delete Floor",
+      message: "Are you sure, you want to delete this whole Floor?",
+      buttons: [
+        {
+          label: "Yes",
+          onClick: async () => {
+            if (!id) return toast.error("Error while deleting floor");
+            try {
+              const res = await deleteFloor(id).unwrap();
+              if (res?.message) toast.success(res.message);
+              return navigate("/dashboard/buildings");
+            } catch (error) {
+              console.log("Error in deleting floor", error);
+              toast.error(error?.data?.message || "Error in delete floor");
+            }
+          },
+        },
+        {
+          label: "No",
+        },
+      ],
+    });
   };
 
   return (
     <div>
       <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-6 gap-4">
-        {floorViewStatus.map((item, i) => (
+        {floorViewStatus?.map((item, i) => (
           <StatusCard key={i} status={item.status} from={item.from} type={item.type} icon={icons[i % icons.length]} />
         ))}
       </section>
-
       <section className="grid grid-cols-12 gap-4 mt-4  ">
         <div className="col-span-12 xl:col-span-8 flex flex-col">
           <div className="my-5"></div>
@@ -138,7 +152,6 @@ const FloorView = () => {
 
           <div className="flex justify-center">
             {activeTab === "heat" ? (
-              // <img src={heatMap} alt="Heat Map" className="h-[400px]" />
               <ShowCanvasData image={image} polygons={polygons} heatmap={true} />
             ) : (
               <ShowCanvasData image={image} polygons={polygons} />
