@@ -5,14 +5,17 @@ import Co2Icon from "../../../assets/svgs/dashboard/Co2Icon";
 import { buildingViewStatus } from "../../../data/data";
 import StatusCard from "../../shared/large/card/StatusCard";
 
-import { Link, useParams } from "react-router-dom";
+import { confirmAlert } from "react-confirm-alert";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 import EnergyIcon from "../../../assets/svgs/dashboard/EnergyIcon";
 import EquipmentIcon from "../../../assets/svgs/dashboard/EquipmentIcon";
 import OccupancyIcon from "../../../assets/svgs/dashboard/OccupancyIcon";
 import TemperatureIcon from "../../../assets/svgs/dashboard/TemperatureIcon";
 import DeleteIcon from "../../../assets/svgs/pages/DeleteIcon";
 import EditIcon from "../../../assets/svgs/stepper/EditIcon";
-import { useGetSingleBuildingQuery } from "../../../redux/apis/buildingApis";
+import { useDeleteSingleBuildingMutation, useGetSingleBuildingQuery } from "../../../redux/apis/buildingApis";
+import { useGetAllFloorQuery } from "../../../redux/apis/floorApis";
 import DoubleAreaChart from "../../charts/areaChart/DoubleAreaChart";
 import BuildingDeleteWithId from "../../shared/large/modal/BuildingDeleteWithId";
 import Modal from "../../shared/large/modal/Modal";
@@ -26,11 +29,14 @@ import SensorDetails from "./components/SensorDetails";
 const icons = [<AlarmsIcon />, <TemperatureIcon />, <EquipmentIcon />, <EnergyIcon />, <Co2Icon />, <OccupancyIcon />];
 
 const BuildingView = () => {
-  const [buildingData, setBuildingData] = useState({});
+  const Navigate = useNavigate();
   const { id } = useParams();
+  const [buildingData, setBuildingData] = useState({});
   const { data, isSuccess, isLoading } = useGetSingleBuildingQuery(id);
+  const { data: floors } = useGetAllFloorQuery(id);
+  const [deleteModal, setDeleteModal] = useState(false);
+  const [deleteBuilding] = useDeleteSingleBuildingMutation("");
 
-  console.log("buildingdata", buildingData);
   useEffect(() => {
     if (isSuccess) {
       const building = data?.data;
@@ -44,20 +50,38 @@ const BuildingView = () => {
           thumbnail: building?.thumbnail?.url || "",
           type: building?.type || "",
           area: building?.area || "",
-          totalSensors: building?.floors.reduce((sensors, floor) => sensors + floor?.sensors.length, 0) || 0,
+          totalSensors: 0,
         });
       }
     }
   }, [data, id, isSuccess]);
 
-  console.log("buildingData", data?.data);
-  const [deleteModal, setDeleteModal] = useState(false);
   const handleOpenDeleteModal = () => {
-    setDeleteModal(true);
+    confirmAlert({
+      title: "Delete Building",
+      message: "Are you sure, you want to delete this whole Building with all his floors?",
+      buttons: [
+        {
+          label: "Yes",
+          onClick: async () => {
+            if (!id) return toast.error("Error while deleting Building");
+            try {
+              const res = await deleteBuilding(id).unwrap();
+              if (res?.message) toast.success(res.message);
+              return Navigate("/dashboard/buildings");
+            } catch (error) {
+              console.log("Error in deleting building", error);
+              toast.error(error?.data?.message || "Error in delete Building");
+            }
+          },
+        },
+        {
+          label: "No",
+        },
+      ],
+    });
   };
-  const handleCloseDeleteModal = () => {
-    setDeleteModal(false);
-  };
+
   return isLoading ? (
     <Loader />
   ) : (
@@ -78,10 +102,10 @@ const BuildingView = () => {
         </div>
       </section>
       {deleteModal && (
-        <Modal onClose={handleCloseDeleteModal} title="Confirmation">
+        <Modal onClose={() => setDeleteModal(false)} title="Confirmation">
           <BuildingDeleteWithId
             message="Are you sure you want to delete this building?"
-            onClose={handleCloseDeleteModal}
+            onClose={() => setDeleteModal(false)}
           />{" "}
         </Modal>
       )}
@@ -114,7 +138,7 @@ const BuildingView = () => {
       </section>
 
       <section className="grid grid-cols-1 mt-4">
-        <Floors buildingData={buildingData} />
+        <Floors floors={floors?.data} />
       </section>
     </div>
   );

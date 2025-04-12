@@ -1,6 +1,20 @@
 /* eslint-disable react/prop-types */
 
-const Button = ({ bg, width, height, radius, color, text, size, weight, cursor, borderColor, Icon, ...rest }) => {
+const Button = ({
+  bg,
+  width,
+  height,
+  radius,
+  color,
+  text,
+  size,
+  weight,
+  cursor,
+  borderColor,
+  className,
+  Icon,
+  ...rest
+}) => {
   const style = {
     background: bg,
     borderRadius: radius,
@@ -22,7 +36,7 @@ const Button = ({ bg, width, height, radius, color, text, size, weight, cursor, 
       ${radius ? radius : "rounded-[8px]"}
       disabled:cursor-not-allowed
       disabled:opacity-50
-      
+      ${className}
       `}
       {...rest}
     >

@@ -88,18 +88,6 @@ const AddFloors = ({ setCurrentStep }) => {
           formData.append("buildingId", buildingId);
           floorPromises.push(addFloor(formData).unwrap());
         }
-        const floors = await Promise.all(floorPromises);
-        if (floors?.every((floor) => floor?.success)) {
-          let floorsIds = "";
-          floors.forEach((floor) => {
-            floorsIds += `${floor?.data?._id},`;
-          });
-          const updateBuildingResponse = await updateBuilding({
-            buildingId,
-            data: { floors: floorsIds },
-          }).unwrap();
-          console.log("update building response", updateBuildingResponse);
-        }
       } else {
         await deleteBuilding(buildingId);
       }

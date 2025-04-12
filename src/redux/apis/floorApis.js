@@ -14,6 +14,7 @@ const floorApis = createApi({
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["floor"],
     }),
 
     // get all floors
@@ -23,6 +24,7 @@ const floorApis = createApi({
         url: `/all?buildingId=${buildingId}`,
         method: "GET",
       }),
+      providesTags: ["floor"],
     }),
 
     // get single floor
@@ -32,6 +34,7 @@ const floorApis = createApi({
         url: `/single/${floorId}`,
         method: "GET",
       }),
+      providesTags: ["floor"],
     }),
 
     // update single floor
@@ -42,6 +45,7 @@ const floorApis = createApi({
         method: "PUT",
         body: data,
       }),
+      invalidatesTags: ["floor"],
     }),
 
     // delete single floor
@@ -51,6 +55,7 @@ const floorApis = createApi({
         url: `/single/${floorId}`,
         method: "DELETE",
       }),
+      invalidatesTags: ["floor"],
     }),
   }),
 });

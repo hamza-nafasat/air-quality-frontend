@@ -1,91 +1,158 @@
 import { useEffect, useState } from "react";
-import UploadModelImage from "./uploads/UploadModelImage";
-import EditGeneralInfo from "./EditGeneralInfo";
-import Button from "../shared/small/Button";
-import EditMapping from "./EditMapping";
-import { useGetSingleBuildingQuery } from "../../redux/apis/buildingApis";
 import { useParams } from "react-router-dom";
+import { useGetSingleBuildingQuery, useUpdateSingleBuildingMutation } from "../../redux/apis/buildingApis";
+import BrowseFile from "../shared/large/BrowseFile";
+import Button from "../shared/small/Button";
+import Dropdown from "../shared/small/Dropdown";
+import Loader from "../shared/small/Loader";
+import TextField from "../shared/small/TextField";
+import StepperMap from "./StepperMap";
+import { toast } from "react-toastify";
+
+const buildingTypesOptions = [
+  { option: "Residential", value: "residential" },
+  { option: "Commercial", value: "commercial" },
+  { option: "Religious", value: "religious" },
+  { option: "Educational", value: "educational" },
+  { option: "Industrial", value: "industrial" },
+  { option: "Hospitality", value: "hospitality" },
+  { option: "Other", value: "other" },
+];
 
 const EditBuilding = () => {
   const buildingId = useParams().id;
+  const { data, isLoading } = useGetSingleBuildingQuery(buildingId);
+  const [updateBuilding, { isLoading: updateLoading }] = useUpdateSingleBuildingMutation();
+  const [name, setName] = useState("");
+  const [type, setType] = useState("");
+  const [area, setArea] = useState(Number(""));
+  const [address, setAddress] = useState("");
+  const [lat, setLat] = useState();
+  const [lng, setLng] = useState();
+  const [thumbnail, setThumbnail] = useState(null);
+  const [thumbnailPreview, setThumbNailPreview] = useState("");
 
-  const [twoDModel, setTwoDModel] = useState(null);
-  const [twoDModelPreview, setTwoDModelPreview] = useState(null);
-  const [twoDModelCoordinates, setTwoDModelCoordinates] = useState([]);
-  const { data, isSuccess, isLoading } = useGetSingleBuildingQuery(buildingId);
-  const [polygons, setPolygons] = useState([]);
-  const [oldImageSrc, setOldImageSrc] = useState(null);
-  const [imageSrc, setImageSrc] = useState(null);
-  const [building, setBuilding] = useState({
-    name: '',
-    address: '',
-    area: '',
-    email: '',
-    type: '',
-    floors: '',
-    thumbnail: '',
-    latitude: '',
-    longitude: '',
-    twoDModel: '',
-    twoDModelCanvasData: '',
-    totalSensors: '',
-    buildingImage: null,
-    buildingCoordinates: [],
-    description: '',
-  });
-  const positionString = data?.data.position?.[0] || '';
-  const [lat, long] = positionString.split(',');
-  useEffect(() => {
-    if (data?.data) {
-      const building = data?.data;
-      setBuilding({
-        name: building.name || '',
-        address: building.address || '',
-        area: building.area || '',
-        email: building.email || '',
-        type: building.type || '',
-        floors: building?.floors || "",
-
-        thumbnail: building?.thumbnail?.url || "",
-        twoDModel: building?.twoDModel?.url || "",
-        twoDModelCanvasData: JSON.parse(building?.twoDModelCanvasData) || [],
-        totalSensors: building?.floors.reduce((sensors, floor) => sensors + floor?.sensors.length, 0) || 0,
-        latitude: lat,
-        longitude: long,
-        buildingImage: building?.twoDImage?.url || null,
-        buildingCoordinates: building.polygonData || [],
-        description: building.description || '',
-      });
-      setTwoDModelPreview(building?.twoDModel?.url)
-      setPolygons(JSON.parse(building?.twoDModelCanvasData))
+  const updateBuildingHandler = async () => {
+    try {
+      const data = {};
+      if (name) data.name = name;
+      if (type) data.type = type;
+      if (area) data.area = area;
+      if (address) data.address = address;
+      if (lat && lng) data.position = `${lat},${lng}`;
+      if (thumbnail) data.thumbnail = thumbnail;
+      const res = await updateBuilding({ buildingId, data }).unwrap();
+      if (res.message) toast.success(res.message);
+    } catch (error) {
+      console.log("error while updating building");
+      toast.error(error?.data?.message || "Error while updating building");
     }
-  }, [])
-  const formDataHandler = (e) => setBuilding({ ...building, [e.target.name]: e.target.value });
+  };
 
+  useEffect(() => {
+    if (!isLoading && data?.data) {
+      const building = data?.data;
+      if (building?.thumbnail?.url) setThumbNailPreview(building?.thumbnail?.url);
+      if (building?.name) setName(building?.name);
+      if (building?.type) setType(building?.type);
+      if (building.area) setArea(building?.area);
+      if (building.address) setAddress(building?.address);
+      if (building.position) {
+        setLat(building?.position?.[0]);
+        setLng(building?.position?.[1]);
+      }
+    }
+  }, [data?.data, isLoading]);
 
-  return (
-    <div>
+  return isLoading ? (
+    <Loader />
+  ) : (
+    <>
       <h6 className="text-base font-semibold">Edit Building</h6>
-      <div className="my-5 flex justify-center">
-        <UploadModelImage
-          twoDModel={twoDModel}
-          setFile={setTwoDModel}
-          previewValue={twoDModelPreview}
-          setPreviewValue={setTwoDModelPreview}
-          polygons={polygons}
-          setPolygons={setPolygons}
-        />
-      </div>
       <div>
-        <EditGeneralInfo formDataHandler={formDataHandler} building={building} />
+        {/* general info */}
+        <div>
+          <BrowseFile setFile={setThumbnail} previewValue={thumbnailPreview} setPreviewValue={setThumbNailPreview} />
+          <form className="mt-4 grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
+            <div className="lg:col-span-6">
+              <TextField
+                label={"Building Name"}
+                type="text"
+                value={name}
+                placeholder="Building Name"
+                onChange={(e) => setName(e.target.value)}
+              />
+            </div>
+            <div className="lg:col-span-6">
+              <Dropdown
+                label="Building Type"
+                value={type}
+                defaultText={type}
+                options={buildingTypesOptions}
+                onSelect={(option) => setType(option?.value)}
+              />
+            </div>
+            <div className="lg:col-span-6">
+              <TextField
+                label={"Area (Sq Ft)"}
+                type="text"
+                value={area}
+                placeholder="Area (Sq Ft)"
+                onChange={(e) => setArea(e.target.value)}
+              />
+            </div>
+            <div className="lg:col-span-6">
+              <TextField
+                label={"Address"}
+                type="text"
+                value={address}
+                placeholder="Address"
+                onChange={(e) => setAddress(e.target.value)}
+              />
+            </div>
+          </form>
+        </div>
+        {/* mapping info */}
+        <div>
+          <form className="grid grid-cols-1 lg:grid-cols-12 gap-4 mt-4">
+            <div className="lg:col-span-6">
+              <TextField
+                label={"Latitude"}
+                value={lat}
+                type="number"
+                placeholder="Latitude"
+                onChange={(e) => setLat(e.target.value)}
+              />
+            </div>
+            <div className="lg:col-span-6">
+              <TextField
+                label={"Longitude"}
+                value={lng}
+                type="number"
+                placeholder="Longitude"
+                onChange={(e) => setLng(e.target.value)}
+              />
+            </div>
+            <div className="lg:col-span-12">
+              <div className="h-[325px] rounded-lg shadow-md">
+                <StepperMap lat={lat} lng={lng} />
+              </div>
+            </div>
+          </form>
+        </div>
+        {/* submit button */}
+        <div className="flex justify-end my-4 mt-8">
+          <Button
+            onClick={updateBuildingHandler}
+            disabled={updateLoading}
+            type="button"
+            text="Update Building"
+            width="w-[158px]"
+            className={`${updateLoading ? "opacity-[0.5] pointer-events-none" : ""}`}
+          />
+        </div>
       </div>
-      <div className="my-5">
-        <EditMapping formDataHandler={formDataHandler} building={building} />
-      </div>
-      <div className="flex justify-end">
-        <Button type="button" text="Update Building" width="w-[158px]" />
-      </div>
-    </div>
+    </>
   );
 };
 

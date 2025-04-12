@@ -46,7 +46,7 @@ const UploadAddFloors = ({
   setSelectedSensor,
 }) => {
   const { data } = useGetAllSensorsQuery();
-  const [availableSensors, setAvailableSensors] = useState(data);
+  const [availableSensors, setAvailableSensors] = useState([]);
 
   const canvasRef = useRef(null);
   const [isDrawingEnabled, setIsDrawingEnabled] = useState(false);
@@ -74,10 +74,10 @@ const UploadAddFloors = ({
 
   useEffect(() => {
     if (data?.data) {
-      const availableSensors =
-        data?.data?.map((sensor) => {
-          if (!sensor?.isConnected) return { option: sensor?.name, value: sensor?._id };
-        }) || [];
+      const availableSensors = [];
+      data?.data?.forEach((sensor) => {
+        if (!sensor?.isConnected) availableSensors.push({ option: sensor?.name, value: sensor?._id });
+      });
       setAvailableSensors(availableSensors);
     }
   }, [data]);
