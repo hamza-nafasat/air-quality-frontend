@@ -1,9 +1,9 @@
-import React from "react";
-import BuildingCard from "../../../buildings/BuildingCard";
+/* eslint-disable react/prop-types */
 import SearchIcon from "../../../../assets/svgs/reports/SearchIcon";
+import BuildingCard from "../../../buildings/BuildingCard";
 
-const Floors = ({ buildingData }) => {
-  const floors = buildingData?.floors;
+const Floors = ({ floors }) => {
+  console.log("floors data ",floors)
   return (
     <div className="bg-white p-5 shadow-dashboard rounded-[16px]">
       <div className="flex justify-between sm:flex-row flex-col">
@@ -16,12 +16,11 @@ const Floors = ({ buildingData }) => {
           id={floor?._id}
           name={floor?.name}
           thumbnail={floor?.twoDModel?.url}
-          // address={floor?.address}
           sensors={floor?.sensors?.length}
-          temperature={floor.temperature}
-          tvoc={floor.tvoc}
-          co2={floor.co2}
-          link={`/dashboard/floor-view/${floor._id}`}
+          temperature={floor?.temperature}
+          tvoc={floor?.tvoc}
+          co2={floor?.co2}
+          link={`/dashboard/floor-view/${floor?._id}`}
         />
       ))}
     </div>
