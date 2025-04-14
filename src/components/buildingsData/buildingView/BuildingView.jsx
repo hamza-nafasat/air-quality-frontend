@@ -25,6 +25,8 @@ import Alerts from "./components/Alerts";
 import BuildingDetails from "./components/BuildingDetails";
 import BuildingHumidityChart from "./components/BuildingHumidityChart";
 import SensorDetails from "./components/SensorDetails";
+import { FaPlus } from "react-icons/fa";
+import AddIcon from "../../../assets/svgs/pages/AddIcon";
 
 const icons = [<AlarmsIcon />, <TemperatureIcon />, <EquipmentIcon />, <EnergyIcon />, <Co2Icon />, <OccupancyIcon />];
 
@@ -93,6 +95,13 @@ const BuildingView = () => {
       </section>
       <section className="mt-4 flex justify-end">
         <div className="flex items-center gap-4">
+          <Link
+            className="flex items-center justify-center text-primary-lightBlue mt-[0.5px]"
+            title="Add New Floor"
+            to={`/dashboard/add-floor/${id}`}
+          >
+            <AddIcon />
+          </Link>
           <Link to={`/dashboard/edit-building/${id}`}>
             <EditIcon />
           </Link>
