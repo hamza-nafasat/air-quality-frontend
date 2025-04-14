@@ -72,6 +72,8 @@ const UploadAddFloors = ({
   const [roomName, setRoomName] = useState("");
   const [color, setColor] = useState("#ffff00");
 
+  const [currentSensor, setCurrentSensor] = useState(null);
+
   useEffect(() => {
     if (data?.data) {
       const availableSensors = [];
@@ -82,7 +84,8 @@ const UploadAddFloors = ({
     }
   }, [data]);
   const sensorOnSelectHandler = (selectedOption) => {
-    setSelectedSensor([...selectedSensor, selectedOption]);
+    setSelectedSensor([...selectedSensor, selectedOption?.value]);
+    setCurrentSensor(selectedOption?.value);
     setAvailableSensors(availableSensors.filter((sensor) => sensor.value !== selectedOption.value));
   };
 
@@ -391,10 +394,11 @@ const UploadAddFloors = ({
                     roomName,
                     polygons,
                     selectedPolygon,
-                    selectedSensor,
+                    currentSensor,
                     color,
                     setPolygons,
-                    setSensorPopup
+                    setSensorPopup,
+                    setCurrentSensor
                   );
                   setSensorPopup(false);
                 }}
