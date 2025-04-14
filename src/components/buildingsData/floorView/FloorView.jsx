@@ -45,7 +45,7 @@ const FloorView = () => {
         sensors: singleFloor?.sensors?.length || 0,
       };
       setImage(singleFloor?.twoDModel?.url);
-      setPolygons(singleFloor?.twoDModelCanvasData ? JSON.parse(singleFloor?.twoDModelCanvasData) : []);
+      setPolygons(singleFloor?.twoDModelCanvasData ? singleFloor?.twoDModelCanvasData : []);
       console.log("floorDetails", singleFloor);
     }
   }, [floor?.data]);
