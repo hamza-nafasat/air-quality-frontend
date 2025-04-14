@@ -26,8 +26,6 @@ const AddFloors = ({ setCurrentStep }) => {
   const [accordionState, setAccordionState] = useState([]);
   const [buildingId, setBuildingId] = useState("");
 
-  console.log("building Data", buildingData);
-
   const toggleAccordion = (index) =>
     setAccordionState((prev) => prev.map((isOpen, i) => (i === index ? !isOpen : isOpen)));
   const openNextAccordion = (index) =>
@@ -60,7 +58,6 @@ const AddFloors = ({ setCurrentStep }) => {
         const floorPromises = [];
         for (let i = 0; i < floorsState.length; i++) {
           const floor = floorsState[i];
-          console.log("floor data", floor);
           if (
             !floor?.floorName ||
             !floor?.roomsCount ||
@@ -156,6 +153,9 @@ const AddFloor = ({ floorsState, setFloorsState, floorIndex, openNextAccordion }
   const [selectedSensors, setSelectedSensors] = useState([]);
   const [twoDModelCoordinates, setTwoDModelCoordinates] = useState([]);
 
+  console.log("twoDModelCoordinates", twoDModelCoordinates);
+  console.log("twoDModelCoordinates", selectedSensors);
+
   const saveStateHandler = () => {
     if (
       !floorName ||
@@ -214,14 +214,6 @@ const AddFloor = ({ floorsState, setFloorsState, floorIndex, openNextAccordion }
       </form>
       <div className="flex items-center justify-between gap-4">
         <h3 className="text-sm md:text-base font-semibold text-[rgba(6,6,6,0.8)]">Upload 2D Model Of Floor</h3>
-        <div className="flex items-center gap-4">
-          <div className="cursor-pointer">
-            <EditIcon />
-          </div>
-          <div className="cursor-pointer">
-            <DeleteIcon />
-          </div>
-        </div>
       </div>
       <div className="my-4 flex justify-center">
         <UploadAddFloors
