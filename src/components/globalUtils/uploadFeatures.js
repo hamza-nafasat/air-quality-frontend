@@ -286,17 +286,6 @@ export const handleDeleteMode = ({
   setIsUpdateMode(false);
 };
 
-// attaching sensor to the polygon
-export const updateSensorAttached = ({ polygonId, sensor, polygons, setPolygons, sensorAttached }) => {
-  const updatedPolygons = polygons.map((polygon) => {
-    return polygon?.id === polygonId
-      ? // ? { ...polygon, sensorAttached: sensor }
-        { ...polygon, id: sensor, sensorAttached }
-      : polygon;
-  });
-  setPolygons(updatedPolygons);
-};
-
 // Handle polygon dragging in Move Mode
 export const handleCanvasMouseMove = ({
   event,
@@ -402,10 +391,11 @@ export const sensorInfoSubmitHandler = (
   floorName,
   polygons,
   selectedPolygon,
-  selectedSensor,
+  currentSensor,
   color,
   setPolygons,
-  setSensorPopup
+  setSensorPopup,
+  setCurrentSensor
 ) => {
   if (floorName) {
     const updatedPolygons = polygons.map((polygon) =>
@@ -413,7 +403,7 @@ export const sensorInfoSubmitHandler = (
         ? {
             ...polygon,
             id: floorName,
-            sensorAttached: selectedSensor || floorName,
+            sensorAttached: currentSensor,
             color: color,
             fillColor: color,
             labelPoint: polygon.labelPoint || "first",
@@ -421,6 +411,7 @@ export const sensorInfoSubmitHandler = (
         : polygon
     );
     setPolygons(updatedPolygons);
+    setCurrentSensor(null);
     setSensorPopup(false);
   } else {
     alert("without sensor id and sensor name polygon not draw");
