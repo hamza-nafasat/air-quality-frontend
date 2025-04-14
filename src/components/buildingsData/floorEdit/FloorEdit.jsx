@@ -22,7 +22,7 @@ function FloorEdit() {
       const singleFloor = data?.data;
       setFloor({ floorName: singleFloor?.name || "", floorRooms: singleFloor?.rooms || "" });
       setTwoDModelPreview(singleFloor?.twoDModel?.url);
-      setPolygons(singleFloor?.twoDModelCanvasData ? JSON.parse(singleFloor?.twoDModelCanvasData) : []);
+      setPolygons(singleFloor?.twoDModelCanvasData ? singleFloor?.twoDModelCanvasData : []);
     }
   }, [data?.data]);
 
@@ -31,7 +31,7 @@ function FloorEdit() {
       const dataForUpdate = {};
       if (floor.floorName) dataForUpdate.name = floor.floorName;
       if (floor.floorRooms) dataForUpdate.rooms = floor.floorRooms;
-      if (polygons) dataForUpdate.twoDModelCanvasData = JSON.stringify(polygons);
+      if (polygons) dataForUpdate.twoDModelCanvasData = polygons;
       if (selectedSensor.length > 0) dataForUpdate.sensors = selectedSensor;
       const res = await updateFloor({ floorId: id, data: dataForUpdate }).unwrap();
       if (res?.message) toast.success(res.message);
