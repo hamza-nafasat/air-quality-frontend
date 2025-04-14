@@ -5,11 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import DeleteIcon from "../../assets/svgs/stepper/DeleteIcon";
 import EditIcon from "../../assets/svgs/stepper/EditIcon";
-import {
-  useCreateBuildingMutation,
-  useDeleteSingleBuildingMutation,
-  useUpdateSingleBuildingMutation,
-} from "../../redux/apis/buildingApis";
+import { useCreateBuildingMutation, useDeleteSingleBuildingMutation } from "../../redux/apis/buildingApis";
 import { useCreateFloorMutation } from "../../redux/apis/floorApis";
 import { removeBuildingData } from "../../redux/slices/buildingSlice";
 import Button from "../shared/small/Button";
@@ -22,7 +18,6 @@ const AddFloors = ({ setCurrentStep }) => {
 
   const [addBuilding, { isLoading: isAddBuilding }] = useCreateBuildingMutation("");
   const [deleteBuilding, { isLoading: isDeleteBuilding }] = useDeleteSingleBuildingMutation("");
-  const [updateBuilding, { isLoading: isUpdateBuilding }] = useUpdateSingleBuildingMutation("");
   const [addFloor, { isLoading: isAddFloor }] = useCreateFloorMutation();
 
   const { buildingData } = useSelector((state) => state.building);
@@ -84,7 +79,7 @@ const AddFloors = ({ setCurrentStep }) => {
           formData.append("rooms", floor?.roomsCount);
           formData.append("file", floor?.twoDModal);
           formData.append("sensors", sensors);
-          formData.append("twoDModelCanvasData", JSON.stringify(floor.twoDModelCoordinates));
+          formData.append("twoDModelCanvasData", JSON.stringify(floor?.twoDModelCoordinates));
           formData.append("buildingId", buildingId);
           floorPromises.push(addFloor(formData).unwrap());
         }
@@ -143,7 +138,7 @@ const AddFloors = ({ setCurrentStep }) => {
           text="Add Building"
           width="w-[128px]"
           onClick={mainSaveHandler}
-          disabled={!allFloorsFilled || isAddBuilding || isAddFloor || isUpdateBuilding || isDeleteBuilding}
+          disabled={!allFloorsFilled || isAddBuilding || isAddFloor || isDeleteBuilding}
         />
       </div>
     </div>
@@ -240,38 +235,6 @@ const AddFloor = ({ floorsState, setFloorsState, floorIndex, openNextAccordion }
         />
       </div>
       {/* add sensor section */}
-      {/* <div>
-        <Dropdown
-          defaultText="Add Sensor"
-          options={sensorsOptions}
-          icon={<AddIcon />}
-          onSelect={(value) => selectSensorHandler(value)}
-        />
-      </div>
-      <div className="my-4">
-        {selectedSensors?.length > 0 ? (
-          <ul className="space-y-2">
-            {selectedSensors?.map((sensor, sensorIndex) => (
-              <li
-                key={sensorIndex}
-                className="flex justify-between items-center border border-primary-lightBlue h-[55px] p-4 rounded-xl bg-[#b2e7fa99]"
-              >
-                <div className="flex items-center gap-2">
-                  <div>{sensor?.icon}</div>
-                  <span className="text-[#0a87b5] text-sm md:text-base font-semibold">{sensor?.option}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button type="button" onClick={() => deleteSensorHandler(sensor)}>
-                    <DeleteIcon />
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>No sensors added yet.</p>
-        )}
-      </div> */}
       <div className="flex items-center justify-end gap-4">
         <Button type="button" text="Save" width="w-[128px]" onClick={saveStateHandler} />
       </div>
