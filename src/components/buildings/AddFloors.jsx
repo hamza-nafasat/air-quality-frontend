@@ -3,8 +3,6 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import DeleteIcon from "../../assets/svgs/stepper/DeleteIcon";
-import EditIcon from "../../assets/svgs/stepper/EditIcon";
 import { useCreateBuildingMutation, useDeleteSingleBuildingMutation } from "../../redux/apis/buildingApis";
 import { useCreateFloorMutation } from "../../redux/apis/floorApis";
 import { removeBuildingData } from "../../redux/slices/buildingSlice";
@@ -67,15 +65,11 @@ const AddFloors = ({ setCurrentStep }) => {
           ) {
             return toast.error("Please Enter all Fields to Save");
           }
-          let sensors = "";
-          floor?.selectedSensors?.forEach((sensor) => {
-            sensors += `${sensor?.value},`;
-          });
           const formData = new FormData();
           formData.append("name", floor?.floorName);
           formData.append("rooms", floor?.roomsCount);
           formData.append("file", floor?.twoDModal);
-          formData.append("sensors", sensors);
+          formData.append("sensors", floor?.selectedSensors?.join(","));
           formData.append("twoDModelCanvasData", JSON.stringify(floor?.twoDModelCoordinates));
           formData.append("buildingId", buildingId);
           floorPromises.push(addFloor(formData).unwrap());
@@ -152,9 +146,6 @@ const AddFloor = ({ floorsState, setFloorsState, floorIndex, openNextAccordion }
   const [roomsCount, setRoomsCount] = useState(1);
   const [selectedSensors, setSelectedSensors] = useState([]);
   const [twoDModelCoordinates, setTwoDModelCoordinates] = useState([]);
-
-  console.log("twoDModelCoordinates", twoDModelCoordinates);
-  console.log("twoDModelCoordinates", selectedSensors);
 
   const saveStateHandler = () => {
     if (
