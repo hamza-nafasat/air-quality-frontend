@@ -1,6 +1,4 @@
 /* eslint-disable react/prop-types */
-// / eslint-disable react-hooks/exhaustive-deps /
-// / eslint-disable react/prop-types /
 import { useEffect, useRef, useState } from "react";
 import Cropper from "react-easy-crop";
 import { AiOutlineDelete } from "react-icons/ai";
@@ -8,6 +6,7 @@ import { CiExport } from "react-icons/ci";
 import { LiaDrawPolygonSolid } from "react-icons/lia";
 import { SlCursorMove } from "react-icons/sl";
 import { VscCopy } from "react-icons/vsc";
+import { useGetAllSensorsQuery } from "../../../redux/apis/sensorApis";
 import {
   convertImageSrcToFile,
   drawCanvas,
@@ -31,7 +30,6 @@ import Button from "../../shared/small/Button";
 import Dropdown from "../../shared/small/Dropdown";
 import TextField from "../../shared/small/TextField";
 import { getCroppedImg } from "../utils/addBuildingFeature";
-import { useGetAllSensorsQuery } from "../../../redux/apis/sensorApis";
 
 const UploadModelImage = ({
   setFile,
@@ -67,9 +65,7 @@ const UploadModelImage = ({
   const [selectedPolygon, setSelectedPolygon] = useState(null);
   const [roomName, setRoomName] = useState("");
   const [color, setColor] = useState("#ffff00");
-  const [reEditModalOpen, setReEditModalOpen] = useState(false);
-  const [selectedPolygonId, setSelectedPolygonId] = useState("");
-  const [selectedPolygonSensor, setSelectedPolygonSensor] = useState("");
+  const [currentSensor, setCurrentSensor] = useState(null);
 
   useEffect(() => {
     if (data?.data) {
@@ -82,6 +78,7 @@ const UploadModelImage = ({
   }, [data]);
   const sensorOnSelectHandler = (selectedOption) => {
     setSelectedSensor([...selectedSensor, selectedOption?.value]);
+    setCurrentSensor(selectedOption?.value);
     setAvailableSensors(availableSensors.filter((sensor) => sensor.value !== selectedOption.value));
   };
 
@@ -122,12 +119,9 @@ const UploadModelImage = ({
     if (selectedPolygon) setDraggedPolygon(selectedPolygon);
   };
   // Function to open modal with polygon ID
-  const handlePolygonClick = (polygonId, polygonSensor) => {
+  const handlePolygonClick = (polygonId) => {
     const polygonToEdit = polygons.find((polygon) => polygon.id === polygonId);
     setSelectedPolygon(polygonToEdit);
-    setSelectedPolygonId(polygonId);
-    setSelectedPolygonSensor(polygonSensor);
-    setReEditModalOpen(true);
   };
   useEffect(() => {
     if (isDrawingEnabled && canvasRef.current) {
@@ -363,10 +357,11 @@ const UploadModelImage = ({
                     roomName,
                     polygons,
                     selectedPolygon,
-                    selectedSensor,
+                    currentSensor,
                     color,
                     setPolygons,
-                    setSensorPopup
+                    setSensorPopup,
+                    setCurrentSensor
                   );
                   setSensorPopup(false);
                 }}
