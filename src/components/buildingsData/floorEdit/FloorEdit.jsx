@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import AccordionEditIcon from "../../../assets/svgs/buildings/AccordionEditIcon";
 import { useGetSingleFloorQuery, useUpdateSingleFloorMutation } from "../../../redux/apis/floorApis";
@@ -7,14 +7,17 @@ import UploadModelImage from "../../buildings/uploads/UploadModelImage";
 import Button from "../../shared/small/Button";
 import Loader from "../../shared/small/Loader";
 import TextField from "../../shared/small/TextField";
+import { useGetAllSensorsQuery } from "../../../redux/apis/sensorApis";
 
 function FloorEdit() {
+  const navigate = useNavigate();
   const { id } = useParams();
   const { data, isLoading } = useGetSingleFloorQuery(id);
   const [twoDModelPreview, setTwoDModelPreview] = useState(null);
   const [polygons, setPolygons] = useState([]);
   const [floor, setFloor] = useState({ floorName: "", floorRooms: "" });
   const [updateFloor, { isLoading: isUpdatingFloor }] = useUpdateSingleFloorMutation("");
+  const { refetch } = useGetAllSensorsQuery();
   const [selectedSensor, setSelectedSensor] = useState([]);
 
   useEffect(() => {
@@ -35,6 +38,9 @@ function FloorEdit() {
       if (selectedSensor.length > 0) dataForUpdate.sensors = selectedSensor;
       const res = await updateFloor({ floorId: id, data: dataForUpdate }).unwrap();
       if (res?.message) toast.success(res.message);
+      setSelectedSensor([]);
+      await refetch();
+      return navigate("/dashboard/floor-view/" + id);
     } catch (error) {
       console.log("Error in updating floor", error);
       toast.error(error?.data?.message || "Error in update floor");
