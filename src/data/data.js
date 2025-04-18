@@ -173,6 +173,7 @@ export const buildingViewStatus = [
   { type: "CO2", status: "539 ppm", from: 8 },
   { type: "Occupancy", status: 80, from: 8 },
 ];
+
 export const floorViewStatus = [
   { type: "temperature", name: "Temprature", status: 16, from: 8 },
   { type: "humidity", name: "Humidity", status: "50%", from: 8 },

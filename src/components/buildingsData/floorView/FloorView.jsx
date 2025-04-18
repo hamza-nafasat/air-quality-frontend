@@ -1,25 +1,24 @@
 /* eslint-disable react/jsx-key */
 import { useEffect, useState } from "react";
+import { confirmAlert } from "react-confirm-alert";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 import CarbonMonoxideIcon from "../../../assets/svgs/buildings/CarbonMonoxideIcon";
 import CoIcon from "../../../assets/svgs/buildings/CoIcon";
 import HumidityIcon from "../../../assets/svgs/buildings/HumidityIcon";
 import LpgIcon from "../../../assets/svgs/buildings/LpgIcon";
 import MethaneIcon from "../../../assets/svgs/buildings/MethaneIcon";
 import AlarmsIcon from "../../../assets/svgs/dashboard/AlarmsIcon";
-import { floorViewStatus } from "../../../data/data";
-import StatusCard from "../../shared/large/card/StatusCard";
-import { Link, useNavigate, useParams } from "react-router-dom";
 import DeleteIcon from "../../../assets/svgs/pages/DeleteIcon";
 import EditIcon from "../../../assets/svgs/stepper/EditIcon";
 import { useDeleteSingleFloorMutation, useGetSingleFloorQuery } from "../../../redux/apis/floorApis";
 import ShowCanvasData from "../../buildings/ShowCanvasData";
 import DoubleAreaChart from "../../charts/areaChart/DoubleAreaChart";
+import { FloorStatusCard } from "../../shared/large/card/StatusCard";
 import Alerts from "./components/Alerts";
 import CurrentHumidityChart from "./components/CurrentHumidityChart";
 import FloorDetails from "./components/FloorDetails";
 import FloorSensorDetails from "./components/FloorSensorDetails";
-import { toast } from "react-toastify";
-import { confirmAlert } from "react-confirm-alert";
 
 const icons = [<AlarmsIcon />, <HumidityIcon />, <MethaneIcon />, <CarbonMonoxideIcon />, <CoIcon />, <LpgIcon />];
 let floorDetails = { buildingImg: "", name: "", type: "", rooms: "", sensors: "" };
@@ -79,16 +78,8 @@ const FloorView = () => {
   return (
     <div>
       <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-6 gap-4">
-        {floorViewStatus?.map((item, i) => (
-          <StatusCard
-            key={i}
-            status={item.status}
-            from={item.from}
-            data={floor?.data?.sensorsData}
-            type={item.type}
-            name={item.name}
-            icon={icons[i % icons.length]}
-          />
+        {floor?.data?.sensorsData?.map((item, i) => (
+          <FloorStatusCard key={i} name={item?.[0]} value={item?.[1]} icon={icons[i % icons.length]} />
         ))}
       </section>
       <section className="grid grid-cols-12 gap-4 mt-4  ">
