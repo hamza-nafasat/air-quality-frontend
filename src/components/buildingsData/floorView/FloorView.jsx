@@ -19,6 +19,7 @@ import Alerts from "./components/Alerts";
 import CurrentHumidityChart from "./components/CurrentHumidityChart";
 import FloorDetails from "./components/FloorDetails";
 import FloorSensorDetails from "./components/FloorSensorDetails";
+import Loader from "../../shared/small/Loader";
 
 const icons = [<AlarmsIcon />, <HumidityIcon />, <MethaneIcon />, <CarbonMonoxideIcon />, <CoIcon />, <LpgIcon />];
 let floorDetails = { buildingImg: "", name: "", type: "", rooms: "", sensors: "" };
@@ -29,7 +30,7 @@ const FloorView = () => {
   const { id } = useParams();
   const [image, setImage] = useState("");
   const [polygons, setPolygons] = useState([]);
-  const { data: floor } = useGetSingleFloorQuery(id);
+  const { data: floor, isLoading } = useGetSingleFloorQuery(id);
   const [deleteFloor] = useDeleteSingleFloorMutation();
 
   useEffect(() => {
@@ -75,7 +76,9 @@ const FloorView = () => {
     });
   };
 
-  return (
+  return isLoading ? (
+    <Loader />
+  ) : (
     <div>
       <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-6 gap-4">
         {floor?.data?.sensorsData?.map((item, i) => (

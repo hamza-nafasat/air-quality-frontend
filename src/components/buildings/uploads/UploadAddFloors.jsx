@@ -352,8 +352,8 @@ const UploadAddFloors = ({
           <div className="flex flex-col gap-2">
             <TextField
               type="text"
-              placeholder="Room Name"
-              label="Room Name"
+              placeholder="Polygon Name"
+              label="Polygon Name"
               value={roomName}
               onChange={(e) => setRoomName(e.target.value)}
             />
