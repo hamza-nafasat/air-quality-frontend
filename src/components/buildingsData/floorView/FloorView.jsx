@@ -80,7 +80,15 @@ const FloorView = () => {
     <div>
       <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-6 gap-4">
         {floorViewStatus?.map((item, i) => (
-          <StatusCard key={i} status={item.status} from={item.from} type={item.type} icon={icons[i % icons.length]} />
+          <StatusCard
+            key={i}
+            status={item.status}
+            from={item.from}
+            data={floor?.data?.sensorsData}
+            type={item.type}
+            name={item.name}
+            icon={icons[i % icons.length]}
+          />
         ))}
       </section>
       <section className="grid grid-cols-12 gap-4 mt-4  ">

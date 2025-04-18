@@ -1,4 +1,3 @@
-import DioxideIcon from "../assets/svgs/devices/DioxideIcon";
 import buildingImg from "../assets/images/buildings/greyBuilding.png";
 
 export const buildings = [
@@ -175,12 +174,12 @@ export const buildingViewStatus = [
   { type: "Occupancy", status: 80, from: 8 },
 ];
 export const floorViewStatus = [
-  { type: "Active Alarms", status: 16, from: 8 },
-  { type: "Humidity", status: "50%", from: 8 },
-  { type: "Methane(CH)", status: "990ppm", from: 8 },
-  { type: "Carbon Monoxide", status: "12235 kWh", from: 8 },
-  { type: "CO2", status: "539ppm", from: 8 },
-  { type: "LPG", status: "90ppm", from: 8 },
+  { type: "temperature", name: "Temprature", status: 16, from: 8 },
+  { type: "humidity", name: "Humidity", status: "50%", from: 8 },
+  { type: "ch", name: "Methylidyne radica", status: "990ppm", from: 8 },
+  { type: "co", name: "Carbon monoxide", status: "12235 kWh", from: 8 },
+  { type: "co2", name: "Carbon dioxide", status: "539ppm", from: 8 },
+  { type: "tvoc", name: "Temprature", status: "90ppm", from: 8 },
 ];
 
 export const sensorData = [
