@@ -4,7 +4,7 @@ import getEnv from "../../config/config.js";
 const sensorApis = createApi({
   reducerPath: "sensorApis",
   baseQuery: fetchBaseQuery({ baseUrl: `${getEnv("SERVER_URL")}/api/sensor`, credentials: "include" }),
-
+  tagTypes: ["sensor"],
   endpoints: (builder) => ({
     // create sensor
     // -------------
