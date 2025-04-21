@@ -92,10 +92,10 @@ const FloorView = () => {
             <ShowCanvasData image={image} polygons={polygons} />
           </div>
           <div className="grid grid-cols-1 mt-4 rounded-[16px] p-5 bg-white shadow-dashboard">
-            <DoubleAreaChart />
+            <DoubleAreaChart chartsData={floor?.data?.chartsData} />
           </div>
           <div className="grid grid-cols-1 mt-4 flex-1">
-            <FloorSensorDetails />
+            <FloorSensorDetails data={floor?.data?.sensors} />
           </div>
         </div>
 
