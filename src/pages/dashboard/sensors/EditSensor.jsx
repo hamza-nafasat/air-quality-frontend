@@ -1,23 +1,23 @@
 /* eslint-disable react/prop-types */
 import { useState } from "react";
+import Select from "react-select";
 import { toast } from "react-toastify";
 import Button from "../../../components/shared/small/Button";
-import Dropdown from "../../../components/shared/small/Dropdown";
 import TextField from "../../../components/shared/small/TextField";
 import { useUpdateSensorMutation } from "../../../redux/apis/sensorApis";
-import { sensorTypes } from "./sensorOptions";
+import { sensorOptionsForMultiSelect } from "./sensorOptions";
 
 const EditSensor = ({ selectedSensor, onClose }) => {
   const [updateSensor, { isLoading }] = useUpdateSensorMutation("");
   const [form, setForm] = useState({
     name: selectedSensor?.name,
-    type: selectedSensor?.type,
     uniqueId: selectedSensor?.uniqueId,
+    parameters: selectedSensor?.parameters,
   });
 
   const handleEditSensor = async () => {
     try {
-      if (!form?.name || !form?.type || !form?.uniqueId) return toast.error("Please fill all the fields");
+      if (!form?.name || !form?.uniqueId) return toast.error("Please fill all the fields");
       const response = await updateSensor({ sensorId: selectedSensor?._id, data: form }).unwrap();
       if (response?.success) toast.success(response?.message);
     } catch (error) {
@@ -27,6 +27,11 @@ const EditSensor = ({ selectedSensor, onClose }) => {
       onClose();
     }
   };
+  const handleChangeFroMultiSelect = (selectedOptions) => {
+    setForm({ ...form, parameters: selectedOptions.map((option) => option.value) });
+  };
+  console.log("form", form);
+
   return (
     <div>
       <h6 className="text-base md:text-lg text-[#000]">General Info</h6>
@@ -38,12 +43,32 @@ const EditSensor = ({ selectedSensor, onClose }) => {
           value={form?.name}
           onChange={(e) => setForm({ ...form, name: e.target.value })}
         />
-        <Dropdown
-          options={sensorTypes}
-          label={"Type"}
-          defaultText={form?.type}
-          onSelect={(option) => setForm({ ...form, type: option?.value })}
-        />
+        <div className="flex flex-col  gap-1 w-full">
+          <label className="text-sm md:text-base font-[600]">Parameters</label>
+          <Select
+            isMulti
+            closeMenuOnSelect={false}
+            styles={{
+              control: (baseStyles) => ({
+                ...baseStyles,
+                border: "1px solid #333",
+                borderRadius: "10px",
+                outline: "none",
+                minHeight: "50px",
+                fontSize: "14px",
+              }),
+              option: (baseStyles) => ({
+                ...baseStyles,
+                fontSize: "14px",
+                zIndex: 999,
+              }),
+            }}
+            options={sensorOptionsForMultiSelect}
+            onChange={handleChangeFroMultiSelect}
+            value={sensorOptionsForMultiSelect.filter((option) => form?.parameters?.includes(option?.value))}
+          />
+        </div>
+
         <TextField
           label="Unique Id"
           type="text"
