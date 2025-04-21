@@ -20,8 +20,7 @@ import Loader from "../../../components/shared/small/Loader";
 
 const columns = (modalOpenHandler, navigate, statusToggleHandler, deleteHandler) => [
   { name: "Name", selector: (row) => row?.name },
-  { name: "Type", selector: (row) => row?.type },
-  { name: "Created At", selector: (row) => new Date(row?.createdAt).toLocaleString() },
+  { name: "Parameters", selector: (row) => row?.parameters?.join(", ") },
   { name: "Is Connected", selector: (row) => (row?.isConnected ? "Yes" : "No") },
   {
     name: "Status",
