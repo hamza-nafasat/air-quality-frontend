@@ -1,49 +1,20 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import DataTable from "react-data-table-component";
 import ToggleButton from "../../../shared/small/ToggleButton";
 import GreenEye from "../../../../assets/svgs/dashboard/GreenEye";
 import BluePen from "../../../../assets/svgs/dashboard/BluePen";
 import RedBin from "../../../../assets/svgs/dashboard/RedBin";
-import { sensorData } from "../../../../data/data";
+import { confirmAlert } from "react-confirm-alert";
+import { useGetAllSensorsQuery } from "../../../../redux/apis/sensorApis";
 
-const columns = (
-  modalOpenHandler,
-  sensorStatus,
-  statusToggleHandler,
-  deleteHandler
-) => [
-  {
-    name: "Sensor Name",
-    selector: (row) => row.sensorName,
-  },
-  {
-    name: "IP",
-    selector: (row) => row.ip,
-  },
-  {
-    name: "URL",
-    selector: (row) => row.url,
-  },
-  {
-    name: "Port",
-    selector: (row) => row.port,
-  },
-  {
-    name: "Type",
-    selector: (row) => row.type,
-  },
-  {
-    name: "Location",
-    selector: (row) => row.location,
-  },
+const columns = (modalOpenHandler, sensorStatus, statusToggleHandler) => [
+  { name: "Sensor Name", selector: (row) => row.name },
+  { name: "Parameters", selector: (row) => row.parameters?.join(", ") },
+  { name: "Connected", selector: (row) => (row.isConnected ? "Yes" : "No") },
   {
     name: "Status",
     selector: (row) => (
-      <ToggleButton
-        isTable={true}
-        isChecked={sensorStatus[row._id] || false}
-        onToggle={() => statusToggleHandler(row._id)}
-      />
+      <ToggleButton isTable={true} isChecked={row?.status} onToggle={() => statusToggleHandler(row._id)} />
     ),
   },
   {
@@ -70,12 +41,11 @@ const columns = (
   },
 ];
 
-const FloorSensorDetails = () => {
+const FloorSensorDetails = ({ data }) => {
   const [modal, setModal] = useState(false);
   const [sensorStatus, setSensorStatus] = useState({});
 
   const modalOpenHandler = (modalType) => setModal(modalType);
-  const modalCloseHandler = () => setModal(false);
 
   const statusToggleHandler = (sensorId) => {
     setSensorStatus((prevState) => ({
@@ -88,44 +58,18 @@ const FloorSensorDetails = () => {
     confirmAlert({
       title: "Delete Sensor",
       message: "Are you sure, you want to delete the sensor?",
-      buttons: [
-        {
-          label: "Yes",
-          onClick: () => {
-            console.log("project deleted");
-          },
-        },
-        {
-          label: "No",
-        },
-      ],
+      buttons: [{ label: "Yes", onClick: () => console.log("project deleted") }, { label: "No" }],
     });
   };
   return (
     <div className="bg-white rounded-[15px]  shadow-dashboard">
       <div className="flex items-center justify-between">
         <div className="p-5">Sensors Details</div>
-        {/* <div className="flex items-center gap-2">
-          <div
-            className="cursor-pointer"
-            onClick={() => modalOpenHandler("add")}
-          >
-            <AddIcon />
-          </div>
-          <div className="cursor-pointer">
-            <DeleteIcon />
-          </div>
-        </div> */}
       </div>
       <div className="mt-5 h-[300px] overflow-auto">
         <DataTable
-          columns={columns(
-            modalOpenHandler,
-            sensorStatus,
-            statusToggleHandler,
-            deleteHandler
-          )}
-          data={sensorData}
+          columns={columns(modalOpenHandler, sensorStatus, statusToggleHandler, deleteHandler)}
+          data={data}
           selectableRows
           selectableRowsHighlight
           customStyles={tableStyles}
@@ -133,24 +77,6 @@ const FloorSensorDetails = () => {
           fixedHeaderScrollHeight="290px"
         />
       </div>
-      {/* {modal === "add" && (
-        <Modal
-          title="Add Sensor"
-          width="w-[300px] md:w-[650px]"
-          onClose={modalCloseHandler}
-        >
-          <AddSensor onClose={modalCloseHandler} />
-        </Modal>
-      )}
-      {modal === "edit" && (
-        <Modal
-          title="Edit Sensor"
-          width="w-[300px] md:w-[650px]"
-          onClose={modalCloseHandler}
-        >
-          <EditSensor onClose={modalCloseHandler} />
-        </Modal>
-      )} */}
     </div>
   );
 };
