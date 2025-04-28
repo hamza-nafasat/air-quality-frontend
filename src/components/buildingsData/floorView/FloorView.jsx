@@ -33,23 +33,6 @@ const FloorView = () => {
   const { data: floor, isLoading } = useGetSingleFloorQuery(id);
   const [deleteFloor] = useDeleteSingleFloorMutation();
 
-  useEffect(() => {
-    if (floor?.data) {
-      const singleFloor = floor?.data;
-      floorDetails = {
-        ...floorDetails,
-        name: singleFloor?.building?.name || "",
-        buildingImg: singleFloor?.building?.thumbnail?.url || "",
-        type: singleFloor?.building?.type || "",
-        rooms: singleFloor?.rooms || "",
-        sensors: singleFloor?.sensors?.length || 0,
-      };
-      setImage(singleFloor?.twoDModel?.url);
-      setPolygons(singleFloor?.twoDModelCanvasData ? singleFloor?.twoDModelCanvasData : []);
-      console.log("floorDetails", singleFloor);
-    }
-  }, [floor?.data]);
-
   const handleOpenDeleteModal = () => {
     confirmAlert({
       title: "Delete Floor",
@@ -76,6 +59,22 @@ const FloorView = () => {
     });
   };
 
+  useEffect(() => {
+    if (floor?.data) {
+      const singleFloor = floor?.data;
+      floorDetails = {
+        ...floorDetails,
+        name: singleFloor?.building?.name || "",
+        buildingImg: singleFloor?.building?.thumbnail?.url || "",
+        type: singleFloor?.building?.type || "",
+        rooms: singleFloor?.rooms || "",
+        sensors: singleFloor?.sensors?.length || 0,
+      };
+      setImage(singleFloor?.twoDModel?.url);
+      setPolygons(singleFloor?.twoDModelCanvasData ? singleFloor?.twoDModelCanvasData : []);
+      console.log("floorDetails", singleFloor);
+    }
+  }, [floor?.data]);
   return isLoading ? (
     <Loader />
   ) : (
@@ -115,7 +114,7 @@ const FloorView = () => {
             <FloorDetails floorDetails={floorDetails} />
           </div>
           <div className="grid grid-cols-1 mt-4 rounded-[16px] p-8 bg-white shadow-dashboard">
-            <CurrentHumidityChart />
+            <CurrentHumidityChart floorData={floor?.data?.sensorsData} />
           </div>
           <div className="grid grid-cols-1 mt-4 flex-1">
             <Alerts />
