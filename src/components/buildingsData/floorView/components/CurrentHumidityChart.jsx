@@ -1,28 +1,40 @@
-import React, { useState } from "react";
-import ChevronIcon from "../../../../assets/svgs/buildings/ChevronIcon";
-import Slider from "react-slick";
+/* eslint-disable react/prop-types */
+import { useState } from "react";
 import Chart from "react-apexcharts";
+import Slider from "react-slick";
+import ChevronIcon from "../../../../assets/svgs/buildings/ChevronIcon";
 import { NextArrow, PrevArrow } from "../../CustomArrows";
 
-const data = [
-  {
-    value: 78,
-    label: "Humidity",
-    colors: ["#FF4560", "#008FFB", "#00E396", "#FEB019"],
-  },
-  {
-    value: 55,
-    label: "Temperature",
-    colors: ["#FF5733", "#33FF57", "#5733FF", "#FFC300"],
-  },
-  {
-    value: 90,
-    label: "Air Quality",
-    colors: ["#FF33A6", "#A633FF", "#33FFC1", "#C1FF33"],
-  },
-];
+const CurrentHumidityChart = ({ floorData }) => {
+  const colors = [
+    "#3300FF",
+    "#17FF00",
+    "#FF0061",
+    "#00ABFF",
+    "#F6FF00",
+    "#BD00FF",
+    "#00FF72",
+    "#FF2800",
+    "#0021FF",
+    "#6CFF00",
+    "#FF00B6",
+    "#00FFFC",
+    "#FFB200",
+    "#6700FF",
+    "#00FF1D",
+    "#FF002C",
+    "#0077FF",
+    "#C1FF00",
+    "#F100FF",
+    "#00FFA7",
+    "#FF5D00",
+    "#1200FF",
+    "#37FF00",
+    "#FF0082",
+    "#00CCFF",
+  ];
 
-const CurrentHumidityChart = () => {
+  // console.log("data", floorData);
   const settings = {
     dots: true,
     infinite: true,
@@ -36,28 +48,24 @@ const CurrentHumidityChart = () => {
   return (
     <div className="relative">
       <div className="flex items-center justify-between gap-2">
-        <h2 className="text-sm md:text-base font-semibold md:font-bold text-[#060606cc]">
-          Current Humidity
-        </h2>
-        <CustomDropDown lists={["Week", "Month", "Year"]} />
+        <h2 className="text-sm md:text-base font-semibold md:font-bold text-[#060606cc]">Current Air Quality</h2>
+        {/* <CustomDropDown lists={["Week", "Month", "Year"]} /> */}
       </div>
       <div>
         <Slider {...settings}>
-          {data.map((item, index) => (
-            <div key={index} className="flex justify-center items-center">
-              <div>
-                <ChartComponent value={item.value} colors={item.colors} />
-                <div className="text-center">
-                  <p className="text-sm font-medium text-[#060606cc]">
-                    {item.label}
-                  </p>
-                  <p className="text-lg md:text-[24px] font-semibold text-primary-lightBlue">
-                    {item.value}%
-                  </p>
+          {floorData?.map((item, index) => {
+            return (
+              <div key={index} className="flex justify-center items-center">
+                <div>
+                  <ChartComponent value={item[1]?.level} colors={[colors[Math.round(Math.random() * 12)]]} />
+                  <div className="text-center">
+                    <p className="text-sm font-medium text-[#060606cc]">{item[0]?.toUpperCase()}</p>
+                    {/* <p className="text-lg md:text-[24px] font-semibold text-primary-lightBlue">{item[1]?.level}</p> */}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </Slider>
       </div>
     </div>
@@ -81,7 +89,7 @@ const ChartComponent = ({ value, colors }) => {
             color: "rgba(3, 165, 224, 1)",
             offsetY: 0,
             show: true,
-            formatter: () => `${value}%`,
+            formatter: () => `${value}`,
           },
         },
       },
@@ -91,14 +99,7 @@ const ChartComponent = ({ value, colors }) => {
     colors: colors,
   };
 
-  return (
-    <Chart
-      options={chartOptions}
-      series={chartOptions.series}
-      type="radialBar"
-      height="250"
-    />
-  );
+  return <Chart options={chartOptions} series={chartOptions.series} type="radialBar" height="250" />;
 };
 
 const CustomDropDown = ({ lists }) => {
@@ -116,11 +117,7 @@ const CustomDropDown = ({ lists }) => {
         onClick={() => optionsHandler()}
       >
         {selectedOption}
-        <div
-          className={`transition-all duration-300 ${
-            isOptionOpen ? "rotate-180" : "rotate-0"
-          }`}
-        >
+        <div className={`transition-all duration-300 ${isOptionOpen ? "rotate-180" : "rotate-0"}`}>
           <ChevronIcon />
         </div>
       </div>
