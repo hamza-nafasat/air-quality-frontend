@@ -1,45 +1,19 @@
 import React, { useState } from "react";
-import DataTable from "react-data-table-component";
-import ToggleButton from "../../../shared/small/ToggleButton";
-import GreenEye from "../../../../assets/svgs/dashboard/GreenEye";
-import BluePen from "../../../../assets/svgs/dashboard/BluePen";
-import RedBin from "../../../../assets/svgs/dashboard/RedBin";
-import { sensorData } from "../../../../data/data";
 import { confirmAlert } from "react-confirm-alert";
+import DataTable from "react-data-table-component";
+import BluePen from "../../../../assets/svgs/dashboard/BluePen";
+import GreenEye from "../../../../assets/svgs/dashboard/GreenEye";
+import RedBin from "../../../../assets/svgs/dashboard/RedBin";
+import ToggleButton from "../../../shared/small/ToggleButton";
 
 const columns = (modalOpenHandler, sensorStatus, statusToggleHandler, deleteHandler) => [
-  {
-    name: "Sensor Name",
-    selector: (row) => row.sensorName,
-  },
-  {
-    name: "IP",
-    selector: (row) => row.ip,
-  },
-  {
-    name: "URL",
-    selector: (row) => row.url,
-  },
-  {
-    name: "Port",
-    selector: (row) => row.port,
-  },
-  {
-    name: "Type",
-    selector: (row) => row.type,
-  },
-  {
-    name: "Location",
-    selector: (row) => row.location,
-  },
+  { name: "Sensor Name", selector: (row) => row.name },
+  { name: "Parameters", selector: (row) => row.parameters?.join(", ") },
+  { name: "Connected", selector: (row) => (row.isConnected ? "Yes" : "No") },
   {
     name: "Status",
     selector: (row) => (
-      <ToggleButton
-        isTable={true}
-        isChecked={sensorStatus[row._id] || false}
-        onToggle={() => statusToggleHandler(row._id)}
-      />
+      <ToggleButton isTable={true} isChecked={row?.status} onToggle={() => statusToggleHandler(row._id)} />
     ),
   },
   {
@@ -66,7 +40,7 @@ const columns = (modalOpenHandler, sensorStatus, statusToggleHandler, deleteHand
   },
 ];
 
-const SensorDetails = () => {
+const SensorDetails = ({ data }) => {
   const [modal, setModal] = useState(false);
   const [sensorStatus, setSensorStatus] = useState({});
 
@@ -101,47 +75,18 @@ const SensorDetails = () => {
     <div className="bg-white rounded-[15px] shadow-dashboard">
       <div className="flex items-center justify-between">
         <div className="p-5">Sensors Details</div>
-        {/* <div className="flex items-center gap-2">
-          <div
-            className="cursor-pointer"
-            onClick={() => modalOpenHandler("add")}
-          >
-            <AddIcon />
-          </div>
-          <div className="cursor-pointer">
-            <DeleteIcon />
-          </div>
-        </div> */}
       </div>
       <div className="mt-5 h-[300px] overflow-auto custom-scrollbar">
         <DataTable
           columns={columns(modalOpenHandler, sensorStatus, statusToggleHandler, deleteHandler)}
-          data={sensorData}
+          data={data}
           selectableRows
           selectableRowsHighlight
           customStyles={tableStyles}
           fixedHeader
-          fixedHeaderScrollHeight="280px" // Adjust the height as needed
+          fixedHeaderScrollHeight="280px"
         />
       </div>
-      {/* {modal === "add" && (
-        <Modal
-          title="Add Sensor"
-          width="w-[300px] md:w-[650px]"
-          onClose={modalCloseHandler}
-        >
-          <AddSensor onClose={modalCloseHandler} />
-        </Modal>
-      )}
-      {modal === "edit" && (
-        <Modal
-          title="Edit Sensor"
-          width="w-[300px] md:w-[650px]"
-          onClose={modalCloseHandler}
-        >
-          <EditSensor onClose={modalCloseHandler} />
-        </Modal>
-      )} */}
     </div>
   );
 };
