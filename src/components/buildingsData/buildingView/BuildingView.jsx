@@ -2,8 +2,7 @@
 import { useEffect, useState } from "react";
 import AlarmsIcon from "../../../assets/svgs/dashboard/AlarmsIcon";
 import Co2Icon from "../../../assets/svgs/dashboard/Co2Icon";
-import { buildingViewStatus } from "../../../data/data";
-import StatusCard from "../../shared/large/card/StatusCard";
+import { BuildingStatusCard } from "../../shared/large/card/StatusCard";
 
 import { confirmAlert } from "react-confirm-alert";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -12,6 +11,7 @@ import EnergyIcon from "../../../assets/svgs/dashboard/EnergyIcon";
 import EquipmentIcon from "../../../assets/svgs/dashboard/EquipmentIcon";
 import OccupancyIcon from "../../../assets/svgs/dashboard/OccupancyIcon";
 import TemperatureIcon from "../../../assets/svgs/dashboard/TemperatureIcon";
+import AddIcon from "../../../assets/svgs/pages/AddIcon";
 import DeleteIcon from "../../../assets/svgs/pages/DeleteIcon";
 import EditIcon from "../../../assets/svgs/stepper/EditIcon";
 import { useDeleteSingleBuildingMutation, useGetSingleBuildingQuery } from "../../../redux/apis/buildingApis";
@@ -25,9 +25,6 @@ import Alerts from "./components/Alerts";
 import BuildingDetails from "./components/BuildingDetails";
 import BuildingHumidityChart from "./components/BuildingHumidityChart";
 import SensorDetails from "./components/SensorDetails";
-import { FaPlus } from "react-icons/fa";
-import AddIcon from "../../../assets/svgs/pages/AddIcon";
-
 const icons = [<AlarmsIcon />, <TemperatureIcon />, <EquipmentIcon />, <EnergyIcon />, <Co2Icon />, <OccupancyIcon />];
 
 const BuildingView = () => {
@@ -53,6 +50,7 @@ const BuildingView = () => {
           type: building?.type || "",
           area: building?.area || "",
           totalSensors: 0,
+          avgSensorData: data?.sensorsDataAverage || [],
         });
       }
     }
@@ -89,8 +87,8 @@ const BuildingView = () => {
   ) : (
     <div className="">
       <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-6 gap-4">
-        {buildingViewStatus.map((item, i) => (
-          <StatusCard key={i} status={item.status} from={item.from} type={item.type} icon={icons[i % icons.length]} />
+        {buildingData?.avgSensorData?.map((item, i) => (
+          <BuildingStatusCard key={i} name={item?.[0]} value={item?.[1]} icon={icons[i % icons.length]} />
         ))}
       </section>
       <section className="mt-4 flex justify-end">
@@ -130,7 +128,7 @@ const BuildingView = () => {
             <DoubleAreaChart />
           </div>
           <div className="grid grid-cols-1 mt-4 flex-1">
-            <SensorDetails />
+            <SensorDetails data={data?.allSensors} />
           </div>
         </div>
         <div className="col-span-12 xl:col-span-4 flex flex-col">
@@ -138,7 +136,7 @@ const BuildingView = () => {
             <BuildingDetails building={buildingData} />
           </div>
           <div className="grid grid-cols-1 mt-4 rounded-[16px] p-8 bg-white shadow-dashboard">
-            <BuildingHumidityChart />
+            <BuildingHumidityChart chartData={buildingData?.avgSensorData} />
           </div>
           <div className="grid grid-cols-1 mt-4 flex-1">
             <Alerts />
