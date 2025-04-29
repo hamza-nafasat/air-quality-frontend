@@ -99,7 +99,7 @@ const ChartComponent = ({ value, colors }) => {
     colors: colors,
   };
 
-  return <Chart options={chartOptions} series={chartOptions.series} type="radialBar" height="250" />;
+  return <Chart options={chartOptions} series={chartOptions.series} type="radialBar" height="300" />;
 };
 
 const CustomDropDown = ({ lists }) => {
