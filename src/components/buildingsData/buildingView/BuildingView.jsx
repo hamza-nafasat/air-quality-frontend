@@ -14,7 +14,10 @@ import TemperatureIcon from "../../../assets/svgs/dashboard/TemperatureIcon";
 import AddIcon from "../../../assets/svgs/pages/AddIcon";
 import DeleteIcon from "../../../assets/svgs/pages/DeleteIcon";
 import EditIcon from "../../../assets/svgs/stepper/EditIcon";
-import { useDeleteSingleBuildingMutation, useGetSingleBuildingQuery } from "../../../redux/apis/buildingApis";
+import {
+  useDeleteSingleBuildingMutation,
+  useGetSingleBuildingQuery,
+} from "../../../redux/apis/buildingApis";
 import { useGetAllFloorQuery } from "../../../redux/apis/floorApis";
 import DoubleAreaChart from "../../charts/areaChart/DoubleAreaChart";
 import BuildingDeleteWithId from "../../shared/large/modal/BuildingDeleteWithId";
@@ -25,7 +28,14 @@ import Alerts from "./components/Alerts";
 import BuildingDetails from "./components/BuildingDetails";
 import BuildingHumidityChart from "./components/BuildingHumidityChart";
 import SensorDetails from "./components/SensorDetails";
-const icons = [<AlarmsIcon />, <TemperatureIcon />, <EquipmentIcon />, <EnergyIcon />, <Co2Icon />, <OccupancyIcon />];
+const icons = [
+  <AlarmsIcon />,
+  <TemperatureIcon />,
+  <EquipmentIcon />,
+  <EnergyIcon />,
+  <Co2Icon />,
+  <OccupancyIcon />,
+];
 
 const BuildingView = () => {
   const Navigate = useNavigate();
@@ -59,7 +69,8 @@ const BuildingView = () => {
   const handleOpenDeleteModal = () => {
     confirmAlert({
       title: "Delete Building",
-      message: "Are you sure, you want to delete this whole Building with all his floors?",
+      message:
+        "Are you sure, you want to delete this whole Building with all his floors?",
       buttons: [
         {
           label: "Yes",
@@ -86,12 +97,17 @@ const BuildingView = () => {
     <Loader />
   ) : (
     <div className="">
-      <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-6 gap-4">
+      <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-5 gap-4">
         {buildingData?.avgSensorData?.map((item, i) => (
-          <BuildingStatusCard key={i} name={item?.[0]} value={item?.[1]} icon={icons[i % icons.length]} />
+          <BuildingStatusCard
+            key={i}
+            name={item?.[0]}
+            value={item?.[1]}
+            icon={icons[i % icons.length]}
+          />
         ))}
       </section>
-      <section className="mt-4 flex justify-end">
+      <section className="mt-4 flex justify-end ">
         <div className="flex items-center gap-4">
           <Link
             className="flex items-center justify-center text-primary-lightBlue mt-[0.5px]"
@@ -119,19 +135,23 @@ const BuildingView = () => {
 
       <section className="grid grid-cols-12 gap-4 mt-4 ">
         <div className="col-span-12 xl:col-span-8 flex flex-col">
-          <div className="grid grid-cols-1">
+          <div className="grid grid-cols-1 ">
             <section className="rounded-[16px] p-5 bg-white shadow-dashboard">
-              <img src={buildingData?.thumbnail} className="w-full" alt="Image" />
+              <img
+                src={buildingData?.thumbnail}
+                className="w-full"
+                alt="Image"
+              />
             </section>
           </div>
-          <div className="grid grid-cols-1 mt-4 rounded-[16px] p-5 bg-white shadow-dashboard">
+          <div className="grid grid-cols-1 mt-4 rounded-[16px] p-5 bg-white shadow-dashboard ">
             <DoubleAreaChart />
           </div>
           <div className="grid grid-cols-1 mt-4 flex-1">
             <SensorDetails data={data?.allSensors} />
           </div>
         </div>
-        <div className="col-span-12 xl:col-span-4 flex flex-col">
+        <div className="col-span-12 xl:col-span-4 flex flex-col ">
           <div className="grid grid-cols-1">
             <BuildingDetails building={buildingData} />
           </div>
