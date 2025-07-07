@@ -1,33 +1,33 @@
 /* eslint-disable react/jsx-key */
-import { useEffect, useState } from "react";
-import AlarmsIcon from "../../../assets/svgs/dashboard/AlarmsIcon";
-import Co2Icon from "../../../assets/svgs/dashboard/Co2Icon";
-import { BuildingStatusCard } from "../../shared/large/card/StatusCard";
+import { useEffect, useState } from 'react';
+import AlarmsIcon from '../../../assets/svgs/dashboard/AlarmsIcon';
+import Co2Icon from '../../../assets/svgs/dashboard/Co2Icon';
+import { BuildingStatusCard } from '../../shared/large/card/StatusCard';
 
-import { confirmAlert } from "react-confirm-alert";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { toast } from "react-toastify";
-import EnergyIcon from "../../../assets/svgs/dashboard/EnergyIcon";
-import EquipmentIcon from "../../../assets/svgs/dashboard/EquipmentIcon";
-import OccupancyIcon from "../../../assets/svgs/dashboard/OccupancyIcon";
-import TemperatureIcon from "../../../assets/svgs/dashboard/TemperatureIcon";
-import AddIcon from "../../../assets/svgs/pages/AddIcon";
-import DeleteIcon from "../../../assets/svgs/pages/DeleteIcon";
-import EditIcon from "../../../assets/svgs/stepper/EditIcon";
+import { confirmAlert } from 'react-confirm-alert';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import EnergyIcon from '../../../assets/svgs/dashboard/EnergyIcon';
+import EquipmentIcon from '../../../assets/svgs/dashboard/EquipmentIcon';
+import OccupancyIcon from '../../../assets/svgs/dashboard/OccupancyIcon';
+import TemperatureIcon from '../../../assets/svgs/dashboard/TemperatureIcon';
+import AddIcon from '../../../assets/svgs/pages/AddIcon';
+import DeleteIcon from '../../../assets/svgs/pages/DeleteIcon';
+import EditIcon from '../../../assets/svgs/stepper/EditIcon';
 import {
   useDeleteSingleBuildingMutation,
   useGetSingleBuildingQuery,
-} from "../../../redux/apis/buildingApis";
-import { useGetAllFloorQuery } from "../../../redux/apis/floorApis";
-import DoubleAreaChart from "../../charts/areaChart/DoubleAreaChart";
-import BuildingDeleteWithId from "../../shared/large/modal/BuildingDeleteWithId";
-import Modal from "../../shared/large/modal/Modal";
-import Loader from "../../shared/small/Loader";
-import Floors from "../floorView/components/Floors";
-import Alerts from "./components/Alerts";
-import BuildingDetails from "./components/BuildingDetails";
-import BuildingHumidityChart from "./components/BuildingHumidityChart";
-import SensorDetails from "./components/SensorDetails";
+} from '../../../redux/apis/buildingApis';
+import { useGetAllFloorQuery } from '../../../redux/apis/floorApis';
+import DoubleAreaChart from '../../charts/areaChart/DoubleAreaChart';
+import BuildingDeleteWithId from '../../shared/large/modal/BuildingDeleteWithId';
+import Modal from '../../shared/large/modal/Modal';
+import Loader from '../../shared/small/Loader';
+import Floors from '../floorView/components/Floors';
+import Alerts from './components/Alerts';
+import BuildingDetails from './components/BuildingDetails';
+import BuildingHumidityChart from './components/BuildingHumidityChart';
+import SensorDetails from './components/SensorDetails';
 const icons = [
   <AlarmsIcon />,
   <TemperatureIcon />,
@@ -44,22 +44,24 @@ const BuildingView = () => {
   const { data, isSuccess, isLoading } = useGetSingleBuildingQuery(id);
   const { data: floors } = useGetAllFloorQuery(id);
   const [deleteModal, setDeleteModal] = useState(false);
-  const [deleteBuilding] = useDeleteSingleBuildingMutation("");
+  const [deleteBuilding] = useDeleteSingleBuildingMutation('');
+  console.log('complet building data', data);
 
   useEffect(() => {
     if (isSuccess) {
       const building = data?.data;
+
       if (building) {
         setBuildingData({
-          id: building?._id || "",
-          address: building?.address || "",
-          floors: building?.floors || "",
-          name: building?.name || "",
-          position: building?.position || "",
-          thumbnail: building?.thumbnail?.url || "",
-          type: building?.type || "",
-          area: building?.area || "",
-          totalSensors: 0,
+          id: building?._id || '',
+          address: building?.address || '',
+          floors: building?.totalFloors || '',
+          name: building?.name || '',
+          position: building?.position || '',
+          thumbnail: building?.thumbnail?.url || '',
+          type: building?.type || '',
+          area: building?.area || '',
+          totalSensors: building?.totalSensors || '',
           avgSensorData: data?.sensorsDataAverage || [],
         });
       }
@@ -68,26 +70,25 @@ const BuildingView = () => {
 
   const handleOpenDeleteModal = () => {
     confirmAlert({
-      title: "Delete Building",
-      message:
-        "Are you sure, you want to delete this whole Building with all his floors?",
+      title: 'Delete Building',
+      message: 'Are you sure, you want to delete this whole Building with all his floors?',
       buttons: [
         {
-          label: "Yes",
+          label: 'Yes',
           onClick: async () => {
-            if (!id) return toast.error("Error while deleting Building");
+            if (!id) return toast.error('Error while deleting Building');
             try {
               const res = await deleteBuilding(id).unwrap();
               if (res?.message) toast.success(res.message);
-              return Navigate("/dashboard/buildings");
+              return Navigate('/dashboard/buildings');
             } catch (error) {
-              console.log("Error in deleting building", error);
-              toast.error(error?.data?.message || "Error in delete Building");
+              console.log('Error in deleting building', error);
+              toast.error(error?.data?.message || 'Error in delete Building');
             }
           },
         },
         {
-          label: "No",
+          label: 'No',
         },
       ],
     });
@@ -129,7 +130,7 @@ const BuildingView = () => {
           <BuildingDeleteWithId
             message="Are you sure you want to delete this building?"
             onClose={() => setDeleteModal(false)}
-          />{" "}
+          />{' '}
         </Modal>
       )}
 
@@ -137,15 +138,11 @@ const BuildingView = () => {
         <div className="col-span-12 xl:col-span-8 flex flex-col">
           <div className="grid grid-cols-1 ">
             <section className="rounded-[16px] p-5 bg-white shadow-dashboard">
-              <img
-                src={buildingData?.thumbnail}
-                className="w-full"
-                alt="Image"
-              />
+              <img src={buildingData?.thumbnail} className="w-full" alt="Image" />
             </section>
           </div>
           <div className="grid grid-cols-1 mt-4 rounded-[16px] p-5 bg-white shadow-dashboard ">
-            <DoubleAreaChart />
+            <DoubleAreaChart chartsData={data?.chartsData} />
           </div>
           <div className="grid grid-cols-1 mt-4 flex-1">
             <SensorDetails data={data?.allSensors} />

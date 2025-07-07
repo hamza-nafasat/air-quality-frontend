@@ -1,14 +1,14 @@
 /* eslint-disable react/prop-types */
 // / eslint-disable react-hooks/exhaustive-deps /
 // / eslint-disable react/prop-types /
-import { useEffect, useRef, useState } from "react";
-import Cropper from "react-easy-crop";
-import { AiOutlineDelete } from "react-icons/ai";
-import { CiExport } from "react-icons/ci";
-import { LiaDrawPolygonSolid } from "react-icons/lia";
-import { RiEditBoxFill } from "react-icons/ri";
-import { SlCursorMove } from "react-icons/sl";
-import { VscCopy } from "react-icons/vsc";
+import { useEffect, useRef, useState } from 'react';
+import Cropper from 'react-easy-crop';
+import { AiOutlineDelete } from 'react-icons/ai';
+import { CiExport } from 'react-icons/ci';
+import { LiaDrawPolygonSolid } from 'react-icons/lia';
+import { RiEditBoxFill } from 'react-icons/ri';
+import { SlCursorMove } from 'react-icons/sl';
+import { VscCopy } from 'react-icons/vsc';
 import {
   convertImageSrcToFile,
   drawCanvas,
@@ -28,13 +28,13 @@ import {
   polygonsLabelHandler,
   sensorInfoSubmitHandler,
   sensorInfoUpdateHandler,
-} from "../../globalUtils/uploadFeatures";
-import Modal from "../../shared/modal/Modal";
-import Button from "../../shared/small/Button";
-import Dropdown from "../../shared/small/Dropdown";
-import TextField from "../../shared/small/TextField";
-import { getCroppedImg } from "../utils/addBuildingFeature";
-import { useGetAllSensorsQuery } from "../../../redux/apis/sensorApis";
+} from '../../globalUtils/uploadFeatures';
+import Modal from '../../shared/modal/Modal';
+import Button from '../../shared/small/Button';
+import Dropdown from '../../shared/small/Dropdown';
+import TextField from '../../shared/small/TextField';
+import { getCroppedImg } from '../utils/addBuildingFeature';
+import { useGetAllSensorsQuery, useGetSingleSensorSqlQuery } from '../../../redux/apis/sensorApis';
 
 const UploadAddFloors = ({
   setFile,
@@ -46,7 +46,11 @@ const UploadAddFloors = ({
   setSelectedSensor,
 }) => {
   const { data } = useGetAllSensorsQuery();
+  const { data: sensor } = useGetSingleSensorSqlQuery();
   const [availableSensors, setAvailableSensors] = useState([]);
+  console.log('availableSensors', availableSensors);
+  console.log('sensor', sensor);
+  // console.log('availableSensors', data.data);
 
   const canvasRef = useRef(null);
   const [isDrawingEnabled, setIsDrawingEnabled] = useState(false);
@@ -69,20 +73,18 @@ const UploadAddFloors = ({
 
   const [sensorPopup, setSensorPopup] = useState(false);
   const [selectedPolygon, setSelectedPolygon] = useState(null);
-  const [roomName, setRoomName] = useState("");
-  const [color, setColor] = useState("#ffff00");
+  const [roomName, setRoomName] = useState('');
+  const [color, setColor] = useState('#ffff00');
 
   const [currentSensor, setCurrentSensor] = useState(null);
 
   useEffect(() => {
-    if (data?.data) {
-      const availableSensors = [];
-      data?.data?.forEach((sensor) => {
-        if (!sensor?.isConnected) availableSensors.push({ option: sensor?.name, value: sensor?._id });
-      });
-      setAvailableSensors(availableSensors);
-    }
-  }, [data]);
+    // Guard: run only when the payload is really an array.
+    if (!Array.isArray(data?.data)) return;
+
+    // Build the new array and save it.
+    setAvailableSensors(data.data.map(({ _id, name }) => ({ option: name, value: _id })));
+  }, [data?.data]); // run when the payload itself changes
   const sensorOnSelectHandler = (selectedOption) => {
     setSelectedSensor([...selectedSensor, selectedOption?.value]);
     setCurrentSensor(selectedOption?.value);
@@ -92,7 +94,7 @@ const UploadAddFloors = ({
   const openSensorPopup = (polygon) => {
     setSelectedPolygon(polygon);
     setSensorPopup(true);
-    setRoomName("");
+    setRoomName('');
   };
 
   const onCropComplete = (croppedArea, croppedAreaPixels) => {
@@ -109,7 +111,7 @@ const UploadAddFloors = ({
       setFile(file);
       setShowCropper(false);
     } catch (error) {
-      console.error("Crop failed:", error);
+      console.error('Crop failed:', error);
     }
   };
 
@@ -128,16 +130,16 @@ const UploadAddFloors = ({
       polygon.points.forEach((point) => path.lineTo(point.x, point.y));
       path.closePath();
 
-      return canvas.getContext("2d").isPointInPath(path, x, y);
+      return canvas.getContext('2d').isPointInPath(path, x, y);
     });
 
     if (selectedPolygon) setDraggedPolygon(selectedPolygon);
   };
 
   const [reEditModalOpen, setReEditModalOpen] = useState(false);
-  const [selectedPolygonId, setSelectedPolygonId] = useState("");
-  const [selectedPolygonSensor, setSelectedPolygonSensor] = useState("");
-  const [selectedPolygonColor, setSelectedPolygonColor] = useState("#fff");
+  const [selectedPolygonId, setSelectedPolygonId] = useState('');
+  const [selectedPolygonSensor, setSelectedPolygonSensor] = useState('');
+  const [selectedPolygonColor, setSelectedPolygonColor] = useState('#fff');
 
   // Function to open modal with polygon ID
   const handlePolygonClick = (polygonId, polygonSensor) => {
@@ -147,10 +149,10 @@ const UploadAddFloors = ({
       setSelectedPolygon(polygonToEdit); // Set the entire polygon object to selectedPolygon
       setSelectedPolygonId(polygonId); // Set the polygon's ID
       setSelectedPolygonSensor(polygonSensor); // Set the polygon's attached sensor
-      setSelectedPolygonColor(polygonToEdit.color || "#000000"); // Set the polygon's color (default to black if undefined)
+      setSelectedPolygonColor(polygonToEdit.color || '#000000'); // Set the polygon's color (default to black if undefined)
       setReEditModalOpen(true); // Open the modal
     } else {
-      console.error("Polygon not found!");
+      console.error('Polygon not found!');
     }
   };
 
@@ -171,7 +173,9 @@ const UploadAddFloors = ({
     <div className="relative">
       {!isDrawingEnabled && (
         <BrowseFileBtn
-          onFileChange={(event) => handleImageUpload(event, setPreviewValue, setShowCropper, setIsDrawingEnabled)}
+          onFileChange={(event) =>
+            handleImageUpload(event, setPreviewValue, setShowCropper, setIsDrawingEnabled)
+          }
         />
       )}
 
@@ -240,10 +244,16 @@ const UploadAddFloors = ({
               onCropComplete={onCropComplete}
             />
             <div className="flex items-center gap-2 mt-4 z-[999] absolute bottom-6 right-6">
-              <button onClick={() => setShowCropper(false)} className="bg-gray-500 text-white px-4 py-2 rounded">
+              <button
+                onClick={() => setShowCropper(false)}
+                className="bg-gray-500 text-white px-4 py-2 rounded"
+              >
                 Cancel
               </button>
-              <button onClick={handleCropConfirm} className="bg-primary-lightBlue text-white px-4 py-2 rounded">
+              <button
+                onClick={handleCropConfirm}
+                className="bg-primary-lightBlue text-white px-4 py-2 rounded"
+              >
                 Crop
               </button>
             </div>
@@ -262,10 +272,13 @@ const UploadAddFloors = ({
                 setIsUpdateMode(false);
               }}
               className={`p-2 border rounded-md text-white ${
-                isEditMode ? "border-primary-lightBlue" : "border-[#565656]"
+                isEditMode ? 'border-primary-lightBlue' : 'border-[#565656]'
               }`}
             >
-              <LiaDrawPolygonSolid fontSize={20} color={isEditMode ? "rgba(3, 165, 224, 1)" : "#565656"} />
+              <LiaDrawPolygonSolid
+                fontSize={20}
+                color={isEditMode ? 'rgba(3, 165, 224, 1)' : '#565656'}
+              />
             </button>
             <button
               onClick={() =>
@@ -280,10 +293,10 @@ const UploadAddFloors = ({
                 })
               }
               className={`p-2 border rounded-md text-white ${
-                isCopyMode ? "border-primary-lightBlue" : "border-[#565656]"
+                isCopyMode ? 'border-primary-lightBlue' : 'border-[#565656]'
               }`}
             >
-              <VscCopy fontSize={20} color={isCopyMode ? "rgba(3, 165, 224, 1)" : "#565656"} />
+              <VscCopy fontSize={20} color={isCopyMode ? 'rgba(3, 165, 224, 1)' : '#565656'} />
             </button>
             <button
               onClick={() =>
@@ -298,10 +311,13 @@ const UploadAddFloors = ({
                 })
               }
               className={`p-2 border rounded-md text-white ${
-                isUpdateMode ? "border-primary-lightBlue" : "border-[#565656]"
+                isUpdateMode ? 'border-primary-lightBlue' : 'border-[#565656]'
               }`}
             >
-              <RiEditBoxFill fontSize={20} color={isUpdateMode ? "rgba(3, 165, 224, 1)" : "#565656"} />
+              <RiEditBoxFill
+                fontSize={20}
+                color={isUpdateMode ? 'rgba(3, 165, 224, 1)' : '#565656'}
+              />
             </button>
             <button
               onClick={() =>
@@ -316,10 +332,10 @@ const UploadAddFloors = ({
                 })
               }
               className={`p-2 border rounded-md text-white ${
-                isMoveMode ? "border-primary-lightBlue" : "border-[#565656]"
+                isMoveMode ? 'border-primary-lightBlue' : 'border-[#565656]'
               }`}
             >
-              <SlCursorMove fontSize={20} color={isMoveMode ? "rgba(3, 165, 224, 1)" : "#565656"} />
+              <SlCursorMove fontSize={20} color={isMoveMode ? 'rgba(3, 165, 224, 1)' : '#565656'} />
             </button>
             <button
               onClick={() =>
@@ -333,10 +349,13 @@ const UploadAddFloors = ({
                 })
               }
               className={`p-2 border rounded-md text-white ${
-                isDeleteMode ? "border-primary-lightBlue" : "border-[#565656]"
+                isDeleteMode ? 'border-primary-lightBlue' : 'border-[#565656]'
               }`}
             >
-              <AiOutlineDelete fontSize={20} color={isDeleteMode ? "rgba(3, 165, 224, 1)" : "#565656"} />
+              <AiOutlineDelete
+                fontSize={20}
+                color={isDeleteMode ? 'rgba(3, 165, 224, 1)' : '#565656'}
+              />
             </button>
             <button
               className="border rounded-md border-[#565656] hover:border-primary-lightBlue p-2"
@@ -359,19 +378,19 @@ const UploadAddFloors = ({
             />
 
             <Dropdown
-              defaultText={"Select Sensor"}
+              defaultText={'Select Sensor'}
               options={availableSensors}
               label="Sensor Name"
               onSelect={(selectedOption) => sensorOnSelectHandler(selectedOption)}
             />
 
             <Dropdown
-              defaultText={"Top-Left"}
+              defaultText={'Top-Left'}
               options={[
-                { option: "Top Left", value: "first" },
-                { option: "Top Right", value: "second" },
-                { option: "Bottom Right", value: "third" },
-                { option: "Bottom Left", value: "fourth" },
+                { option: 'Top Left', value: 'first' },
+                { option: 'Top Right', value: 'second' },
+                { option: 'Bottom Right', value: 'third' },
+                { option: 'Bottom Left', value: 'fourth' },
               ]}
               label="Label Positioning of polygon"
               onSelect={(selectedOption) =>
@@ -433,9 +452,9 @@ const UploadAddFloors = ({
             <Dropdown
               defaultText={selectedPolygonSensor || selectedSensor}
               options={[
-                { option: "No sensor", value: "no-sensor" },
-                { option: "Sensor 1", value: "sensor-1" },
-                { option: "Sensor 2", value: "sensor-2" },
+                { option: 'No sensor', value: 'no-sensor' },
+                { option: 'Sensor 1', value: 'sensor-1' },
+                { option: 'Sensor 2', value: 'sensor-2' },
               ]}
               label="Sensor Name"
               // onChange={(e) => setSelectedSensor(e.target.value)}
@@ -443,12 +462,12 @@ const UploadAddFloors = ({
             />
 
             <Dropdown
-              defaultText={selectedPolygon.labelPoint || "first"}
+              defaultText={selectedPolygon.labelPoint || 'first'}
               options={[
-                { option: "First-Point", value: "first" },
-                { option: "Second-Point", value: "second" },
-                { option: "Third-Point", value: "third" },
-                { option: "Fourth-Point", value: "fourth" },
+                { option: 'First-Point', value: 'first' },
+                { option: 'Second-Point', value: 'second' },
+                { option: 'Third-Point', value: 'third' },
+                { option: 'Fourth-Point', value: 'fourth' },
               ]}
               label="Label Positioning of Polygon"
               onSelect={(selectedOption) => {
@@ -497,7 +516,11 @@ const BrowseFileBtn = ({ onFileChange }) => {
   return (
     <button className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 px-4 py-2 cursor-pointer rounded-lg bg-primary-lightBlue text-white font-semibold">
       Browse File
-      <input type="file" className="absolute inset-0 cursor-pointer opacity-0" onChange={onFileChange} />
+      <input
+        type="file"
+        className="absolute inset-0 cursor-pointer opacity-0"
+        onChange={onFileChange}
+      />
     </button>
   );
 };

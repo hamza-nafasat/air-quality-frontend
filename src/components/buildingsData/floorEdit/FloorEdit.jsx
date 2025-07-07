@@ -1,13 +1,16 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { toast } from "react-toastify";
-import AccordionEditIcon from "../../../assets/svgs/buildings/AccordionEditIcon";
-import { useGetSingleFloorQuery, useUpdateSingleFloorMutation } from "../../../redux/apis/floorApis";
-import UploadModelImage from "../../buildings/uploads/UploadModelImage";
-import Button from "../../shared/small/Button";
-import Loader from "../../shared/small/Loader";
-import TextField from "../../shared/small/TextField";
-import { useGetAllSensorsQuery } from "../../../redux/apis/sensorApis";
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import AccordionEditIcon from '../../../assets/svgs/buildings/AccordionEditIcon';
+import {
+  useGetSingleFloorQuery,
+  useUpdateSingleFloorMutation,
+} from '../../../redux/apis/floorApis';
+import UploadModelImage from '../../buildings/uploads/UploadModelImage';
+import Button from '../../shared/small/Button';
+import Loader from '../../shared/small/Loader';
+import TextField from '../../shared/small/TextField';
+import { useGetAllSensorsQuery } from '../../../redux/apis/sensorApis';
 
 function FloorEdit() {
   const navigate = useNavigate();
@@ -15,19 +18,20 @@ function FloorEdit() {
   const { data, isLoading } = useGetSingleFloorQuery(id);
   const [twoDModelPreview, setTwoDModelPreview] = useState(null);
   const [polygons, setPolygons] = useState([]);
-  const [floor, setFloor] = useState({ floorName: "", floorRooms: "" });
-  const [updateFloor, { isLoading: isUpdatingFloor }] = useUpdateSingleFloorMutation("");
+  const [floor, setFloor] = useState({ floorName: '', floorRooms: '' });
+  const [updateFloor, { isLoading: isUpdatingFloor }] = useUpdateSingleFloorMutation('');
   const { refetch } = useGetAllSensorsQuery();
   const [selectedSensor, setSelectedSensor] = useState([]);
 
   useEffect(() => {
     if (data?.data) {
       const singleFloor = data?.data;
-      setFloor({ floorName: singleFloor?.name || "", floorRooms: singleFloor?.rooms || "" });
+      setFloor({ floorName: singleFloor?.name || '', floorRooms: singleFloor?.rooms || '' });
       setTwoDModelPreview(singleFloor?.twoDModel?.url);
       setPolygons(singleFloor?.twoDModelCanvasData ? singleFloor?.twoDModelCanvasData : []);
     }
   }, [data?.data]);
+  console.log('data', data);
 
   const updateFloorHandler = async () => {
     try {
@@ -36,14 +40,16 @@ function FloorEdit() {
       if (floor.floorRooms) dataForUpdate.rooms = floor.floorRooms;
       if (polygons) dataForUpdate.twoDModelCanvasData = polygons;
       if (selectedSensor.length > 0) dataForUpdate.sensors = selectedSensor;
+      console.log('sensorsExist', dataForUpdate);
+
       const res = await updateFloor({ floorId: id, data: dataForUpdate }).unwrap();
       if (res?.message) toast.success(res.message);
       setSelectedSensor([]);
       await refetch();
-      return navigate("/dashboard/floor-view/" + id);
+      return navigate('/dashboard/floor-view/' + id);
     } catch (error) {
-      console.log("Error in updating floor", error);
-      toast.error(error?.data?.message || "Error in update floor");
+      console.log('Error in updating floor', error);
+      toast.error(error?.data?.message || 'Error in update floor');
     }
   };
 
@@ -61,14 +67,14 @@ function FloorEdit() {
       </div>
       <div className="flex gap-4 mt-4">
         <TextField
-          label={"Floor Name"}
+          label={'Floor Name'}
           type="text"
           value={floor.floorName}
           placeholder="Floor Name"
           onChange={(e) => setFloor({ ...floor, floorName: e.target.value })}
         />
         <TextField
-          label={"Rooms"}
+          label={'Rooms'}
           type="text"
           value={floor.floorRooms}
           placeholder="Rooms"
@@ -90,9 +96,9 @@ function FloorEdit() {
       <div className="flex justify-end">
         <Button
           disabled={isUpdatingFloor}
-          text={"Update Floor"}
+          text={'Update Floor'}
           onClick={updateFloorHandler}
-          className={`max-w-[200px] ${isUpdatingFloor ? "pointer-events-none opacity-30" : ""}`}
+          className={`max-w-[200px] ${isUpdatingFloor ? 'pointer-events-none opacity-30' : ''}`}
         />
       </div>
     </div>

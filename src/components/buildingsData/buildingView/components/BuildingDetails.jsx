@@ -1,10 +1,9 @@
 // eslint-disable-next-line react/prop-types
-import React from "react";
-import greyBuilding from "../../../../assets/images/buildings/greyBuilding.png";
-import LocationIcon from "../../../../assets/svgs/pages/LocationIcon";
+import React from 'react';
+import greyBuilding from '../../../../assets/images/buildings/greyBuilding.png';
+import LocationIcon from '../../../../assets/svgs/pages/LocationIcon';
 
 const BuildingDetails = ({ building }) => {
-  console.log('buildingdetails',building)
   return (
     <div className="p-5 bg-white rounded-[16px]  shadow-dashboard h-full">
       <h5 className="mb-2">Building Details</h5>
@@ -20,33 +19,25 @@ const BuildingDetails = ({ building }) => {
         <h1 className="text-[16px] font-[600] text-[#060606CC] ">{building?.name}</h1>
         <div className="flex items-center gap-2 mt-1">
           <LocationIcon />
-          <p className="text-[8px] font-[600] text-[#060606CC] ">
-            {building?.address}
-          </p>
+          <p className="text-[8px] font-[600] text-[#060606CC] ">{building?.address}</p>
         </div>
       </section>
 
       <section>
         <div className="flex justify-between mt-1">
           <h3 className="text-[12px] text-[#060606CC] font-[400]">Type</h3>
-          <h3 className="text-[12px] text-[#060606CC] font-[400] capitalize">
-            {building?.type}
-          </h3>
+          <h3 className="text-[12px] text-[#060606CC] font-[400] capitalize">{building?.type}</h3>
         </div>
         <div className="flex justify-between mt-1">
-          <h3 className="text-[12px] text-[#060606CC] font-[400]">
-            Total Floors
-          </h3>
-          <h3 className="text-[12px] text-[#060606CC] font-[400]">{building?.floors?.length}</h3>
+          <h3 className="text-[12px] text-[#060606CC] font-[400]">Total Floors</h3>
+          <h3 className="text-[12px] text-[#060606CC] font-[400]">{building?.floors}</h3>
         </div>
         <div className="flex justify-between mt-1">
           <h3 className="text-[12px] text-[#060606CC] font-[400]">Area</h3>
           <h3 className="text-[12px] text-[#060606CC] font-[400]">{building?.area}</h3>
         </div>
         <div className="flex justify-between mt-1">
-          <h3 className="text-[12px] text-[#060606CC] font-[400]">
-            Total Sensors
-          </h3>
+          <h3 className="text-[12px] text-[#060606CC] font-[400]">Total Sensors</h3>
           <h3 className="text-[12px] text-[#060606CC] font-[400]">{building?.totalSensors}</h3>
         </div>
       </section>

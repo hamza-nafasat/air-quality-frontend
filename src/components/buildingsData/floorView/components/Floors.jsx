@@ -1,9 +1,8 @@
 /* eslint-disable react/prop-types */
-import SearchIcon from "../../../../assets/svgs/reports/SearchIcon";
-import BuildingCard from "../../../buildings/BuildingCard";
+import SearchIcon from '../../../../assets/svgs/reports/SearchIcon';
+import BuildingCard from '../../../buildings/BuildingCard';
 
 const Floors = ({ floors }) => {
-  console.log("floors data ",floors)
   return (
     <div className="bg-white p-5 shadow-dashboard rounded-[16px]">
       <div className="flex justify-between sm:flex-row flex-col">

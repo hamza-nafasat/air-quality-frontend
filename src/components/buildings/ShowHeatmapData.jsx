@@ -1,9 +1,9 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 // Helper function to convert hex to rgba with opacity
 const convertHexToRgba = (hex, opacity) => {
-  const cleanHex = hex.replace("#", "");
+  const cleanHex = hex.replace('#', '');
   const bigint = parseInt(cleanHex, 16);
   const r = (bigint >> 16) & 255;
   const g = (bigint >> 8) & 255;
@@ -17,7 +17,7 @@ const ShowHeatmapData = ({ image, polygons, view }) => {
   const [selectedPolygon, setSelectedPolygon] = useState(null);
   const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
 
-  console.log("polygons", polygons);
+  // console.log("polygons", polygons);
 
   // Function to handle polygon click detection
   const handlePolygonClick = (e, polygon) => {
@@ -27,7 +27,7 @@ const ShowHeatmapData = ({ image, polygons, view }) => {
     const mouseY = e.clientY - rect.top;
 
     // Get the context and begin a path for the polygon
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext('2d');
     ctx.beginPath();
     ctx.moveTo(polygon.points[0].x, polygon.points[0].y);
     polygon.points.forEach((point) => ctx.lineTo(point.x, point.y));
@@ -52,7 +52,7 @@ const ShowHeatmapData = ({ image, polygons, view }) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext('2d');
 
     // Clear the canvas and draw the image as background
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -67,7 +67,7 @@ const ShowHeatmapData = ({ image, polygons, view }) => {
         ctx.save(); // Save canvas state
 
         // Apply blur and semi-transparent effect
-        ctx.filter = "blur(8px)"; // Adjust blur intensity (e.g., 4px, 8px, etc.)
+        ctx.filter = 'blur(8px)'; // Adjust blur intensity (e.g., 4px, 8px, etc.)
         ctx.globalAlpha = 0.7; // Adjust opacity (range 0 to 1)
 
         // Draw the polygon
@@ -79,15 +79,15 @@ const ShowHeatmapData = ({ image, polygons, view }) => {
         // Fill polygon with blur effect
         ctx.fillStyle = polygon.fillColor
           ? convertHexToRgba(polygon.fillColor, 0.5)
-          : "rgba(255, 255, 255, 0.5)";
+          : 'rgba(255, 255, 255, 0.5)';
         ctx.fill();
 
         // Remove blur for the stroke
-        ctx.filter = "none";
+        ctx.filter = 'none';
         ctx.globalAlpha = 1;
 
         // Draw polygon border
-        ctx.strokeStyle = polygon.color || "#000000";
+        ctx.strokeStyle = polygon.color || '#000000';
         ctx.lineWidth = 2;
         ctx.stroke();
 
@@ -98,12 +98,12 @@ const ShowHeatmapData = ({ image, polygons, view }) => {
 
     // Cleanup event listener when the component is unmounted
     return () => {
-      canvas.removeEventListener("click", handlePolygonClick);
+      canvas.removeEventListener('click', handlePolygonClick);
     };
   }, [image, polygons]);
 
   return (
-    <div style={{ position: "relative" }}>
+    <div style={{ position: 'relative' }}>
       <canvas
         width={800}
         height={500}
@@ -116,27 +116,19 @@ const ShowHeatmapData = ({ image, polygons, view }) => {
           style={{
             top: `${popupPosition.top}px`,
             left: `${popupPosition.left}px`,
-            transform: "translate(-50%, -50%)",
+            transform: 'translate(-50%, -50%)',
           }}
         >
-          {view === "building-view" ? (
+          {view === 'building-view' ? (
             <div>
-              <h6 className="text-base font-semibold text-center">
-                Floor Details
-              </h6>
+              <h6 className="text-base font-semibold text-center">Floor Details</h6>
               <div className="my-4">
                 <h6 className="text-sm font-medium">Sensors List:</h6>
                 <ul className="text-sm my-1">
-                  <li className="list-disc text-gray-700 ml-4">
-                    Floor Temperature: 20° C
-                  </li>
+                  <li className="list-disc text-gray-700 ml-4">Floor Temperature: 20° C</li>
                   <li className="list-disc text-gray-700 ml-4">CO2: 12 ppm</li>
-                  <li className="list-disc text-gray-700 ml-4">
-                    Occupancy: 20° C
-                  </li>
-                  <li className="list-disc text-gray-700 ml-4">
-                    Energy: 21 kWh
-                  </li>
+                  <li className="list-disc text-gray-700 ml-4">Occupancy: 20° C</li>
+                  <li className="list-disc text-gray-700 ml-4">Energy: 21 kWh</li>
                 </ul>
                 <p className="text-sm mt-3">Total sensors: 12</p>
               </div>
@@ -157,9 +149,7 @@ const ShowHeatmapData = ({ image, polygons, view }) => {
             </div>
           ) : (
             <div>
-              <h6 className="text-base font-semibold text-center">
-                Sensor Details
-              </h6>
+              <h6 className="text-base font-semibold text-center">Sensor Details</h6>
               <div className="my-4">
                 <h6 className="text-sm">Sensor name: Sensor one</h6>
                 <p className="text-sm">CO2: 23 ppm</p>

@@ -1,27 +1,27 @@
 /* eslint-disable react/prop-types */
-import { useEffect, useState } from "react";
-import ReactApexChart from "react-apexcharts";
-import ChevronIcon from "../../../assets/svgs/buildings/ChevronIcon";
+import { useEffect, useState } from 'react';
+import ReactApexChart from 'react-apexcharts';
+import ChevronIcon from '../../../assets/svgs/buildings/ChevronIcon';
 
 const DoubleAreaChart = ({ chartsData }) => {
-  const [selectedOption, setSelectedOption] = useState("Temp & Humi");
+  const [selectedOption, setSelectedOption] = useState('Temp & Humi');
   const [series, setSeries] = useState([]);
   const [options] = useState({
     chart: {
       height: 350,
-      type: "area",
+      type: 'area',
       toolbar: { show: false },
     },
-    colors: ["#33B5E5", "#8E44AD"],
+    colors: ['#33B5E5', '#8E44AD'],
     dataLabels: { enabled: false },
-    stroke: { curve: "smooth", width: 2 },
+    stroke: { curve: 'smooth', width: 2 },
     fill: {
-      type: "gradient",
+      type: 'gradient',
       gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0, stops: [0, 90, 100] },
     },
     xaxis: {
-      categories: ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"],
-      labels: { style: { colors: "#9aa0ac" } },
+      categories: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'],
+      labels: { style: { colors: '#9aa0ac' } },
     },
     yaxis: {
       labels: {
@@ -30,35 +30,35 @@ const DoubleAreaChart = ({ chartsData }) => {
         },
       },
     },
-    grid: { show: true, borderColor: "#f1f1f1" },
+    grid: { show: true, borderColor: '#f1f1f1' },
     tooltip: {
-      theme: "light",
-      x: { format: "dd/MM" },
+      theme: 'light',
+      x: { format: 'dd/MM' },
       marker: { show: true },
       y: { formatter: (value) => `${value} C` },
     },
     legend: {
       show: true,
-      position: "top",
-      horizontalAlign: "center",
-      markers: { fillColors: ["#33B5E5", "#8E44AD"] },
+      position: 'top',
+      horizontalAlign: 'center',
+      markers: { fillColors: ['#33B5E5', '#8E44AD'] },
     },
   });
   useEffect(() => {
-    if (selectedOption === "Temp & Humi") {
+    if (selectedOption === 'Temp & Humi') {
       setSeries([
-        { name: "temperature", data: chartsData?.temperature },
-        { name: "Humidity", data: chartsData?.humidity },
+        { name: 'temperature', data: chartsData?.temperature },
+        { name: 'Humidity', data: chartsData?.humidity },
       ]);
-    } else if (selectedOption === "Co & Co2") {
+    } else if (selectedOption === 'Co & Co2') {
       setSeries([
-        { name: "Co", data: chartsData?.co },
-        { name: "Co2", data: chartsData?.co2 },
+        { name: 'Co', data: chartsData?.co },
+        { name: 'Co2', data: chartsData?.co2 },
       ]);
-    } else if (selectedOption === "Tvoc & Ch") {
+    } else if (selectedOption === 'Tvoc & Ch') {
       setSeries([
-        { name: "Tvoc", data: chartsData?.tvoc },
-        { name: "Ch", data: chartsData?.ch },
+        { name: 'Tvoc', data: chartsData?.tvoc },
+        { name: 'Ch', data: chartsData?.ch },
       ]);
     }
   }, [selectedOption, chartsData]);
@@ -71,7 +71,7 @@ const DoubleAreaChart = ({ chartsData }) => {
           <CustomDropDown
             selectedOption={selectedOption}
             setSelectedOption={setSelectedOption}
-            lists={["Temp & Humi", "Co & Co2", "Tvoc & Ch"]}
+            lists={['Temp & Humi', 'Co & Co2', 'Tvoc & Ch']}
           />
         </div>
       </div>
@@ -97,7 +97,7 @@ const CustomDropDown = ({ lists, selectedOption, setSelectedOption }) => {
         onClick={() => optionsHandler()}
       >
         {selectedOption}
-        <div className={`transition-all duration-300 ${isOptionOpen ? "rotate-180" : "rotate-0"}`}>
+        <div className={`transition-all duration-300 ${isOptionOpen ? 'rotate-180' : 'rotate-0'}`}>
           <ChevronIcon />
         </div>
       </div>

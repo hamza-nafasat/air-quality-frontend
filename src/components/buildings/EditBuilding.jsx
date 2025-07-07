@@ -1,37 +1,40 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { useGetSingleBuildingQuery, useUpdateSingleBuildingMutation } from "../../redux/apis/buildingApis";
-import BrowseFile from "../shared/large/BrowseFile";
-import Button from "../shared/small/Button";
-import Dropdown from "../shared/small/Dropdown";
-import Loader from "../shared/small/Loader";
-import TextField from "../shared/small/TextField";
-import StepperMap from "./StepperMap";
-import { toast } from "react-toastify";
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import {
+  useGetSingleBuildingQuery,
+  useUpdateSingleBuildingMutation,
+} from '../../redux/apis/buildingApis';
+import BrowseFile from '../shared/large/BrowseFile';
+import Button from '../shared/small/Button';
+import Dropdown from '../shared/small/Dropdown';
+import Loader from '../shared/small/Loader';
+import TextField from '../shared/small/TextField';
+import StepperMap from './StepperMap';
+import { toast } from 'react-toastify';
 
 const buildingTypesOptions = [
-  { option: "Residential", value: "residential" },
-  { option: "Commercial", value: "commercial" },
-  { option: "Religious", value: "religious" },
-  { option: "Educational", value: "educational" },
-  { option: "Industrial", value: "industrial" },
-  { option: "Hospitality", value: "hospitality" },
-  { option: "Other", value: "other" },
+  { option: 'Residential', value: 'residential' },
+  { option: 'Commercial', value: 'commercial' },
+  { option: 'Religious', value: 'religious' },
+  { option: 'Educational', value: 'educational' },
+  { option: 'Industrial', value: 'industrial' },
+  { option: 'Hospitality', value: 'hospitality' },
+  { option: 'Other', value: 'other' },
 ];
 
 const EditBuilding = () => {
   const buildingId = useParams().id;
   const { data, isLoading } = useGetSingleBuildingQuery(buildingId);
   const [updateBuilding, { isLoading: updateLoading }] = useUpdateSingleBuildingMutation();
-  const [name, setName] = useState("");
-  const [type, setType] = useState("");
-  const [area, setArea] = useState(Number(""));
-  const [address, setAddress] = useState("");
+  const [name, setName] = useState('');
+  const [type, setType] = useState('');
+  const [area, setArea] = useState(Number(''));
+  const [address, setAddress] = useState('');
   const [lat, setLat] = useState();
   const [lng, setLng] = useState();
   const [thumbnail, setThumbnail] = useState(null);
-  const [thumbnailPreview, setThumbNailPreview] = useState("");
-
+  const [thumbnailPreview, setThumbNailPreview] = useState('');
+  const Navigate = useNavigate();
   const updateBuildingHandler = async () => {
     try {
       const data = {};
@@ -43,9 +46,10 @@ const EditBuilding = () => {
       if (thumbnail) data.thumbnail = thumbnail;
       const res = await updateBuilding({ buildingId, data }).unwrap();
       if (res.message) toast.success(res.message);
+      Navigate('/dashboard/buildings');
     } catch (error) {
-      console.log("error while updating building");
-      toast.error(error?.data?.message || "Error while updating building");
+      console.log('error while updating building');
+      toast.error(error?.data?.message || 'Error while updating building');
     }
   };
 
@@ -72,11 +76,15 @@ const EditBuilding = () => {
       <div>
         {/* general info */}
         <div>
-          <BrowseFile setFile={setThumbnail} previewValue={thumbnailPreview} setPreviewValue={setThumbNailPreview} />
+          <BrowseFile
+            setFile={setThumbnail}
+            previewValue={thumbnailPreview}
+            setPreviewValue={setThumbNailPreview}
+          />
           <form className="mt-4 grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
             <div className="lg:col-span-6">
               <TextField
-                label={"Building Name"}
+                label={'Building Name'}
                 type="text"
                 value={name}
                 placeholder="Building Name"
@@ -94,7 +102,7 @@ const EditBuilding = () => {
             </div>
             <div className="lg:col-span-6">
               <TextField
-                label={"Area (Sq Ft)"}
+                label={'Area (Sq Ft)'}
                 type="text"
                 value={area}
                 placeholder="Area (Sq Ft)"
@@ -103,7 +111,7 @@ const EditBuilding = () => {
             </div>
             <div className="lg:col-span-6">
               <TextField
-                label={"Address"}
+                label={'Address'}
                 type="text"
                 value={address}
                 placeholder="Address"
@@ -117,7 +125,7 @@ const EditBuilding = () => {
           <form className="grid grid-cols-1 lg:grid-cols-12 gap-4 mt-4">
             <div className="lg:col-span-6">
               <TextField
-                label={"Latitude"}
+                label={'Latitude'}
                 value={lat}
                 type="number"
                 placeholder="Latitude"
@@ -126,7 +134,7 @@ const EditBuilding = () => {
             </div>
             <div className="lg:col-span-6">
               <TextField
-                label={"Longitude"}
+                label={'Longitude'}
                 value={lng}
                 type="number"
                 placeholder="Longitude"
@@ -148,7 +156,7 @@ const EditBuilding = () => {
             type="button"
             text="Update Building"
             width="w-[158px]"
-            className={`${updateLoading ? "opacity-[0.5] pointer-events-none" : ""}`}
+            className={`${updateLoading ? 'opacity-[0.5] pointer-events-none' : ''}`}
           />
         </div>
       </div>
