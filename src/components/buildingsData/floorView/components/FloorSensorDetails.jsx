@@ -12,12 +12,13 @@ const columns = (navigate, sensorStatus) => [
   { name: 'Sensor Name', selector: (row) => row.name },
   { name: 'Parameters', selector: (row) => row.parameters?.join(', ') },
   { name: 'Connected', selector: (row) => (row.isConnected ? 'Yes' : 'No') },
-  // {
-  //   name: "Status",
-  //   selector: (row) => (
-  //     <ToggleButton isTable={true} isChecked={row?.status} onToggle={() => statusToggleHandler(row._id)} />
-  //   ),
-  // },
+  {
+    /* Status column now shows a toggle that reflects & updates state   */
+    name: 'Status',
+    cell: (row) => <div>{row.status ? ` Active` : 'Inactive'}</div>,
+    ignoreRowClick: true,
+    allowOverflow: true,
+  },
   {
     name: 'View',
     cell: (row) => (
@@ -60,7 +61,7 @@ const FloorSensorDetails = ({ data }) => {
         <DataTable
           columns={columns(navigate, sensorStatus)}
           data={data}
-          selectableRows
+          // selectableRows
           selectableRowsHighlight
           customStyles={tableStyles}
           fixedHeader

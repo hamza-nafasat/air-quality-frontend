@@ -110,7 +110,9 @@ const FloorView = () => {
             <ShowCanvasData image={image} polygons={polygons} />
           </div>
           {floor?.data?.chartsData ? (
-            <DoubleAreaChart chartsData={floor?.data?.chartsData} />
+            <div className="grid grid-cols-1 mt-4 rounded-[16px] p-5 bg-white shadow-dashboard ">
+              <DoubleAreaChart chartsData={floor?.data?.chartsData} />
+            </div>
           ) : (
             <div className="text-center py-8 text-gray-500">No chart data yet</div>
           )}

@@ -118,7 +118,7 @@ import { useNavigate } from 'react-router-dom';
 /* ------------------------------------------------------------------ */
 /* 1. Columns helper                                                   */
 /* ------------------------------------------------------------------ */
-const buildColumns = (sensorStatus, navigate) => [
+const buildColumns = (navigate) => [
   {
     name: 'Sensor Name',
     selector: (row) => row.name,
@@ -134,7 +134,7 @@ const buildColumns = (sensorStatus, navigate) => [
   {
     /* Status column now shows a toggle that reflects & updates state   */
     name: 'Status',
-    cell: (row) => <div>{sensorStatus ? 'Active' : 'Inactive'}</div>,
+    cell: (row) => <div>{row.status ? ` Active` : 'Inactive'}</div>,
     ignoreRowClick: true,
     allowOverflow: true,
   },
@@ -158,6 +158,8 @@ const buildColumns = (sensorStatus, navigate) => [
 /* ------------------------------------------------------------------ */
 const SensorDetails = ({ data }) => {
   const [modal, setModal] = useState(false);
+  console.log('datadatadatadata', data);
+
   const [sensorStatus, setSensorStatus] = useState({}); // { sensorId: boolean }
   const navigate = useNavigate();
 
@@ -173,9 +175,9 @@ const SensorDetails = ({ data }) => {
 
       <div className="mt-5 r">
         <DataTable
-          columns={buildColumns(sensorStatus, navigate)}
+          columns={buildColumns(navigate)}
           data={data}
-          selectableRows
+          // selectableRows
           selectableRowsHighlight
           customStyles={tableStyles}
           fixedHeader
