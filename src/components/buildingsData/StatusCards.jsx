@@ -205,6 +205,34 @@ const StatusCards = ({ data }) => {
     Icon: iconMap[item.type] || null,
   }));
 
+  const maxValues = {
+    'Current Temperature': 150,
+    'Current Humidity': 100,
+    CO: 1000,
+    CH: 100,
+    TVOC: 10000,
+    CO2: 50000,
+  };
+
+  // Add percentages
+  const updatedSensorsData = statusData?.map((sensor) => {
+    const max = maxValues[sensor.type];
+    if (!max) return { ...sensor };
+
+    const todayPercent = (sensor.todayy / max) * 100;
+    const yesterdayPercent = (sensor.yesterday / max) * 100;
+    const changePercent = todayPercent - yesterdayPercent;
+
+    return {
+      ...sensor,
+      todayPercentage: todayPercent.toFixed(2),
+      yesterdayPercentage: yesterdayPercent.toFixed(2),
+      changePercentage: changePercent.toFixed(2),
+    };
+  });
+
+  console.log('updatedSensorsData', updatedSensorsData);
+
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4">
@@ -232,14 +260,14 @@ const StatusCards = ({ data }) => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4">
-      {statusData.map((item, index) => (
+      {updatedSensorsData?.map((item, index) => (
         <StatusCard
           key={index}
           type={item.type}
           status={`${item.todayy ?? 'N/A'}`}
-          from={item.differ ?? '0.00'}
+          from={item.changePercentage ?? '0.00'}
           icon={item.Icon ? <item.Icon /> : null}
-          progressIcon={<ProgressRadialChart seriesData={[item.todayy]} />}
+          progressIcon={<ProgressRadialChart seriesData={[item.todayPercentage]} />}
         />
       ))}
     </div>

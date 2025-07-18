@@ -8,12 +8,45 @@ import AirQualityIndex from '../../../components/buildingsData/AirQualityIndex';
 import WeatherChart from '../../../components/buildingsData/WeatherChart';
 import DoubleAreaChart from '../../../components/charts/areaChart/DoubleAreaChart';
 import BuildingFloors from '../../../components/buildingsData/buildingView/components/BuildingFloors';
-import { useAdminDashboardQuery } from '../../../redux/apis/dashboardApis';
+import dashboardApis from '../../../redux/apis/dashboardApis';
 import { getDailyAverageAirQuality } from '../../../utils/functions';
 import DashboardBuildings from '../../../components/buildingsData/DashboardBuildings';
+import { useDispatch } from 'react-redux';
 
 const BuildingsData = () => {
-  const { data, isLoading, error } = useAdminDashboardQuery();
+  // const { data, isLoading, error } = useAdminDashboardQuery();
+
+  const dispatch = useDispatch();
+
+  const [result, setResult] = useState({
+    data: null,
+    isLoading: true,
+    error: null,
+  });
+
+  useEffect(() => {
+    // Start fetching manually
+    const promise = dispatch(dashboardApis.endpoints.adminDashboard.initiate());
+
+    // Handle response
+    promise
+      .unwrap()
+      .then((data) => {
+        setResult({ data, isLoading: false, error: null });
+      })
+      .catch((err) => {
+        if (err.name === 'AbortError') return; // Swallow abort
+        setResult({ data: null, isLoading: false, error: err });
+      });
+
+    // Cancel API on unmount (e.g., user navigates away)
+    return () => {
+      promise.abort();
+    };
+  }, [dispatch]);
+
+  const { data, isLoading, error } = result;
+
   console.log('data', data);
   const [dailyAverages, setDailyAverages] = useState([]);
 

@@ -369,10 +369,47 @@ const WeatherChart = ({ data, loading }) => {
   const [selectedRange, setSelectedRange] = useState('Week');
   const [chartData, setChartData] = useState([]);
 
+  const labelToMaxKey = {
+    Temperature: 'Current Temperature',
+    Humidity: 'Current Humidity',
+    CO: 'CO',
+    CH: 'CH',
+    TVOC: 'TVOC',
+    CO2: 'CO2',
+  };
+
+  // Max values
+  const maxValues = {
+    'Current Temperature': 150,
+    'Current Humidity': 100,
+    CO: 1000,
+    CH: 100,
+    TVOC: 10000,
+    CO2: 50000,
+  };
+
+  // Add percentage field to each value
+  const withPercentages = {};
+  if (data?.overAverageAllDataOfSensor && typeof data?.overAverageAllDataOfSensor === 'object') {
+    Object?.entries(data?.overAverageAllDataOfSensor).forEach(([period, readings]) => {
+      withPercentages[period] = readings?.map((sensor) => {
+        const fullKey = labelToMaxKey[sensor.label];
+        const max = maxValues[fullKey];
+        const percentage = max ? (sensor.value / max) * 100 : null;
+
+        return {
+          ...sensor,
+          percentage: percentage?.toFixed(2) ?? null,
+        };
+      });
+    });
+  }
+  console.log('withPercentages', withPercentages);
+
   // ✅ Update state when real API data is available
   useEffect(() => {
     if (data?.overAverageAllDataOfSensor) {
-      setSData(data.overAverageAllDataOfSensor);
+      setSData(withPercentages);
     }
   }, [data]);
 
@@ -438,11 +475,11 @@ const WeatherChart = ({ data, loading }) => {
           {chartData.map((item, index) => (
             <div key={index} className="flex justify-center items-center">
               <div>
-                <ChartComponent value={item.value} colors={item.colors} />
+                <ChartComponent value={item.percentage} colors={item.colors} />
                 <div className="text-center">
                   <p className="text-sm font-medium text-[#060606cc]">{item.label}</p>
                   <p className="text-lg md:text-[24px] font-semibold text-primary-lightBlue">
-                    {item.value}%
+                    {item.percentage}%
                   </p>
                 </div>
               </div>

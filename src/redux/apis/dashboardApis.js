@@ -1,8 +1,8 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import getEnv from '../../config/config.js';
 const dashboardApis = createApi({
-  reducerPath: 'floorApi',
-  // reducerPath: 'dashboardApis',
+  // reducerPath: 'floorApi',
+  reducerPath: 'dashboardApis',
   baseQuery: fetchBaseQuery({
     baseUrl: `${getEnv('SERVER_URL')}/api/admin`,
     credentials: 'include',
@@ -19,12 +19,5 @@ const dashboardApis = createApi({
   }),
 });
 
-export const {
-  useAdminDashboardQuery,
-  //   useCreateFloorMutation,
-  //   useGetAllFloorQuery,
-  //   useGetSingleFloorQuery,
-  //   useUpdateSingleFloorMutation,
-  //   useDeleteSingleFloorMutation,
-} = dashboardApis;
+export const { useAdminDashboardQuery } = dashboardApis;
 export default dashboardApis;
