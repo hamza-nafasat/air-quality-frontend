@@ -1,11 +1,12 @@
-import { configureStore } from "@reduxjs/toolkit";
-import authApis from "./apis/authApis";
-import buildingApis from "./apis/buildingApis";
-import sensorApis from "./apis/sensorApis";
-import authSlice from "./slices/authSlice";
-import buildingSlice from "./slices/buildingSlice";
-import floorApis from "./apis/floorApis";
-import subscriptionsApis from "./apis/subscriptionApis";
+import { configureStore } from '@reduxjs/toolkit';
+import authApis from './apis/authApis';
+import buildingApis from './apis/buildingApis';
+import sensorApis from './apis/sensorApis';
+import authSlice from './slices/authSlice';
+import buildingSlice from './slices/buildingSlice';
+import floorApis from './apis/floorApis';
+import subscriptionsApis from './apis/subscriptionApis';
+import dashboardApis from './apis/dashboardApis';
 
 const store = configureStore({
   reducer: {
@@ -19,6 +20,7 @@ const store = configureStore({
     [floorApis.reducerPath]: floorApis.reducer,
     [sensorApis.reducerPath]: sensorApis.reducer,
     [subscriptionsApis.reducerPath]: subscriptionsApis.reducer,
+    [dashboardApis.reducerPath]: dashboardApis.reducer,
   },
   middleware: (getDefaultMiddleware) => {
     return getDefaultMiddleware({ serializableCheck: false })
@@ -26,7 +28,8 @@ const store = configureStore({
       .concat(sensorApis.middleware)
       .concat(buildingApis.middleware)
       .concat(floorApis.middleware)
-      .concat(subscriptionsApis.middleware);
+      .concat(subscriptionsApis.middleware)
+      .concat(dashboardApis.middleware);
   },
 });
 
