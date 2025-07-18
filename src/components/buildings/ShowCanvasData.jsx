@@ -21,6 +21,7 @@ const ShowCanvasData = ({ image, polygons, view, heatmap = false, data = [] }) =
   const [selectedPolygon, setSelectedPolygon] = useState(null);
   const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
   // console.log('polygons', polygons);
+  console.log('selectedPolygon', selectedPolygon);
 
   // Function to handle polygon click detection
   const handlePolygonClick = (e, polygon) => {
@@ -305,14 +306,14 @@ const ShowCanvasData = ({ image, polygons, view, heatmap = false, data = [] }) =
                     </div>
                   </div>
                 </div>
-                <div className="flex pb-3 items-center justify-center">
+                {/* <div className="flex pb-3 items-center justify-center">
                   <button
                     className="bg-white  border-2 border-[#03A5E0] hover:bg-[#a5a5a5] hover:text-white px-4 py-1 rounded-md text-primary-lightBlue font-semibold transition-all "
                     onClick={() => setSelectedPolygon(null)}
                   >
                     View Details
                   </button>
-                </div>
+                </div> */}
               </div>
             )}
           </div>
