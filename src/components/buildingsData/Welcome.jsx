@@ -48,7 +48,7 @@ const Welcome = ({ data, loading }) => {
             title="Air Quality Rating"
             value={data?.allBuildingAirQulity?.status}
             color="#82d717"
-            icon={<GoodIcon />}
+            icon={<GoodIcon status={data?.allBuildingAirQulity?.status} />}
             loading={loading}
           />
 

@@ -7,6 +7,7 @@ import buildingSlice from './slices/buildingSlice';
 import floorApis from './apis/floorApis';
 import subscriptionsApis from './apis/subscriptionApis';
 import dashboardApis from './apis/dashboardApis';
+import reportsApi from './apis/reportsApi';
 
 const store = configureStore({
   reducer: {
@@ -21,6 +22,7 @@ const store = configureStore({
     [sensorApis.reducerPath]: sensorApis.reducer,
     [subscriptionsApis.reducerPath]: subscriptionsApis.reducer,
     [dashboardApis.reducerPath]: dashboardApis.reducer,
+    [reportsApi.reducerPath]: reportsApi.reducer,
   },
   middleware: (getDefaultMiddleware) => {
     return getDefaultMiddleware({ serializableCheck: false })
@@ -29,7 +31,8 @@ const store = configureStore({
       .concat(buildingApis.middleware)
       .concat(floorApis.middleware)
       .concat(subscriptionsApis.middleware)
-      .concat(dashboardApis.middleware);
+      .concat(dashboardApis.middleware)
+      .concat(reportsApi.middleware);
   },
 });
 

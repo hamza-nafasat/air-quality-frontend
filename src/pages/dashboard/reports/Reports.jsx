@@ -1,36 +1,84 @@
-import React, { useState } from "react";
-import Button from "../../../components/shared/small/Button";
-import SearchIcon from "../../../assets/svgs/reports/SearchIcon";
-import Dropdown from "../../../components/shared/small/Dropdown";
-import ReportsList from "./ReportsList";
-import { reportsLists } from "../../../data/data";
-import jsPDF from "jspdf";
-import "jspdf-autotable";
-import fullLogo from "../../../assets/images/full-logo.png";
-import Modal from "../../../components/shared/modal/Modal";
-import BrowseFile from "../../../components/shared/large/BrowseFile";
+import { useEffect, useState } from 'react';
+import Button from '../../../components/shared/small/Button';
+import SearchIcon from '../../../assets/svgs/reports/SearchIcon';
+import ReportsList from './ReportsList';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+import fullLogo from '../../../assets/images/full-logo.png';
+import Modal from '../../../components/shared/modal/Modal';
+import BrowseFile from '../../../components/shared/large/BrowseFile';
+import { useGetReportsQuery, useLazyGetReportsQuery } from '../../../redux/apis/reportsApi';
+import Loader from '../../../components/shared/small/Loader';
 
 const Reports = () => {
   const [file, setFile] = useState(null);
   const [modal, setModal] = useState(false);
+  const { data, isFetching, error } = useGetReportsQuery({});
+  const [trigger] = useLazyGetReportsQuery();
+  const [buildingReports, setBuildingReports] = useState({});
 
-  console.log("file", file);
+  // On initial load, store all buildings' data
+  useEffect(() => {
+    if (data?.data) {
+      const reports = {};
+      data.data.forEach((building) => {
+        reports[building.buildingId] = {
+          ...building,
+          isLoading: false,
+          page: building.page || 1,
+          limit: building.limit || 5,
+        };
+      });
+      setBuildingReports(reports);
+    }
+  }, [data]);
 
-  const openModalHandler = () => setModal("upload-image");
+  // Handler for paginating a single building
+  const handlePaginate = (buildingId, page, limit) => {
+    setBuildingReports((prev) => ({
+      ...prev,
+      [buildingId]: { ...prev[buildingId], isLoading: true },
+    }));
+    trigger({ buildingId, page, limit }).then((res) => {
+      const building = res.data?.data?.[0];
+      if (building) {
+        setBuildingReports((prev) => ({
+          ...prev,
+          [buildingId]: {
+            ...prev[buildingId],
+            ...building,
+            isLoading: false,
+            page,
+            limit,
+          },
+        }));
+      } else {
+        setBuildingReports((prev) => ({
+          ...prev,
+          [buildingId]: {
+            ...prev[buildingId],
+            isLoading: false,
+          },
+        }));
+      }
+    });
+  };
+
+  const openModalHandler = () => setModal('upload-image');
   const closeModalHandler = () => setModal(false);
 
   const getBase64ImageFromURL = (url) => {
     return new Promise((resolve, reject) => {
       let img = new Image();
-      img.setAttribute("crossOrigin", "anonymous");
+      img.setAttribute('crossOrigin', 'anonymous');
       img.src = url;
       img.onload = () => {
-        let canvas = document.createElement("canvas");
+        let canvas = document.createElement('canvas');
         canvas.width = img.width;
         canvas.height = img.height;
-        let ctx = canvas.getContext("2d");
+        let ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0);
-        let dataURL = canvas.toDataURL("image/png");
+        let dataURL = canvas.toDataURL('image/png');
         resolve(dataURL);
       };
       img.onerror = (error) => reject(error);
@@ -71,15 +119,15 @@ const Reports = () => {
 
       const logoX = (pageWidth - desiredWidth) / 2;
 
-      doc.addImage(logoBase64, "PNG", logoX, yPos, desiredWidth, desiredHeight);
+      doc.addImage(logoBase64, 'PNG', logoX, yPos, desiredWidth, desiredHeight);
       yPos += desiredHeight + 15;
 
       doc.setFontSize(10);
-      doc.text("Reports: Following are the reports of all sensors on all buildings", 14, yPos);
+      doc.text('Reports: Following are the reports of all sensors on all buildings', 14, yPos);
       yPos += 10;
     }
 
-    for (const report of reportsLists) {
+    for (const report of Object.values(buildingReports)) {
       const buildingImgBase64 = await getBase64ImageFromURL(report.image);
       const imageHeight = 30;
       const imageWidth = 50;
@@ -92,7 +140,7 @@ const Reports = () => {
       }
 
       if (buildingImgBase64) {
-        doc.addImage(buildingImgBase64, "PNG", imageX, yPos, imageWidth, imageHeight);
+        doc.addImage(buildingImgBase64, 'PNG', imageX, yPos, imageWidth, imageHeight);
 
         doc.setFontSize(14);
         doc.text(report.title, textX, yPos + 10);
@@ -104,7 +152,16 @@ const Reports = () => {
         yPos += imageHeight + 5;
       }
 
-      const tableColumn = ["Date", "Temperature", "TVOC", "CO2", "Humidity", "CO", "CH4", "Performance"];
+      const tableColumn = [
+        'Date',
+        'Temperature',
+        'TVOC',
+        'CO2',
+        'Humidity',
+        'CO',
+        'CH4',
+        'Performance',
+      ];
       const tableRows = report.listData.map((item) => [
         item.date,
         `${item.temperature}°F`,
@@ -127,25 +184,25 @@ const Reports = () => {
         head: [tableColumn],
         body: tableRows,
         startY: yPos,
-        theme: "grid",
+        theme: 'grid',
         styles: { cellPadding: 2 },
         headStyles: { fillColor: [52, 152, 219] },
-        bodyStyles: { valign: "middle" },
-        columnStyles: { 0: { halign: "center" } },
-        pageBreak: "auto",
+        bodyStyles: { valign: 'middle' },
+        columnStyles: { 0: { halign: 'center' } },
+        pageBreak: 'auto',
         willDrawCell: (data) => {
           // Check if the current column is the "Performance" column (index 7)
           if (data.column.index === 7) {
             const performanceValue = data.cell.raw;
 
             // Dynamically change text color based on performance value
-            if (performanceValue === "excellent") {
+            if (performanceValue === 'excellent') {
               doc.setTextColor(0, 128, 0); // Green for "Excellent"
-            } else if (performanceValue === "average") {
+            } else if (performanceValue === 'average') {
               doc.setTextColor(255, 215, 0); // Yellow for "Average"
-            } else if (performanceValue === "bad") {
+            } else if (performanceValue === 'bad') {
               doc.setTextColor(255, 0, 0); // Red for "Bad"
-            } else if (performanceValue === "good") {
+            } else if (performanceValue === 'good') {
               doc.setTextColor(44, 116, 199); // Blue for "Good"
             }
           }
@@ -168,21 +225,43 @@ const Reports = () => {
       yPos += 15;
     }
 
-    doc.save("reports.pdf");
+    doc.save('reports.pdf');
   };
+
+  if (isFetching && Object.keys(buildingReports).length === 0) {
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <Loader />
+      </div>
+    );
+  }
 
   return (
     <div>
       <div className="flex items-center flex-wrap justify-between gap-4">
         <div>
-          <h3 className="text-sm md:text-base font-bold text-[#2e2e2e]">Access Your Reports Anytime</h3>
+          <h3 className="text-sm md:text-base font-bold text-[#2e2e2e]">
+            Access Your Reports Anytime
+          </h3>
           <p className="text-xs font-medium text-[#2e2e2e]">
-            Quickly view and track your reports here. Stay updated with the latest data and insights effortlessly.
+            Quickly view and track your reports here. Stay updated with the latest data and insights
+            effortlessly.
           </p>
         </div>
         <div className="flex items-center gap-4">
-          <Button text="Refresh Data" bg="bg-transparent" color="#03a5e0" borderColor="#03a5e0" height="h-[25px]" />
-          <Button text="Export" height="h-[25px]" borderColor="#03a5e0" onClick={openModalHandler} />
+          <Button
+            text="Refresh Data"
+            bg="bg-transparent"
+            color="#03a5e0"
+            borderColor="#03a5e0"
+            height="h-[25px]"
+          />
+          <Button
+            text="Export"
+            height="h-[25px]"
+            borderColor="#03a5e0"
+            onClick={openModalHandler}
+          />
         </div>
       </div>
       <div className="my-4">
@@ -190,14 +269,26 @@ const Reports = () => {
       </div>
       {/* Report Lists */}
       <div>
-        <ReportsList />
+        {error ? (
+          <p>Error loading reports.</p>
+        ) : (
+          Object.values(buildingReports).map((building) => (
+            <ReportsList
+              key={building.buildingId}
+              building={building}
+              onPaginate={handlePaginate}
+            />
+          ))
+        )}
       </div>
       <div>
-        {modal === "upload-image" && (
+        {modal === 'upload-image' && (
           <Modal width="w-[300px] md:w-[500px]" onClose={closeModalHandler}>
             <div>
               <h3 className="text-base md:text-lg font-semibold">Upload Your Logo</h3>
-              <p className="text-sm">If no logo is uploaded, the Air Quality logo will be used by default.</p>
+              <p className="text-sm">
+                If no logo is uploaded, the Air Quality logo will be used by default.
+              </p>
               <BrowseFile setFile={setFile} />
               <div className="mt-4">
                 <Button text="Generate" onClick={generatePDF} />

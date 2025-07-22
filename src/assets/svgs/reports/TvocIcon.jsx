@@ -1,14 +1,17 @@
-import React from "react";
+import React from 'react';
+import getStatusColor from '../../../components/reports/getStatusColor';
 
-const TvocIcon = ({temperature}) => {
-    let color = '#64ED23';
-    if(temperature <= 15) {
-        color = '#64ED23'
-    } else if(temperature > 15 && temperature <= 25) {
-        color = '#f1a634'
-    } else {
-        color = '#ee0e00'
-    }
+const TvocIcon = ({ temperature }) => {
+  const coColor = getStatusColor('TVOC', temperature); // likely red
+
+  let color = coColor;
+  // if (temperature <= 15) {
+  //   color = '#64ED23';
+  // } else if (temperature > 15 && temperature <= 25) {
+  //   color = '#f1a634';
+  // } else {
+  //   color = '#ee0e00';
+  // }
   return (
     <>
       <svg

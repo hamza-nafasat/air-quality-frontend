@@ -42,7 +42,7 @@ const FloorView = () => {
   const [polygons, setPolygons] = useState([]);
   const { data: floor, isLoading } = useGetSingleFloorQuery(id);
   const [deleteFloor] = useDeleteSingleFloorMutation();
-  console.log('full data of floor', polygons);
+  console.log('full data of floor', floor);
 
   const handleOpenDeleteModal = () => {
     confirmAlert({
@@ -111,7 +111,7 @@ const FloorView = () => {
           </div>
           {floor?.data?.chartsData ? (
             <div className="grid grid-cols-1 mt-4 rounded-[16px] p-5 bg-white shadow-dashboard ">
-              <DoubleAreaChart chartsData={floor?.data?.chartsData} />
+              <DoubleAreaChart chartsData={floor?.data?.chartData} />
             </div>
           ) : (
             <div className="text-center py-8 text-gray-500">No chart data yet</div>

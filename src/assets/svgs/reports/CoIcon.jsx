@@ -1,14 +1,11 @@
-import React from "react";
+import React from 'react';
+import getStatusColor from '../../../components/reports/getStatusColor';
 
-const CoIcon = ({temperature}) => {
-    let color = '#64ED23';
-    if(temperature <= 25) {
-        color = '#64ED23'
-    } else if(temperature > 25 && temperature <= 45) {
-        color = '#f1a634'
-    } else {
-        color = '#ee0e00'
-    }
+const CoIcon = ({ temperature }) => {
+  const coColor = getStatusColor('CO', temperature); // likely red
+
+  let color = coColor;
+
   return (
     <>
       <svg

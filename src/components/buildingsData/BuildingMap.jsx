@@ -165,7 +165,7 @@ const BuildingPopup = ({ building }) => {
           <PinIcon />
           <div className="text-[10px] font-medium text-white">{building.address}</div>
         </div>
-        <div className="border border-white rounded-lg px-2 py-1 w-full md:w-[70%]">
+        <div className="border border-white rounded-lg px-2 py-1 w-full md:w-full">
           <div className="flex items-center justify-between gap-2">
             <p className="text-[10px] text-white">Floor</p>
             <p className="text-[10px] text-white">{building.floor}</p>

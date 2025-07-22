@@ -81,7 +81,7 @@ const LineChart = ({ seriesData, xLabels, loading }) => {
       colors: ['rgba(3, 165, 224, 1)'],
     },
     title: {
-      text: 'Weekly',
+      text: 'Weekly Air Quality',
     },
     dataLabels: {
       enabled: false,

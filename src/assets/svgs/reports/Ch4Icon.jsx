@@ -1,14 +1,17 @@
-import React from "react";
+import React from 'react';
+import getStatusColor from '../../../components/reports/getStatusColor';
 
-const Ch4Icon = ({temperature}) => {
-    let color = '#64ED23';
-    if(temperature <= 25) {
-        color = '#64ED23'
-    } else if(temperature > 25 && temperature <= 45) {
-        color = '#f1a634'
-    } else {
-        color = '#ee0e00'
-    }
+const Ch4Icon = ({ temperature }) => {
+  const coColor = getStatusColor('CH', temperature); // likely red
+
+  let color = coColor;
+  // if(temperature <= 25) {
+  //     color = '#64ED23'
+  // } else if(temperature > 25 && temperature <= 45) {
+  //     color = '#f1a634'
+  // } else {
+  //     color = '#ee0e00'
+  // }
   return (
     <>
       <svg

@@ -1,14 +1,16 @@
-import React from "react";
+import React from 'react';
+import getStatusColor from '../../../components/reports/getStatusColor';
 
-const HumidityIcon = ({temperature}) => {
-    let color = '#64ED23';
-    if(temperature <= 25) {
-        color = '#64ED23'
-    } else if(temperature > 25 && temperature <= 45) {
-        color = '#f1a634'
-    } else {
-        color = '#ee0e00'
-    }
+const HumidityIcon = ({ temperature }) => {
+  const humidityColor = getStatusColor('Current Humidity', temperature); // green or yellow
+  let color = humidityColor;
+  // if(temperature <= 25) {
+  //     color = '#64ED23'
+  // } else if(temperature > 25 && temperature <= 45) {
+  //     color = '#f1a634'
+  // } else {
+  //     color = '#ee0e00'
+  // }
   return (
     <>
       <svg
