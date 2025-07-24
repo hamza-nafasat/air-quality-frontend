@@ -1,8 +1,14 @@
 /* eslint-disable react/prop-types */
 import SearchIcon from '../../../../assets/svgs/reports/SearchIcon';
 import BuildingCard from '../../../buildings/BuildingCard';
+import BuildingCards from '../../../buildings/BuildingCards';
 
-const Floors = ({ floors }) => {
+const Floors = ({ floors, floor }) => {
+  // console.log('floor', floor);
+
+  // if (!Array.isArray(floor) || floor.length === 0) {
+  //   return <div>No building data available</div>;
+  // }
   return (
     <div className="bg-white p-5 shadow-dashboard rounded-[16px]">
       <div className="flex justify-between sm:flex-row flex-col">
@@ -22,6 +28,10 @@ const Floors = ({ floors }) => {
           link={`/dashboard/floor-view/${floor?._id}`}
         />
       ))}
+      {/* {floor.map((building, index) => {
+        if (!building) return null; // safeguard
+        return <BuildingCards key={building._id || index} data={building} />;
+      })} */}
     </div>
   );
 };

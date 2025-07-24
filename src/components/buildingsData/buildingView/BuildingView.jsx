@@ -63,6 +63,7 @@ const BuildingView = () => {
           area: building?.area || '',
           totalSensors: building?.totalSensors || '',
           avgSensorData: data?.sensorsDataAverage || [],
+          airQuality: data?.AllBuildingAvrageAirQuality,
         });
       }
     }
@@ -138,11 +139,15 @@ const BuildingView = () => {
         <div className="col-span-12 xl:col-span-8 flex flex-col">
           <div className="grid grid-cols-1 ">
             <section className="rounded-[16px] p-5 bg-white shadow-dashboard">
-              <img src={buildingData?.thumbnail} className="w-full" alt="Image" />
+              <img
+                src={buildingData?.thumbnail}
+                className="w-full h-[400px] object-contain"
+                alt="Image"
+              />
             </section>
           </div>
           <div className="grid grid-cols-1 mt-4 rounded-[16px] p-5 bg-white shadow-dashboard ">
-            <DoubleAreaChart chartsData={data?.chartsData} />
+            <DoubleAreaChart chartsData={data?.chartData} />
           </div>
           <div className="grid grid-cols-1 mt-4 flex-1">
             <SensorDetails data={data?.allSensors} />
@@ -162,7 +167,7 @@ const BuildingView = () => {
       </section>
 
       <section className="grid grid-cols-1 mt-4">
-        <Floors floors={floors?.data} />
+        <Floors floors={floors?.data} floor={data?.floor} />
       </section>
     </div>
   );

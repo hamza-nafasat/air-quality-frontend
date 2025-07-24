@@ -44,6 +44,43 @@ const FloorView = () => {
   const [deleteFloor] = useDeleteSingleFloorMutation();
   console.log('full data of floor', floor);
 
+  // const twoDModelCanvasData = floor?.data?.twoDModelCanvasData ?? [];
+  // const sensors = floor?.data?.sensors ?? [];
+
+  // const sensorMap = sensors.reduce((acc, sensor) => {
+  //   acc[sensor._id] = sensor;
+  //   return acc;
+  // }, {});
+
+  // const enrichedCanvasData = twoDModelCanvasData.map((item) => ({
+  //   ...item,
+  //   sensorAttached: sensorMap[item.sensorAttached] || null,
+  // }));
+
+  // console.log('enrichedCanvasData', enrichedCanvasData);
+  const enrichResponseData = (response) => {
+    const data = response?.data ?? {};
+    const sensorMap = (data.sensors ?? []).reduce((acc, sensor) => {
+      acc[sensor._id] = sensor;
+      return acc;
+    }, {});
+
+    const enrichedCanvasData = (data.twoDModelCanvasData ?? []).map((item) => ({
+      ...item,
+      sensorAttached: sensorMap[item.sensorAttached] || null,
+    }));
+
+    return {
+      ...response,
+      data: {
+        ...data,
+        twoDModelCanvasData: enrichedCanvasData,
+      },
+    };
+  };
+  const enrichedResponse = enrichResponseData(floor);
+  console.log('new', enrichedResponse);
+
   const handleOpenDeleteModal = () => {
     confirmAlert({
       title: 'Delete Floor',
@@ -109,7 +146,7 @@ const FloorView = () => {
           <div className="grid grid-cols-1 rounded-[16px] p-5 bg-white shadow-dashboard">
             <ShowCanvasData image={image} polygons={polygons} />
           </div>
-          {floor?.data?.chartsData ? (
+          {floor?.data?.chartData ? (
             <div className="grid grid-cols-1 mt-4 rounded-[16px] p-5 bg-white shadow-dashboard ">
               <DoubleAreaChart chartsData={floor?.data?.chartData} />
             </div>

@@ -52,7 +52,7 @@ const ShowCanvasData = ({ image, polygons, view, heatmap = false, data = [] }) =
     }
   };
   console.log('jgjjjjgjggjjgjgjggj', polygons);
-
+  //  const navigate = useNavigate();
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -257,63 +257,48 @@ const ShowCanvasData = ({ image, polygons, view, heatmap = false, data = [] }) =
                   </div>
                 </div>
                 <div className="my-4 p-3 gap-3 bg-[#03A5E01A]/10 rounded-md space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h6 className="text-sm font-medium text-black ">Active Alarms</h6>
-                    </div>
-                    <div>
-                      <h6 className="  text-black">16</h6>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h6 className="text-sm font-medium text-black ">Humidity</h6>
-                    </div>
-                    <div>
-                      <h6 className="  text-black">50%</h6>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h6 className="text-sm font-medium text-black ">Methane( CH )</h6>
-                    </div>
-                    <div>
-                      <h6 className="  text-black">990PPM</h6>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h6 className="text-sm font-medium text-black ">Carbon Monoxide</h6>
-                    </div>
-                    <div>
-                      <h6 className="  text-black">1,223.45kWh</h6>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h6 className="text-sm font-medium text-black ">Co</h6>
-                    </div>
-                    <div>
-                      <h6 className="  text-black">539PPM</h6>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h6 className="text-sm font-medium text-black ">LPG</h6>
-                    </div>
-                    <div>
-                      <h6 className="  text-black">90PPM</h6>
-                    </div>
-                  </div>
+                  <h6 className="text-lg text-black font-bold text-center">
+                    {selectedPolygon?.sensorAttached?.name}
+                  </h6>
+                  {selectedPolygon?.sensorAttached?.latestValues?.map((item) => {
+                    const unitMap = {
+                      temperature: '°C',
+                      humidity: '%',
+                      co2: 'ppm',
+                      co: 'ppm',
+                      ch: 'ppm',
+                      tvoc: 'μg/m³',
+                    };
+
+                    return (
+                      <div className="flex items-center justify-between" key={item.parameter}>
+                        <div>
+                          <h6 className="text-sm font-medium capitalize text-black">
+                            {item?.parameter}
+                          </h6>
+                        </div>
+                        <div>
+                          <h6 className="text-black">
+                            {item.value} {unitMap[item.parameter] || ''}
+                          </h6>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-                {/* <div className="flex pb-3 items-center justify-center">
+                <div className="flex pb-3 items-center justify-center">
                   <button
                     className="bg-white  border-2 border-[#03A5E0] hover:bg-[#a5a5a5] hover:text-white px-4 py-1 rounded-md text-primary-lightBlue font-semibold transition-all "
-                    onClick={() => setSelectedPolygon(null)}
+                    // onClick={() => setSelectedPolygon(null)}
+                    onClick={() =>
+                      navigate(
+                        `/dashboard/sensors/sensor-detail/${selectedPolygon?.sensorAttached?._id}`
+                      )
+                    }
                   >
                     View Details
                   </button>
-                </div> */}
+                </div>
               </div>
             )}
           </div>

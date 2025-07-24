@@ -4,6 +4,10 @@ import greyBuilding from '../../../../assets/images/buildings/greyBuilding.png';
 import LocationIcon from '../../../../assets/svgs/pages/LocationIcon';
 
 const BuildingDetails = ({ building }) => {
+  console.log('building', building);
+  const bestAirQuality = building?.airQuality?.goodAirQuality;
+  const worstAirQuality = building?.airQuality?.badAirQuality;
+
   return (
     <div className="p-5 bg-white rounded-[16px]  shadow-dashboard h-full">
       <h5 className="mb-2">Building Details</h5>
@@ -45,19 +49,48 @@ const BuildingDetails = ({ building }) => {
       <section className="mt-2 flex justify-center">
         <div className="flex gap-3  ">
           <div className="px-5 py-3 bg-[#D7FFCE] rounded-[10px] basis-[80%] ">
-            <h2 className="text-[14px] text-[#060606CC]">Best-Floor</h2>
+            <h2 className="text-sm text-[#060606CC]">Best-Floor</h2>
             <h5 className="text-[12px] text-[#060606CC]">Basement-B4</h5>
             <h5 className="text-[12px] text-[#060606CC]">Floor-F21</h5>
             <h5 className="text-[12px] text-[#060606CC]">Floor-f12</h5>
           </div>
           <div className="px-5 py-3 bg-[#FFD6D6] rounded-[10px] basis-[80%] ">
-            <h2 className="text-[14px] text-[#060606CC]">Worst-Floor</h2>
+            <h2 className="text-sm text-[#060606CC]">Worst-Floor</h2>
             <h5 className="text-[12px] text-[#060606CC]">Basement-B4</h5>
             <h5 className="text-[12px] text-[#060606CC]">Floor-F21</h5>
             <h5 className="text-[12px] text-[#060606CC]">Floor-f12</h5>
           </div>
         </div>
       </section>
+      {/* <section className="mt-2  w-full flex justify-center">
+        <div className="flex w-full gap-3">
+          <div className="px-5 py-3 bg-[#D7FFCE] rounded-[10px] w-full">
+            <h2 className="text-sm text-[#060606CC]">Best-Floor</h2>
+            {bestAirQuality?.length > 0 ? (
+              bestAirQuality?.slice(0, 2).map((floorName, index) => (
+                <h5 key={floorName.id} className="text-[12px] text-[#060606CC]">
+                  {floorName.name}
+                </h5>
+              ))
+            ) : (
+              <h5 className="text-[12px] text-[#060606CC] italic">No floor</h5>
+            )}
+          </div>
+
+          <div className="px-5 py-3 bg-[#FFD6D6] rounded-[10px] w-full">
+            <h2 className="text-sm text-[#060606CC]">Worst-Floor</h2>
+            {worstAirQuality?.length > 0 ? (
+              worstAirQuality.map((floorName, index) => (
+                <h5 key={floorName.id} className="text-[12px] text-[#060606CC]">
+                  {floorName.name}
+                </h5>
+              ))
+            ) : (
+              <h5 className="text-[12px] text-[#060606CC] italic">No floor</h5>
+            )}
+          </div>
+        </div>
+      </section> */}
     </div>
   );
 };
