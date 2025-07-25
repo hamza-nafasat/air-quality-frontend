@@ -13,9 +13,16 @@ import Loader from '../../../components/shared/small/Loader';
 const Reports = () => {
   const [file, setFile] = useState(null);
   const [modal, setModal] = useState(false);
-  const { data, isFetching, error } = useGetReportsQuery({});
+  const { data, isFetching, error } = useGetReportsQuery({ interval: 4 });
   const [trigger] = useLazyGetReportsQuery();
   const [buildingReports, setBuildingReports] = useState({});
+  const [searchTerm, setSearchTerm] = useState('');
+  const filteredReports = Object.values(buildingReports).filter((building) => {
+    const query = searchTerm.toLowerCase();
+    return building.buildingName?.toLowerCase().includes(query);
+  });
+  console.log('searchTerm', filteredReports);
+  console.log('dtaaaaa', data);
 
   // On initial load, store all buildings' data
   useEffect(() => {
@@ -39,7 +46,12 @@ const Reports = () => {
       ...prev,
       [buildingId]: { ...prev[buildingId], isLoading: true },
     }));
-    trigger({ buildingId, page, limit }).then((res) => {
+    trigger({
+      interval: 4,
+      buildingId,
+      page,
+      limit,
+    }).then((res) => {
       const building = res.data?.data?.[0];
       if (building) {
         setBuildingReports((prev) => ({
@@ -265,21 +277,33 @@ const Reports = () => {
         </div>
       </div>
       <div className="my-4">
-        <FilterSection />
+        <FilterSection searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
       </div>
       {/* Report Lists */}
       <div>
-        {error ? (
+        {/* {error ? (
           <p>Error loading reports.</p>
-        ) : (
-          Object.values(buildingReports).map((building) => (
+        ) : 
+        // (
+        //   Object.values(buildingReports).map((building) => (
+        //     <ReportsList
+        //       key={building.buildingId}
+        //       building={building}
+        //       onPaginate={handlePaginate}
+        //     />
+        //   ))
+        // )
+        
+        } */}
+        <div>
+          {(searchTerm ? filteredReports : Object.values(buildingReports)).map((building) => (
             <ReportsList
               key={building.buildingId}
               building={building}
               onPaginate={handlePaginate}
             />
-          ))
-        )}
+          ))}
+        </div>
       </div>
       <div>
         {modal === 'upload-image' && (
@@ -303,21 +327,21 @@ const Reports = () => {
 
 export default Reports;
 
-const FilterSection = () => {
+const FilterSection = ({ searchTerm, setSearchTerm }) => {
   return (
     <div className="flex items-center flex-wrap gap-4">
       <div className="flex items-center gap-1 border border-[#e7e7e7] rounded-lg h-[34px] bg-white px-3 basis-[35%] flex-1">
         <SearchIcon />
-        <input type="search" placeholder="Search" className="focus:outline-none text-sm w-full" />
+        <input
+          type="search"
+          placeholder="Search"
+          className="focus:outline-none text-sm w-full"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
       </div>
       <div className="flex items-center justify-between gap-1 border border-[#e7e7e7] rounded-lg h-[34px] bg-white px-3 flex-1">
         <p className="text-sm text-[#7e7e7e]">Buildings:</p>
-        <select className="focus:outline-none text-sm">
-          <option className="w-full">All</option>
-        </select>
-      </div>
-      <div className="flex items-center justify-between gap-1 border border-[#e7e7e7] rounded-lg h-[34px] bg-white px-3 flex-1">
-        <p className="text-sm text-[#7e7e7e]">Sensors:</p>
         <select className="focus:outline-none text-sm">
           <option className="w-full">All</option>
         </select>
