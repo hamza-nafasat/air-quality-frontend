@@ -12,6 +12,7 @@ import dashboardApis from '../../../redux/apis/dashboardApis';
 import { getDailyAverageAirQuality } from '../../../utils/functions';
 import DashboardBuildings from '../../../components/buildingsData/DashboardBuildings';
 import { useDispatch } from 'react-redux';
+import WeatherForecast from '../../../components/buildings/utils/WeatherForecast';
 
 const BuildingsData = () => {
   // const { data, isLoading, error } = useAdminDashboardQuery();
@@ -96,6 +97,7 @@ const BuildingsData = () => {
         </div>
         <div className="shadow-dashboard rounded-xl bg-white mt-4 flex-1">
           <WeatherCard />
+          {/* <WeatherForecast /> */}
         </div>
         <div className="shadow-dashboard border-[0.2px] border-[#00000033] rounded-xl bg-white mt-4">
           <AirQualityIndex />
