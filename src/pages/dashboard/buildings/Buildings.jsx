@@ -141,6 +141,7 @@ import BuildingCard from '../../../components/buildings/BuildingCard';
 import { useGetAllBuildingsQuery } from '../../../redux/apis/buildingApis';
 import Loader from '../../../components/shared/small/Loader';
 import RingMeter from '../../../components/buildings/utils/RingMeter';
+import BuildingCards from '../../../components/buildings/BuildingCards';
 
 /* ─────────────────────────────────────────────────────────────────── */
 /*  Main page                                                          */
@@ -161,6 +162,8 @@ const Buildings = () => {
 
   /* — hydrate buildings when query succeeds — */
   useEffect(() => {
+    console.log('data', data);
+
     if (isSuccess) {
       const buildingsData = data?.data?.map((building) => {
         /* quick helper: ObjectId → Date ‑ fallback to now() */
@@ -225,24 +228,6 @@ const Buildings = () => {
       {/* header + controls */}
       <section className="p-3 sm:flex-row flex-col flex justify-between sm:items-center">
         <h5 className="text-[14px] xl:text-[16px] font-[600]">Buildings</h5>
-        {/* <div className="flex items-center justify-center">
-          <div id='ring4' className="size-8 flex items-center justify-center bg-red-200 rounded-full">
-            <div id='ring3' className="size-6 flex items-center justify-center bg-red-300 rounded-full">
-              <div id='ring2' className="size-4 flex items-center justify-center bg-red-700 rounded-full">
-                <div id='ring1' className="size-4 flex items-center justify-center bg-red-900 rounded-full"></div>
-              </div>
-            </div>
-          </div>
-        </div> */}
-        {/* <div>
-          <RingMeter value={100} />
-          <RingMeter value={85} />
-          <RingMeter value={75} />
-          <RingMeter value={55} />
-          <RingMeter value={42} />
-          <RingMeter value={30} />
-        </div> */}
-
         <div className="flex gap-2 items-end sm:items-center sm:flex-row flex-col-reverse">
           <FilterSection
             searchTerm={searchTerm}
@@ -263,19 +248,10 @@ const Buildings = () => {
         {filteredSorted.length === 0 ? (
           <div className="text-gray-500 font-medium text-base">No buildings data</div>
         ) : (
-          currentItems.map((b) => (
-            <BuildingCard
-              key={b.id}
-              name={b.name}
-              address={b.address}
-              sensors={b.sensors}
-              temperature={b.temperature}
-              thumbnail={b.thumbnail}
-              tvoc={b.tvoc}
-              co2={b.co2}
-              link={`/dashboard/building-view/${b.id}`}
-            />
-          ))
+          data.data.map((building, index) => {
+            if (!building) return null; // safeguard
+            return <BuildingCards key={building._id || index} data={building} />;
+          })
         )}
       </section>
 

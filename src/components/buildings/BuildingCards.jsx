@@ -23,7 +23,9 @@ const iconMap = {
 
 function BuildingCards({ data }) {
   const [isDataReady, setIsDataReady] = useState(false);
-  console.log('datadata', data);
+  // console.log('datadata', data);
+  // const hasType = !!data?.type; // or check nested if needed
+  // console.log('hasType', hasType);
 
   useEffect(() => {
     if (data && typeof data === 'object' && Object.keys(data).length > 0) {
@@ -32,7 +34,7 @@ function BuildingCards({ data }) {
       setIsDataReady(false);
     }
   }, [data]);
-  console.log('datadatadata', data);
+  // console.log('datadatadata', data);
 
   if (!isDataReady) {
     return <div className="p-4 text-gray-500 text-sm">Loading building data...</div>;
@@ -46,14 +48,6 @@ function BuildingCards({ data }) {
     thumbnail = {},
     currentSensorValues = [],
   } = data;
-
-  //   const formattedSensorData = Array.isArray(currentSensorValues)
-  //     ? currentSensorValues.map(({ type, value }) => ({
-  //         type,
-  //         value,
-  //         Icon: iconMap[type] || null,
-  //       }))
-  //     : [];
 
   const formattedSensorData = Array.isArray(currentSensorValues)
     ? currentSensorValues.map(({ parameter, value }) => ({
@@ -71,9 +65,9 @@ function BuildingCards({ data }) {
           name={name}
           address={address}
           sensors={sensors}
-          thumbnail={data?.twoDModel?.url}
+          thumbnail={data?.twoDModel?.url || data.thumbnail.url}
         />
-        <SensorInfo data={formattedSensorData} id={id} />
+        <SensorInfo data={formattedSensorData} id={id} type={!!data?.type} />
       </div>
     </div>
   );
@@ -109,11 +103,32 @@ const BuildingInfo = ({ name = '', thumbnail = '', address = '', sensors = 0 }) 
   );
 };
 
-const SensorInfo = ({ data = [], id }) => {
+const SensorInfo = ({ data = [], id, type }) => {
+  console.log('hasTypehasType', type);
+
+  const linkUrl = type ? `/dashboard/building-view/${id}` : `/dashboard/floor-view/${id}`;
   if (!Array.isArray(data) || data.length === 0) {
     return (
       <div className="flex justify-end">
-        <div className="text-sm text-gray-500">No sensor data available</div>
+        <div className="flex justify-end">
+          <div className="flex flex-col-reverse xl:flex-col items-end gap-5">
+            <section>
+              <Link to={linkUrl}>
+                <Button
+                  text="View Details"
+                  bg="none"
+                  borderColor="rgba(3, 165, 224, 1)"
+                  radius="rounded-[10px]"
+                  color="rgba(3, 165, 224, 1)"
+                  width="w-[fit]"
+                />
+              </Link>
+            </section>
+            <section className="flex flex-wrap gap-5">
+              <div className="text-sm text-gray-500">No sensor data available</div>
+            </section>
+          </div>
+        </div>
       </div>
     );
   }
@@ -122,7 +137,7 @@ const SensorInfo = ({ data = [], id }) => {
     <div className="flex justify-end">
       <div className="flex flex-col-reverse xl:flex-col items-end gap-5">
         <section>
-          <Link to={`/dashboard/building-view/${id}`}>
+          <Link to={linkUrl}>
             <Button
               text="View Details"
               bg="none"

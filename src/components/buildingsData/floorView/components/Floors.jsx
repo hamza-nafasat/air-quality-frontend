@@ -15,7 +15,7 @@ const Floors = ({ floors, floor }) => {
         <h5>Building Floors</h5>
         <FilterSection />
       </div>
-      {floors?.map((floor, i) => (
+      {/* {floors?.map((floor, i) => (
         <BuildingCard
           key={i}
           id={floor?._id}
@@ -27,11 +27,11 @@ const Floors = ({ floors, floor }) => {
           co2={floor?.co2}
           link={`/dashboard/floor-view/${floor?._id}`}
         />
-      ))}
-      {/* {floor.map((building, index) => {
+      ))} */}
+      {floor?.map((building, index) => {
         if (!building) return null; // safeguard
         return <BuildingCards key={building._id || index} data={building} />;
-      })} */}
+      })}
     </div>
   );
 };

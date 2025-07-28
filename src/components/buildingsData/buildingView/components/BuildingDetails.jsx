@@ -46,23 +46,7 @@ const BuildingDetails = ({ building }) => {
         </div>
       </section>
 
-      <section className="mt-2 flex justify-center">
-        <div className="flex gap-3  ">
-          <div className="px-5 py-3 bg-[#D7FFCE] rounded-[10px] basis-[80%] ">
-            <h2 className="text-sm text-[#060606CC]">Best-Floor</h2>
-            <h5 className="text-[12px] text-[#060606CC]">Basement-B4</h5>
-            <h5 className="text-[12px] text-[#060606CC]">Floor-F21</h5>
-            <h5 className="text-[12px] text-[#060606CC]">Floor-f12</h5>
-          </div>
-          <div className="px-5 py-3 bg-[#FFD6D6] rounded-[10px] basis-[80%] ">
-            <h2 className="text-sm text-[#060606CC]">Worst-Floor</h2>
-            <h5 className="text-[12px] text-[#060606CC]">Basement-B4</h5>
-            <h5 className="text-[12px] text-[#060606CC]">Floor-F21</h5>
-            <h5 className="text-[12px] text-[#060606CC]">Floor-f12</h5>
-          </div>
-        </div>
-      </section>
-      {/* <section className="mt-2  w-full flex justify-center">
+      <section className="mt-2  w-full flex justify-center">
         <div className="flex w-full gap-3">
           <div className="px-5 py-3 bg-[#D7FFCE] rounded-[10px] w-full">
             <h2 className="text-sm text-[#060606CC]">Best-Floor</h2>
@@ -90,7 +74,7 @@ const BuildingDetails = ({ building }) => {
             )}
           </div>
         </div>
-      </section> */}
+      </section>
     </div>
   );
 };

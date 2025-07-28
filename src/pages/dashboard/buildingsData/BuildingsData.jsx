@@ -83,7 +83,7 @@ const BuildingsData = () => {
           <BuildingMap data={data} loading={isLoading} />
         </div>
         <div className="shadow-dashboard border-[0.2px] border-[#00000033] rounded-xl bg-white p-4 mt-4 flex-1">
-          <DoubleAreaChart chartsData={data?.allBuildingAverageChartsData} />
+          <DoubleAreaChart chartsData={data?.chartData} />
         </div>
       </div>
       <div className="lg:col-span-4 flex flex-col">
