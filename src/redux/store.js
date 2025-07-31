@@ -8,6 +8,8 @@ import floorApis from './apis/floorApis';
 import subscriptionsApis from './apis/subscriptionApis';
 import dashboardApis from './apis/dashboardApis';
 import reportsApi from './apis/reportsApi';
+import alertApi from './apis/alertApi';
+import ruleEngineApi from './apis/ruleEngineApi';
 
 const store = configureStore({
   reducer: {
@@ -23,6 +25,8 @@ const store = configureStore({
     [subscriptionsApis.reducerPath]: subscriptionsApis.reducer,
     [dashboardApis.reducerPath]: dashboardApis.reducer,
     [reportsApi.reducerPath]: reportsApi.reducer,
+    [alertApi.reducerPath]: alertApi.reducer,
+    [ruleEngineApi.reducerPath]: ruleEngineApi.reducer,
   },
   middleware: (getDefaultMiddleware) => {
     return getDefaultMiddleware({ serializableCheck: false })
@@ -32,7 +36,9 @@ const store = configureStore({
       .concat(floorApis.middleware)
       .concat(subscriptionsApis.middleware)
       .concat(dashboardApis.middleware)
-      .concat(reportsApi.middleware);
+      .concat(reportsApi.middleware)
+      .concat(alertApi.middleware)
+      .concat(ruleEngineApi.middleware);
   },
 });
 

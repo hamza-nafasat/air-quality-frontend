@@ -1,60 +1,73 @@
-/* eslint-disable react/prop-types */
-import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
-import { toast } from "react-toastify";
-// import {
-//   createRuleEngineActions,
-//   getAllRuleEngineActions,
-// } from "../../../../../redux/actions/ruleEngine.actions";
-
-import { FaChevronDown } from "react-icons/fa";
-import { MdAddBox } from "react-icons/md";
-import Button from "../../../../components/shared/small/Button";
-import TextField from "../../../../components/shared/small/TextField";
-import Dropdown from "../../../../components/shared/small/Dropdown";
+import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
+import { FaChevronDown } from 'react-icons/fa';
+import { MdAddBox } from 'react-icons/md';
+import Button from '../../../../components/shared/small/Button';
+import TextField from '../../../../components/shared/small/TextField';
+import Dropdown from '../../../../components/shared/small/Dropdown';
+import MultipleSelector from '../../../../components/shared/small/MultipleSelector';
+import { useUpdateRuleMutation } from '../../../../redux/apis/ruleEngineApi';
 
 const alertType = [
-  { option: "speed-alert" },
-  { option: "sudden-stop" },
-  { option: "two-detection" },
-  { option: "tire-pressure" },
-  { option: "sensor-offline" },
-  { option: "idle-engine" },
-  { option: "damage-alert" },
+  { option: 'ch' },
+  { option: 'co' },
+  { option: 'co2' },
+  { option: 'humidity' },
+  { option: 'temperature' },
+  { option: 'tvoc' },
 ];
 
-const severityType = [
-  { option: "high" },
-  { option: "medium" },
-  { option: "low" },
-];
+const severityType = [{ option: 'high' }, { option: 'medium' }, { option: 'low' }];
 
-const EditRuleEngine = ({ onClose }) => {
-  const dispatch = useDispatch();
-  const [addLoading, setAddLoading] = useState(false);
-  const [isAccordionComplete, setIsAccordionComplete] = useState(true);
-  const [accordionList, setAccordionList] = useState([{ id: 1, type: "" }]);
-  const [formData, setFormData] = useState({
-    alertName: "",
-    severityType: "",
-    email: "",
-    platform: "",
-    status: "",
-  });
+const EditRuleEngine = ({ isLoading, onClose, data, editData }) => {
+  const [updateRuleEngine] = useUpdateRuleMutation();
+  const [accordionList, setAccordionList] = useState([]);
+  const [selectedBuildings, setSelectedBuildings] = useState([]);
   const [inputEmail, setInputEmail] = useState(false);
+  const [addLoading, setAddLoading] = useState(false);
+  console.log('data', data);
+  console.log('editData', editData);
 
-  const handleAddAccordion = () => {
-    setAccordionList((prevList) => [
-      ...prevList,
-      { id: prevList.length + 1, type: "" },
-    ]);
-  };
+  const [formData, setFormData] = useState({
+    alertName: '',
+    severityType: '',
+    email: '',
+    platform: '',
+    status: '',
+  });
+  console.log('formDataformData', editData);
+  console.log('datadatadatadata', data);
 
-  const handleRemoveAccordion = (id) => {
-    setAccordionList((prevList) =>
-      prevList.filter((accordion) => accordion.id !== id)
-    );
-  };
+  useEffect(() => {
+    if (editData) {
+      const { name, severity, onMail, platform, status, alerts, building } = editData;
+
+      setFormData({
+        alertName: name || '',
+        severityType: severity || '',
+        email: onMail || '',
+        platform: platform || '',
+        status: status || '',
+      });
+
+      setAccordionList(
+        alerts?.map((item, idx) => ({
+          id: idx + 1,
+          alertType: item.type,
+          lessThen: item.lessThen,
+          moreThen: item.moreThen,
+        }))
+      );
+
+      // const preSelected = data?.filter((b) => building?.includes(b._id));
+      // setSelectedBuildings(preSelected);
+      if (editData && data?.length) {
+        const preSelected = data.filter((item) => editData.building.includes(item._id));
+        setSelectedBuildings(preSelected);
+      }
+      setInputEmail(platform === 'email');
+    }
+  }, [editData, data]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -64,107 +77,122 @@ const EditRuleEngine = ({ onClose }) => {
     }));
   };
 
-  const handleCheckboxChange = (event) => {
-    const { name, checked } = event.target;
+  const handleCheckboxChange = (e) => {
+    const { name, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
-      platform: checked ? name : "",
+      platform: checked ? name : '',
     }));
-    if (name === "email") {
-      setInputEmail(true);
-    } else {
-      setInputEmail(false);
-    }
+    setInputEmail(name === 'email');
+  };
+
+  const handleAddAccordion = () => {
+    setAccordionList((prev) => [...prev, { id: prev.length + 1, type: '' }]);
+  };
+
+  const handleRemoveAccordion = (id) => {
+    setAccordionList((prev) => prev.filter((item) => item.id !== id));
   };
 
   const handleSave = async () => {
     const { alertName, email, severityType, platform, status } = formData;
-    if (!alertName || !severityType || !platform || !status)
-      return toast.error("All fields are required");
-    if (platform === "email" && !email) return toast.error("Email is required");
-    const alerts = accordionList
-      .map((item) => {
-        const data = {};
-        if (item?.type) data.type = item.type;
-        if (item?.speed) data.speed = item.speed;
-        if (item?.lessThen) data.lessThen = item.lessThen;
-        if (item?.moreThen) data.moreThen = item.moreThen;
 
-        if (data.type) return data;
-        return null;
+    if (!alertName || !severityType || !platform || !status)
+      return toast.error('All fields are required');
+    if (platform === 'email' && !email) return toast.error('Email is required');
+    if (!selectedBuildings.length) return toast.error('Select at least one building');
+
+    const alerts = accordionList
+      .map(({ alertType, lessThen, moreThen }) => {
+        const obj = {};
+        if (alertType) obj.type = alertType;
+        if (lessThen) obj.lessThen = lessThen;
+        if (moreThen) obj.moreThen = moreThen;
+        return obj.type ? obj : null;
       })
       .filter(Boolean);
 
-    if (!alerts.length)
-      return toast.error("At least one alert type is required");
-    if (!isAccordionComplete) return setIsAccordionComplete(true);
+    if (!alerts.length) return toast.error('At least one alert is required');
 
     try {
       setAddLoading(true);
-      await dispatch(
-        createRuleEngineActions({
+      await updateRuleEngine({
+        ruleId: editData._id,
+        payload: {
+          name: alertName,
+          severity: severityType,
+          platform,
+          status,
+          onMail: email,
+          building: selectedBuildings?.map((b) => b._id),
           alerts,
-          name: formData.alertName,
-          severity: formData.severityType,
-          platform: formData.platform,
-          onMil: formData.email,
-          status: formData.status,
-        })
-      );
-      await dispatch(getAllRuleEngineActions());
+        },
+      }).unwrap();
+
+      toast.success('Rule Engine updated successfully');
       onClose();
+    } catch (err) {
+      console.error(err);
+      toast.error(err?.data?.message || 'Failed to update Rule Engine');
+    } finally {
       setAddLoading(false);
-    } catch (error) {
-      setAddLoading(false);
-      console.log("Error in creating rule engine", error);
     }
   };
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center ">
+        <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
   return (
-    <div className="">
-      {/* Form */}
+    <div>
       <div className="mt-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {/* Alert Name Field */}
-          <div>
-            <TextField
-              type="text"
-              label="Alert Name"
-              required
-              placeholder="Alert Name"
-              value={formData.alertName || ""}
-              onChange={handleChange}
-            />
-          </div>
+          <TextField
+            type="text"
+            label="Alert Name"
+            name="alertName"
+            value={formData.alertName}
+            onChange={handleChange}
+            required
+          />
 
-          {/* Severity Type Dropdown */}
-          <div>
-            <Dropdown label="Severity Type" options={severityType} />
-          </div>
+          <MultipleSelector
+            label="Buildings"
+            options={data}
+            value={selectedBuildings} // pre-selected will now work
+            onSelect={(selected) => setSelectedBuildings(selected)}
+          />
 
-          {/* Status Dropdown */}
-          <div>
-            <Dropdown
-              label="Status"
-              options={[{ option: "Enable" }, { option: "Disable" }]}
-            />
-          </div>
+          <MultipleSelector
+            label="Buildings"
+            options={data}
+            // defaultText={selectedBuildings?.map((item) => item.name)}
+            value={selectedBuildings}
+            onSelect={(selected) => setSelectedBuildings(selected)}
+          />
 
-          {/* Email Input */}
+          <Dropdown
+            label="Status"
+            options={[{ option: 'enable' }, { option: 'disable' }]}
+            value={formData.status}
+            defaultText={formData.status}
+            onSelect={(option) => setFormData({ ...formData, status: option.option })}
+          />
+
           {inputEmail && (
-            <div>
-              <TextField
-                type="email"
-                label="Email"
-                placeholder="Enter Email"
-                value={formData.email || ""}
-                onChange={handleChange}
-                required
-              />
-            </div>
+            <TextField
+              type="email"
+              label="Email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
           )}
         </div>
 
-        {/* Notification Type */}
         <div className="mt-4 flex justify-between items-center">
           <span className="font-semibold text-sm">NOTIFICATION TYPE*</span>
           <div className="flex gap-4">
@@ -172,50 +200,43 @@ const EditRuleEngine = ({ onClose }) => {
               <input
                 type="checkbox"
                 name="email"
-                checked={formData.platform === "email"}
+                checked={formData.platform === 'email'}
                 onChange={handleCheckboxChange}
-                className="text-indigo-500 focus:ring-indigo-300"
               />
               <span>Email</span>
             </label>
-
             <label className="flex items-center space-x-2">
               <input
                 type="checkbox"
                 name="platform"
-                checked={formData.platform === "platform"}
+                checked={formData.platform === 'platform'}
                 onChange={handleCheckboxChange}
-                className="text-indigo-500 focus:ring-indigo-300"
               />
               <span>Platform</span>
             </label>
           </div>
         </div>
 
-        {/* Accordion Component */}
         <div className="mt-6">
-          {accordionList?.map((accordion) => (
+          {accordionList?.map((item, idx) => (
             <Accordion
-              key={accordion.id}
-              id={accordion.id}
+              key={item.id}
+              id={item.id}
+              data={item}
               onRemove={handleRemoveAccordion}
-              accordionList={accordionList}
               setAccordionList={setAccordionList}
+              accordionList={accordionList}
             />
           ))}
-          <button
-            onClick={handleAddAccordion}
-            // className="mt-4 px-4 py-2 bg-indigo-500 text-white rounded-lg flex items-center gap-2"
-          >
+          <button onClick={handleAddAccordion}>
             <MdAddBox fontSize={30} color="#03A5E0" />
           </button>
         </div>
 
-        {/* Save and Cancel Buttons */}
         <div className="flex justify-end items-center gap-4 mt-6">
           <Button
             text="Save"
-            width=" w-full md:w-[100px]"
+            width="w-full md:w-[100px]"
             onClick={handleSave}
             disabled={addLoading}
           />
@@ -227,111 +248,66 @@ const EditRuleEngine = ({ onClose }) => {
 
 export default EditRuleEngine;
 
-const Accordion = ({ id, onRemove, accordionList, setAccordionList }) => {
-  const [formData, setFormData] = useState({});
-
+const Accordion = ({ id, data, onRemove, setAccordionList, accordionList }) => {
   const [isAccordionOpen, setIsAccordionOpen] = useState(false);
 
-  const toggleAccordion = () => {
-    setIsAccordionOpen(!isAccordionOpen);
-  };
-
-  // Handle alert type change
   const handleChange = (e) => {
-    setAccordionList((prevList) =>
-      prevList.map((accordion) => {
-        if (accordion.id === id) {
-          return {
-            ...accordion,
-            [e.target.name]: e.target.value,
-          };
-        }
-        return accordion;
-      })
+    const { name, value } = e.target;
+    setAccordionList((prev) =>
+      prev?.map((item) => (item.id === id ? { ...item, [name]: value } : item))
     );
   };
-
-  // Filter alert types based on what's already selected
-  const availableAlertTypes = alertType.filter((type) => {
-    const allSelectedAlertTypes = accordionList?.map(
-      (accordion) => accordion.alert
-    );
-    return !allSelectedAlertTypes.includes(type?.type);
-  });
-
-  useEffect(() => {
-    setFormData(accordionList.find((accordion) => accordion?.id === id) || {});
-  }, [id, accordionList]);
 
   return (
     <div className="border border-gray-300 rounded-lg my-4 shadow-sm">
-      {/* Accordion Summary */}
       <div
         className="flex justify-between items-center px-4 py-3 cursor-pointer bg-gray-100"
-        onClick={toggleAccordion}
+        onClick={() => setIsAccordionOpen((prev) => !prev)}
       >
         <h6 className="font-semibold text-sm">Alert Configuration</h6>
         <FaChevronDown
           className={`text-gray-500 transition-all duration-500 ${
-            isAccordionOpen ? "rotate-180" : "rotate-0"
+            isAccordionOpen ? 'rotate-180' : 'rotate-0'
           }`}
         />
       </div>
 
-      {/* Accordion Details */}
       {isAccordionOpen && (
         <div className="p-3 bg-white">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Alert Type Dropdown */}
-            <div>
-              <Dropdown
-                label="Alert Type"
-                options={alertType}
-                value={formData.alertType}
-                onSelect={(option) =>
-                  setFormData({ ...formData, alertType: option.option })
-                }
+          <div className="grid grid-cols-1 gap-4">
+            <Dropdown
+              label="Alert Type"
+              options={alertType}
+              value={data.alertType}
+              defaultText={data.alertType}
+              onSelect={(option) =>
+                setAccordionList((prev) =>
+                  prev?.map((item) =>
+                    item.id === id ? { ...item, alertType: option.option } : item
+                  )
+                )
+              }
+            />
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <TextField
+                label="Less Than"
+                name="lessThen"
+                type="number"
+                value={data.lessThen || ''}
+                onChange={handleChange}
+              />
+              <TextField
+                label="More Than"
+                name="moreThen"
+                type="number"
+                value={data.moreThen || ''}
+                onChange={handleChange}
               />
             </div>
-
-            {/* Additional Fields for Specific Alert Types */}
-            {(formData?.alertType === "tire-pressure" ||
-              formData?.alertType === "speed-alert") && (
-              <>
-                <div>
-                  <TextField
-                    label="Less Than"
-                    type="number"
-                    onChange={handleChange}
-                    value={formData?.lessThen || ""}
-                  />
-                </div>
-                <div>
-                  <TextField
-                    label="More Than"
-                    type="number"
-                    onChange={handleChange}
-                    value={formData?.moreThen || ""}
-                  />
-                </div>
-              </>
-            )}
-            {formData?.alertType === "idle-engine" && (
-              <div>
-                <TextField
-                  label="Time in Seconds"
-                  text="number"
-                  placeholder="Time in Seconds"
-                />
-              </div>
-            )}
           </div>
           <div className="flex justify-end mt-4">
-            <Button
-              text="Close"
-              width=" w-full md:w-[80px]"
-              onClick={() => onRemove(id)}
-            />
+            <Button text="Close" width="w-full md:w-[80px]" onClick={() => onRemove(id)} />
           </div>
         </div>
       )}

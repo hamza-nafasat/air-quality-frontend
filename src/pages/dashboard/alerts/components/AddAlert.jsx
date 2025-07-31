@@ -1,138 +1,123 @@
-import { Fragment, useState } from "react";
-import { toast } from "react-toastify";
-import TextField from "../../../../components/shared/small/TextField";
-import Dropdown from "../../../../components/shared/small/Dropdown";
+import { Fragment, useState } from 'react';
+import { toast } from 'react-toastify';
+import TextField from '../../../../components/shared/small/TextField';
+import Dropdown from '../../../../components/shared/small/Dropdown';
+import { useCreateAlertMutation } from '../../../../redux/apis/alertApi';
 
 const alertType = [
-  { option: "infence" },
-  { option: "outfence" },
-  { option: "speed-alert" },
-  { option: "sudden-stop" },
-  { option: "two-detection" },
-  { option: "tire-pressure" },
-  { option: "sensor-offline" },
-  { option: "idle-engine" },
-  { option: "damage-alert" },
+  { option: 'low-temp' },
+  { option: 'high-temp' },
+  { option: 'low-humidity' },
+  { option: 'high-humidity' },
+  { option: 'low-co' },
+  { option: 'high-co' },
+  { option: 'low-co2' },
+  { option: 'high-co2' },
+  { option: 'low-ch' },
+  { option: 'high-ch' },
+  { option: 'low-tvoc' },
+  { option: 'high-tvoc' },
+  { option: 'damage' },
 ];
 
-const severityType = [
-  { option: "high" },
-  { option: "medium" },
-  { option: "low" },
-];
+const severityType = [{ option: 'high' }, { option: 'medium' }, { option: 'low' }];
 
 const AddAlert = ({ onClose }) => {
   const [inputEmail, setInputEmail] = useState(false);
+  const [createAlert, { isLoading }] = useCreateAlertMutation();
 
-  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    alertName: "",
-    alertType: "",
-    severityType: "",
-    email: "",
-    platform: "",
+    alertName: '',
+    alertType: '',
+    severityType: '',
+    email: '',
+    platform: '',
   });
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       [e.target.name]: e.target.value,
-    });
+    }));
   };
 
-  const handleSave = () => {
-    setIsLoading(true);
-    if (!formData.alertType || !formData.severityType || !formData.platform) {
-      toast.error("All fields are required");
-      setIsLoading(false);
-      return;
+  const handleSave = async () => {
+    const { alertName, alertType, severityType, platform, email } = formData;
+
+    if (!alertName || !alertType || !severityType || !platform) {
+      return toast.error('All required fields must be filled.');
     }
-    toast.success("Alert saved successfully!");
-    setIsLoading(false);
-    onClose();
+
+    const payload = {
+      name: alertName,
+      type: alertType,
+      severity: severityType,
+      platform,
+    };
+
+    if (inputEmail && email) {
+      payload.onMail = email;
+    }
+
+    try {
+      await createAlert(payload).unwrap();
+      toast.success('Alert created successfully');
+      onClose();
+    } catch (err) {
+      console.error(err);
+      toast.error(err?.data?.message || 'Something went wrong');
+    }
   };
 
   return (
     <Fragment>
       <div className="flex flex-col w-full mt-4 lg:mt-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div>
-            <TextField
-              name="alertName"
-              type="text"
-              value={formData.alertName}
-              onChange={handleChange}
-              placeholder="Enter alert name"
-              label="Alert Name"
-            />
-          </div>
+          <TextField
+            name="alertName"
+            type="text"
+            value={formData.alertName}
+            onChange={handleChange}
+            placeholder="Enter alert name"
+            label="Alert Name"
+          />
 
-          <div>
-            <Dropdown
-              label="Alert Type"
-              options={alertType}
-              value={formData.alertType}
-              onSelect={(option) =>
-                setFormData({ ...formData, alertType: option.option })
-              }
-            />
-          </div>
+          <Dropdown
+            label="Alert Type"
+            options={alertType}
+            value={formData.alertType}
+            onSelect={(option) => setFormData({ ...formData, alertType: option.option })}
+          />
 
-          <div>
-            <Dropdown
-              label="Severity Type"
-              options={severityType}
-              onSelect={(option) =>
-                setFormData({ ...formData, severityType: option.option })
-              }
-            />
-          </div>
-
-          {formData.alertType === "idle-engine" && (
-            <div>
-              <TextField label="Idle Time" type="time" />
-            </div>
-          )}
-
-          {formData.alertType === "tire-pressure" && (
-            <div>
-              <TextField
-                label="Tyre Pressure"
-                type="number"
-                placeholder="Enter Tyre Pressure"
-              />
-            </div>
-          )}
-
-          {formData.alertType === "speed-alert" && (
-            <div>
-              <TextField
-                type="number"
-                label="Speed Alert"
-                placeholder="Enter Speed Limit"
-              />
-            </div>
-          )}
+          <Dropdown
+            label="Severity Type"
+            options={severityType}
+            value={formData.severityType}
+            onSelect={(option) => setFormData({ ...formData, severityType: option.option })}
+          />
 
           {inputEmail && (
-            <div>
-              <TextField label="Email" type="email" placeholder="Enter Email" />
-            </div>
+            <TextField
+              name="email"
+              type="email"
+              label="Email"
+              placeholder="Enter Email"
+              value={formData.email}
+              onChange={handleChange}
+            />
           )}
         </div>
 
         <div className="flex flex-col sm:flex-row justify-between items-center mt-6">
-          <h3 className="text-gray-900 text-sm md:text-base font-semibold">
-            NOTIFICATION TYPE*
-          </h3>
+          <h3 className="text-gray-900 text-sm md:text-base font-semibold">NOTIFICATION TYPE*</h3>
           <div className="flex items-center gap-4">
             <label className="flex items-center gap-2 text-gray-900 font-medium">
               <input
-                type="checkbox"
-                checked={formData.platform === "email"}
-                onChange={(event) => {
-                  handleChange(event);
-                  if (event.target.checked) setInputEmail(true);
+                type="radio"
+                checked={formData.platform === 'email'}
+                onChange={(e) => {
+                  setFormData({ ...formData, platform: 'email' });
+                  setInputEmail(true);
                 }}
                 name="platform"
                 value="email"
@@ -142,11 +127,11 @@ const AddAlert = ({ onClose }) => {
 
             <label className="flex items-center gap-2 text-gray-900 font-medium">
               <input
-                type="checkbox"
-                checked={formData.platform === "platform"}
-                onChange={(event) => {
-                  handleChange(event);
-                  if (event.target.checked) setInputEmail(false);
+                type="radio"
+                checked={formData.platform === 'platform'}
+                onChange={(e) => {
+                  setFormData({ ...formData, platform: 'platform' });
+                  setInputEmail(false);
                 }}
                 name="platform"
                 value="platform"
@@ -167,10 +152,10 @@ const AddAlert = ({ onClose }) => {
             onClick={handleSave}
             disabled={isLoading}
             className={`px-6 py-2 text-white rounded-md ${
-              isLoading ? "bg-blue-300" : "bg-blue-500 hover:bg-blue-600"
+              isLoading ? 'bg-blue-300' : 'bg-blue-500 hover:bg-blue-600'
             }`}
           >
-            {isLoading ? "Saving..." : "Save"}
+            {isLoading ? 'Saving...' : 'Save'}
           </button>
         </div>
       </div>

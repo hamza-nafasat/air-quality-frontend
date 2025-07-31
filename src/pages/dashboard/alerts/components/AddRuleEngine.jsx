@@ -1,59 +1,49 @@
-/* eslint-disable react/prop-types */
-import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
-import { toast } from "react-toastify";
-// import {
-//   createRuleEngineActions,
-//   getAllRuleEngineActions,
-// } from "../../../../../redux/actions/ruleEngine.actions";
-
-import { FaChevronDown } from "react-icons/fa";
-import { MdAddBox } from "react-icons/md";
-import Button from "../../../../components/shared/small/Button";
-import TextField from "../../../../components/shared/small/TextField";
-import Dropdown from "../../../../components/shared/small/Dropdown";
+import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
+import { FaChevronDown } from 'react-icons/fa';
+import { MdAddBox } from 'react-icons/md';
+import Button from '../../../../components/shared/small/Button';
+import TextField from '../../../../components/shared/small/TextField';
+import Dropdown from '../../../../components/shared/small/Dropdown';
+import MultipleSelector from '../../../../components/shared/small/MultipleSelector';
+// import { useGetAllRuleEnginesQuery } from '../../../../services/ruleEngineApi';
+import { useCreateRuleMutation } from '../../../../redux/apis/ruleEngineApi';
 
 const alertType = [
-  { option: "speed-alert" },
-  { option: "sudden-stop" },
-  { option: "two-detection" },
-  { option: "tire-pressure" },
-  { option: "sensor-offline" },
-  { option: "idle-engine" },
-  { option: "damage-alert" },
+  { option: 'ch' },
+  { option: 'co' },
+  { option: 'co2' },
+  { option: 'humidity' },
+  { option: 'temperature' },
+  { option: 'tvoc' },
 ];
 
-const severityType = [
-  { option: "high" },
-  { option: "medium" },
-  { option: "low" },
-];
+const severityType = [{ option: 'high' }, { option: 'medium' }, { option: 'low' }];
 
-const AddRuleEngine = ({ onClose }) => {
-  const dispatch = useDispatch();
+const AddRuleEngine = ({ onClose, isLoading, data }) => {
+  const [createRuleEngine] = useCreateRuleMutation();
+  // const { refetch } = useGetAllRuleEnginesQuery();
   const [addLoading, setAddLoading] = useState(false);
   const [isAccordionComplete, setIsAccordionComplete] = useState(true);
-  const [accordionList, setAccordionList] = useState([{ id: 1, type: "" }]);
-  const [formData, setFormData] = useState({
-    alertName: "",
-    severityType: "",
-    email: "",
-    platform: "",
-    status: "",
-  });
+  const [accordionList, setAccordionList] = useState([{ id: 1, type: '' }]);
+  const [selectedBuildings, setSelectedBuildings] = useState([]);
   const [inputEmail, setInputEmail] = useState(false);
+  console.log('addselectedBuildings', selectedBuildings);
+
+  const [formData, setFormData] = useState({
+    alertName: '',
+    severityType: '',
+    email: '',
+    platform: '',
+    status: '',
+  });
 
   const handleAddAccordion = () => {
-    setAccordionList((prevList) => [
-      ...prevList,
-      { id: prevList.length + 1, type: "" },
-    ]);
+    setAccordionList((prevList) => [...prevList, { id: prevList.length + 1, type: '' }]);
   };
 
   const handleRemoveAccordion = (id) => {
-    setAccordionList((prevList) =>
-      prevList.filter((accordion) => accordion.id !== id)
-    );
+    setAccordionList((prevList) => prevList.filter((accordion) => accordion.id !== id));
   };
 
   const handleChange = (e) => {
@@ -68,95 +58,118 @@ const AddRuleEngine = ({ onClose }) => {
     const { name, checked } = event.target;
     setFormData((prev) => ({
       ...prev,
-      platform: checked ? name : "",
+      platform: checked ? name : '',
     }));
-    if (name === "email") {
-      setInputEmail(true);
-    } else {
-      setInputEmail(false);
-    }
+    setInputEmail(name === 'email');
   };
 
   const handleSave = async () => {
     const { alertName, email, severityType, platform, status } = formData;
+
     if (!alertName || !severityType || !platform || !status)
-      return toast.error("All fields are required");
-    if (platform === "email" && !email) return toast.error("Email is required");
+      return toast.error('All fields are required');
+    if (platform === 'email' && !email) return toast.error('Email is required');
+    if (!selectedBuildings.length) return toast.error('Select at least one building');
+
     const alerts = accordionList
       .map((item) => {
         const data = {};
-        if (item?.type) data.type = item.type;
-        if (item?.speed) data.speed = item.speed;
+        if (item?.alertType) data.type = item.alertType;
         if (item?.lessThen) data.lessThen = item.lessThen;
         if (item?.moreThen) data.moreThen = item.moreThen;
-
+        // if (item?.sensorUniqueId) data.sensorUniqueId = item.sensorUniqueId;
         if (data.type) return data;
         return null;
       })
       .filter(Boolean);
 
-    if (!alerts.length)
-      return toast.error("At least one alert type is required");
-    if (!isAccordionComplete) return setIsAccordionComplete(true);
+    if (!alerts.length) return toast.error('At least one valid alert config is required');
 
     try {
       setAddLoading(true);
-      await dispatch(
-        createRuleEngineActions({
-          alerts,
-          name: formData.alertName,
-          severity: formData.severityType,
-          platform: formData.platform,
-          onMil: formData.email,
-          status: formData.status,
-        })
-      );
-      await dispatch(getAllRuleEngineActions());
+
+      await createRuleEngine({
+        name: alertName,
+        alerts,
+        severity: severityType,
+        platform,
+        status,
+        onMail: email,
+        building: selectedBuildings.map((b) => b._id), // ✅ convert here
+      }).unwrap();
+
+      toast.success('Rule Engine created successfully');
+      // refetch();
       onClose();
-      setAddLoading(false);
     } catch (error) {
+      console.error(error);
+      toast.error(error?.data?.message || 'Failed to create Rule Engine');
+    } finally {
       setAddLoading(false);
-      console.log("Error in creating rule engine", error);
     }
   };
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center ">
+        <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
   return (
     <div className="">
       {/* Form */}
       <div className="mt-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {/* Alert Name Field */}
           <div>
             <TextField
               type="text"
               label="Alert Name"
               required
               placeholder="Alert Name"
-              value={formData.alertName || ""}
+              name="alertName"
+              value={formData.alertName || ''}
               onChange={handleChange}
             />
           </div>
 
-          {/* Severity Type Dropdown */}
-          <div>
-            <Dropdown label="Severity Type" options={severityType} />
-          </div>
-
-          {/* Status Dropdown */}
           <div>
             <Dropdown
-              label="Status"
-              options={[{ option: "Enable" }, { option: "Disable" }]}
+              label="Severity Type"
+              options={severityType}
+              onSelect={(option) => setFormData({ ...formData, severityType: option.option })}
             />
           </div>
 
-          {/* Email Input */}
+          {/* <MultipleSelector
+            label="Buildings"
+            options={data} // [{ _id, name }]
+            // defaultText="Select Buildings"
+            value={selectedBuildings}
+            onSelect={(selected) => setSelectedBuildings(selected.map((s) => s._id))}
+          /> */}
+          <MultipleSelector
+            label="Buildings"
+            options={data} // [{ _id, name }]
+            value={selectedBuildings} // should be full objects
+            onSelect={(selected) => setSelectedBuildings(selected)} // don't map to _id here
+          />
+
+          <div>
+            <Dropdown
+              label="Status"
+              options={[{ option: 'enable' }, { option: 'disable' }]}
+              onSelect={(option) => setFormData({ ...formData, status: option.option })}
+            />
+          </div>
+
           {inputEmail && (
             <div>
               <TextField
                 type="email"
                 label="Email"
+                name="email"
                 placeholder="Enter Email"
-                value={formData.email || ""}
+                value={formData.email || ''}
                 onChange={handleChange}
                 required
               />
@@ -164,7 +177,6 @@ const AddRuleEngine = ({ onClose }) => {
           )}
         </div>
 
-        {/* Notification Type */}
         <div className="mt-4 flex justify-between items-center">
           <span className="font-semibold text-sm">NOTIFICATION TYPE*</span>
           <div className="flex gap-4">
@@ -172,18 +184,17 @@ const AddRuleEngine = ({ onClose }) => {
               <input
                 type="checkbox"
                 name="email"
-                checked={formData.platform === "email"}
+                checked={formData.platform === 'email'}
                 onChange={handleCheckboxChange}
                 className="text-indigo-500 focus:ring-indigo-300"
               />
               <span>Email</span>
             </label>
-
             <label className="flex items-center space-x-2">
               <input
                 type="checkbox"
                 name="platform"
-                checked={formData.platform === "platform"}
+                checked={formData.platform === 'platform'}
                 onChange={handleCheckboxChange}
                 className="text-indigo-500 focus:ring-indigo-300"
               />
@@ -194,7 +205,7 @@ const AddRuleEngine = ({ onClose }) => {
 
         {/* Accordion Component */}
         <div className="mt-6">
-          {accordionList?.map((accordion) => (
+          {accordionList.map((accordion) => (
             <Accordion
               key={accordion.id}
               id={accordion.id}
@@ -203,19 +214,15 @@ const AddRuleEngine = ({ onClose }) => {
               setAccordionList={setAccordionList}
             />
           ))}
-          <button
-            onClick={handleAddAccordion}
-            // className="mt-4 px-4 py-2 bg-indigo-500 text-white rounded-lg flex items-center gap-2"
-          >
+          <button onClick={handleAddAccordion}>
             <MdAddBox fontSize={30} color="#03A5E0" />
           </button>
         </div>
 
-        {/* Save and Cancel Buttons */}
         <div className="flex justify-end items-center gap-4 mt-6">
           <Button
             text="Save"
-            width=" w-full md:w-[100px]"
+            width="w-full md:w-[100px]"
             onClick={handleSave}
             disabled={addLoading}
           />
@@ -229,43 +236,25 @@ export default AddRuleEngine;
 
 const Accordion = ({ id, onRemove, accordionList, setAccordionList }) => {
   const [formData, setFormData] = useState({});
-
   const [isAccordionOpen, setIsAccordionOpen] = useState(false);
 
-  const toggleAccordion = () => {
-    setIsAccordionOpen(!isAccordionOpen);
-  };
+  const toggleAccordion = () => setIsAccordionOpen(!isAccordionOpen);
 
-  // Handle alert type change
   const handleChange = (e) => {
+    const { name, value } = e.target;
     setAccordionList((prevList) =>
-      prevList.map((accordion) => {
-        if (accordion.id === id) {
-          return {
-            ...accordion,
-            [e.target.name]: e.target.value,
-          };
-        }
-        return accordion;
-      })
+      prevList.map((accordion) =>
+        accordion.id === id ? { ...accordion, [name]: value } : accordion
+      )
     );
   };
-
-  // Filter alert types based on what's already selected
-  const availableAlertTypes = alertType.filter((type) => {
-    const allSelectedAlertTypes = accordionList?.map(
-      (accordion) => accordion.alert
-    );
-    return !allSelectedAlertTypes.includes(type?.type);
-  });
 
   useEffect(() => {
-    setFormData(accordionList.find((accordion) => accordion?.id === id) || {});
+    setFormData(accordionList.find((a) => a.id === id) || {});
   }, [id, accordionList]);
 
   return (
     <div className="border border-gray-300 rounded-lg my-4 shadow-sm">
-      {/* Accordion Summary */}
       <div
         className="flex justify-between items-center px-4 py-3 cursor-pointer bg-gray-100"
         onClick={toggleAccordion}
@@ -273,65 +262,55 @@ const Accordion = ({ id, onRemove, accordionList, setAccordionList }) => {
         <h6 className="font-semibold text-sm">Alert Configuration</h6>
         <FaChevronDown
           className={`text-gray-500 transition-all duration-500 ${
-            isAccordionOpen ? "rotate-180" : "rotate-0"
+            isAccordionOpen ? 'rotate-180' : 'rotate-0'
           }`}
         />
       </div>
 
-      {/* Accordion Details */}
       {isAccordionOpen && (
         <div className="p-3 bg-white">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Alert Type Dropdown */}
+          <div className="grid grid-cols-1 gap-4">
             <div>
               <Dropdown
                 label="Alert Type"
                 options={alertType}
                 value={formData.alertType}
                 onSelect={(option) =>
-                  setFormData({ ...formData, alertType: option.option })
+                  setAccordionList((prevList) =>
+                    prevList.map((accordion) =>
+                      accordion.id === id ? { ...accordion, alertType: option.option } : accordion
+                    )
+                  )
                 }
               />
             </div>
 
-            {/* Additional Fields for Specific Alert Types */}
-            {(formData?.alertType === "tire-pressure" ||
-              formData?.alertType === "speed-alert") && (
-              <>
-                <div>
-                  <TextField
-                    label="Less Than"
-                    type="number"
-                    onChange={handleChange}
-                    value={formData?.lessThen || ""}
-                  />
-                </div>
-                <div>
-                  <TextField
-                    label="More Than"
-                    type="number"
-                    onChange={handleChange}
-                    value={formData?.moreThen || ""}
-                  />
-                </div>
-              </>
-            )}
-            {formData?.alertType === "idle-engine" && (
-              <div>
-                <TextField
-                  label="Time in Seconds"
-                  text="number"
-                  placeholder="Time in Seconds"
-                />
-              </div>
-            )}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* <TextField
+                label="Sensor Unique ID"
+                name="sensorUniqueId"
+                type="text"
+                onChange={handleChange}
+                value={formData?.sensorUniqueId || ''}
+              /> */}
+              <TextField
+                label="Less Than"
+                name="lessThen"
+                type="number"
+                onChange={handleChange}
+                value={formData?.lessThen || ''}
+              />
+              <TextField
+                label="More Than"
+                name="moreThen"
+                type="number"
+                onChange={handleChange}
+                value={formData?.moreThen || ''}
+              />
+            </div>
           </div>
           <div className="flex justify-end mt-4">
-            <Button
-              text="Close"
-              width=" w-full md:w-[80px]"
-              onClick={() => onRemove(id)}
-            />
+            <Button text="Close" width="w-full md:w-[80px]" onClick={() => onRemove(id)} />
           </div>
         </div>
       )}

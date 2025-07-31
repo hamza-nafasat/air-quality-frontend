@@ -1,50 +1,68 @@
-import { Fragment, useState } from "react";
-import DataTable from "react-data-table-component";
-import Modal from "../../../components/shared/modal/Modal";
-import { ImArrowDown, ImArrowLeft, ImArrowUp } from "react-icons/im";
-import { MdAddBox, MdDelete } from "react-icons/md";
-import { FiEdit } from "react-icons/fi";
-import { CgArrowTopRightO } from "react-icons/cg";
-import AddAlert from "./components/AddAlert";
-import EditAlert from "./components/EditAlert";
+import { Fragment, useState } from 'react';
+import DataTable from 'react-data-table-component';
+import Modal from '../../../components/shared/modal/Modal';
+import { ImArrowDown, ImArrowLeft, ImArrowUp } from 'react-icons/im';
+import { MdAddBox, MdDelete } from 'react-icons/md';
+import { FiEdit } from 'react-icons/fi';
+import { CgArrowTopRightO } from 'react-icons/cg';
+import AddAlert from './components/AddAlert';
+import EditAlert from './components/EditAlert';
+import { useDeleteAlertMutation, useGetAlertsQuery } from '../../../redux/apis/alertApi';
 
 const Alerts = () => {
   const [modalType, setModalType] = useState(null);
   const [selectedAlert, setSelectedAlert] = useState(null);
+  const { data, isLoading, isError } = useGetAlertsQuery();
+  const [deleteAlert] = useDeleteAlertMutation('');
+
+  console.log('newwewewewewe', data);
 
   const staticAlerts = [
     {
-      _id: "1",
-      name: "Speed Alert",
-      type: "speed",
-      severity: "high",
-      platform: "email",
-      status: "enable",
+      _id: '1',
+      name: 'Speed Alert',
+      type: 'speed',
+      severity: 'high',
+      platform: 'email',
+      status: 'enable',
     },
     {
-      _id: "2",
-      name: "In-Fence Alert",
-      type: "infence",
-      severity: "medium",
-      platform: "platform",
-      status: "disable",
+      _id: '2',
+      name: 'In-Fence Alert',
+      type: 'infence',
+      severity: 'medium',
+      platform: 'platform',
+      status: 'disable',
     },
     {
-      _id: "3",
-      name: "Out-Fence Alert",
-      type: "outfence",
-      severity: "low",
-      platform: "email",
-      status: "enable",
+      _id: '3',
+      name: 'Out-Fence Alert',
+      type: 'outfence',
+      severity: 'low',
+      platform: 'email',
+      status: 'enable',
     },
   ];
+  const handleDelete = async (row) => {
+    const alertId = row._id;
+    console.log('alertId', alertId);
+
+    try {
+      const result = await deleteAlert(alertId).unwrap();
+      console.log('Deleted successfully:', result);
+      toast.success('Rule deleted successfully');
+    } catch (err) {
+      console.error('Delete failed:', err);
+      toast.error('Failed to delete rule');
+    }
+  };
 
   const handleOpenEditModal = (row) => {
     setSelectedAlert(row);
-    setModalType("edit");
+    setModalType('edit');
   };
 
-  const handleOpenAddModal = () => setModalType("add");
+  const handleOpenAddModal = () => setModalType('add');
 
   const handleCloseModal = () => {
     setModalType(null);
@@ -52,24 +70,22 @@ const Alerts = () => {
 
   const columns = [
     {
-      name: "ALERT NAME",
+      name: 'ALERT NAME',
       selector: (row) => row.name,
       cell: (row) => (
         <div className="flex items-center gap-2">
-          <span className="text-blue-700 text-sm font-medium">
-            {row.name.toUpperCase()}
-          </span>
+          <span className="text-blue-700 text-sm font-medium">{row.name.toUpperCase()}</span>
         </div>
       ),
     },
     {
-      name: "ALERT TYPE",
+      name: 'ALERT TYPE',
       selector: (row) => row.type,
       cell: (row) => (
         <div className="flex items-center gap-1">
-          {row.type === "speed" ? (
+          {row.type === 'speed' ? (
             <CgArrowTopRightO fontSize={20} color="#03a5e0" />
-          ) : row.type === "infence" ? (
+          ) : row.type === 'infence' ? (
             <CgArrowTopRightO fontSize={20} color="#03a5e0" />
           ) : (
             <CgArrowTopRightO fontSize={20} color="#03a5e0" />
@@ -79,32 +95,32 @@ const Alerts = () => {
       ),
     },
     {
-      name: "SEVERITY",
+      name: 'SEVERITY',
       selector: (row) => row.severity,
       cell: (row) => (
         <div
           className={`flex items-center gap-2 p-2 rounded-md w-[110px] justify-center ${
-            row.severity === "high"
-              ? "bg-red-100 text-red-500"
-              : row.severity === "medium"
-              ? "bg-orange-100 text-orange-500"
-              : "bg-green-100 text-green-500"
+            row.severity === 'high'
+              ? 'bg-red-100 text-red-500'
+              : row.severity === 'medium'
+              ? 'bg-orange-100 text-orange-500'
+              : 'bg-green-100 text-green-500'
           }`}
         >
-          {row.severity === "high" ? (
+          {row.severity === 'high' ? (
             <ImArrowUp />
-          ) : row.severity === "medium" ? (
+          ) : row.severity === 'medium' ? (
             <ImArrowLeft />
           ) : (
             <ImArrowDown />
           )}
           <span
             className={`text-sm font-semibold ${
-              row.severity === "high"
-                ? "text-red-500"
-                : row.severity === "medium"
-                ? "text-orange-500"
-                : "text-green-500"
+              row.severity === 'high'
+                ? 'text-red-500'
+                : row.severity === 'medium'
+                ? 'text-orange-500'
+                : 'text-green-500'
             }`}
           >
             {row.severity.toUpperCase()}
@@ -113,23 +129,21 @@ const Alerts = () => {
       ),
     },
     {
-      name: "NOTIFICATION TYPE",
+      name: 'NOTIFICATION TYPE',
       selector: (row) => row.platform,
       cell: (row) => (
         <div className="flex items-center gap-2 text-black text-sm">
           <div
             className={`w-5 h-5 rounded-full border-2 ${
-              row.platform === "platform"
-                ? "border-orange-500"
-                : "border-blue-500"
+              row.platform === 'platform' ? 'border-orange-500' : 'border-blue-500'
             }`}
           ></div>
-          {row.platform === "platform" ? "On Platform" : "On Email"}
+          {row.platform === 'platform' ? 'On Platform' : 'On Email'}
         </div>
       ),
     },
     {
-      name: "STATUS",
+      name: 'STATUS',
       selector: (row) => row.status,
       cell: (row) => (
         <div className="flex items-center gap-2">
@@ -137,19 +151,19 @@ const Alerts = () => {
           <input
             type="checkbox"
             // readOnly
-            checked={row.status === "enable"}
+            checked={row.status === 'enable'}
             className="cursor-pointer"
           />
         </div>
       ),
     },
     {
-      name: "ACTIONS",
+      name: 'ACTIONS',
       cell: (row) => (
         <div className="flex items-end gap-2">
           <FiEdit fontSize={18} onClick={() => handleOpenEditModal(row)} />
           <button className="bg-transparent border-none flex items-center justify-center cursor-pointer">
-            <MdDelete className="text-red-500 text-xl" />
+            <MdDelete onClick={() => handleDelete(row)} className="text-red-500 text-xl" />
           </button>
         </div>
       ),
@@ -164,44 +178,45 @@ const Alerts = () => {
             <MdAddBox fontSize={30} color="#03A5E0" />
           </div>
         </div>
-        {staticAlerts.length > 0 ? (
+        {data?.data?.length > 0 ? (
           <DataTable
             columns={columns}
-            data={staticAlerts}
+            // data={data?.data}
+            data={[...data?.data].reverse()}
             pagination
             customStyles={{
               rows: {
                 style: {
-                  minHeight: "50px",
+                  minHeight: '50px',
                 },
               },
               headCells: {
                 style: {
-                  fontSize: "14px",
-                  fontWeight: "600",
-                  color: "#111",
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: '#111',
                 },
               },
               cells: {
                 style: {
-                  fontSize: "14px",
-                  color: "#555",
+                  fontSize: '14px',
+                  color: '#555',
                 },
               },
             }}
           />
         ) : (
-          "No Data Component"
+          'No Data Component'
         )}
       </div>
-      {modalType === "edit" && (
+      {modalType === 'edit' && (
         <Modal title="Edit Alert" onClose={handleCloseModal}>
-          <EditAlert />
+          <EditAlert onClose={handleCloseModal} editData={selectedAlert} />
         </Modal>
       )}
-      {modalType === "add" && (
+      {modalType === 'add' && (
         <Modal title="Add Alert" onClose={handleCloseModal}>
-          <AddAlert />
+          <AddAlert onClose={handleCloseModal} />
         </Modal>
       )}
     </Fragment>
