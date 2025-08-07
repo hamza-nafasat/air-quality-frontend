@@ -128,7 +128,7 @@ const DoubleAreaChart = ({ chartsData }) => {
   const [selectedPeriod, setSelectedPeriod] = useState('Daily');
   const [series, setSeries] = useState([]);
   const [xCategories, setXCategories] = useState([]);
-  console.log('chartsDatachartsData', chartsData);
+  // console.log('chartsDatachartsData', chartsData);
 
   // const chartsData = {
   //   Daily: {

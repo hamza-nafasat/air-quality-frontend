@@ -1,36 +1,41 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import Lock from "../../assets/svgs/auth/Lock";
-import Mail from "../../assets/svgs/auth/Mail";
-import Button from "../../components/shared/small/Button";
-import TextField from "../../components/shared/small/TextField";
-import { useLoginMutation } from "../../redux/apis/authApis";
-import { toast } from "react-toastify";
-import { useDispatch } from "react-redux";
-import { userExist } from "../../redux/slices/authSlice";
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import Lock from '../../assets/svgs/auth/Lock';
+import Mail from '../../assets/svgs/auth/Mail';
+import Button from '../../components/shared/small/Button';
+import TextField from '../../components/shared/small/TextField';
+import { useLoginMutation } from '../../redux/apis/authApis';
+import { toast } from 'react-toastify';
+import { useDispatch } from 'react-redux';
+import { userExist } from '../../redux/slices/authSlice';
+import { socket } from '../../sockets/socket';
 
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [checked, setChecked] = useState(true);
-  const [loginUser, { isLoading }] = useLoginMutation("");
+  const [loginUser, { isLoading }] = useLoginMutation('');
 
   const formSubmitHandler = async (e) => {
     e.preventDefault();
-    if (!email || !password) return toast.error("Please fill all the fields");
+    if (!email || !password) return toast.error('Please fill all the fields');
     try {
       const response = await loginUser({ email, password }).unwrap();
-      console.log("response while login ", response);
+      // console.log('response while login ', response);
       if (response?.success) {
         dispatch(userExist(response?.data));
+        socket.connect();
+
+        // Send user ID to register socket
+        socket.emit('register', response?.data?._id);
         toast.success(response?.message);
-        return navigate("/dashboard");
+        return navigate('/dashboard');
       }
     } catch (error) {
-      console.log(" Error While Logging In", error);
-      toast.error(error?.data?.message || "Error occurred while logging in");
+      console.log(' Error While Logging In', error);
+      toast.error(error?.data?.message || 'Error occurred while logging in');
     }
   };
 
@@ -65,13 +70,16 @@ const Login = () => {
               onChange={() => setChecked(!checked)}
               id="check"
             />
-            <p className="select-none text-[12px] xl:text-[1rem]" onClick={() => setChecked(!checked)}>
+            <p
+              className="select-none text-[12px] xl:text-[1rem]"
+              onClick={() => setChecked(!checked)}
+            >
               Remember Me
             </p>
           </div>
 
           <Link
-            to={"/forget-password"}
+            to={'/forget-password'}
             className="border-none outline-none bg-transparent text-primary-lightBlue text-[12px] xl:text-[1rem] font-[500]"
           >
             Forget Password?
@@ -82,7 +90,7 @@ const Login = () => {
 
       <section className="flex w-full items-center justify-center gap-4 text-[12px] xl:text-[1rem]">
         <p>New User?</p>
-        <Link to={"/signup"} className="text-primary-lightBlue">
+        <Link to={'/signup'} className="text-primary-lightBlue">
           Signup
         </Link>
       </section>

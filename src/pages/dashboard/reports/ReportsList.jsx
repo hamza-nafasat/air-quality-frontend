@@ -78,7 +78,7 @@ const columns = [
         <p className="text-sm text-[#292d32cc] font-medium capitalize">{row.face}</p>
       </div>
     ),
-    center: true,
+    // center: true,
   },
 ];
 

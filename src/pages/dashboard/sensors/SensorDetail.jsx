@@ -12,10 +12,10 @@ import { useParams } from 'react-router-dom';
 
 const SensorDetail = () => {
   const { id } = useParams();
-  console.log('hjjhhjjhhj', id);
+  // console.log('hjjhhjjhhj', id);
 
   const { data } = useGetSingleSensorQuery(id);
-  console.log('hjj?.hhjjadfefeqwfwehhj', data);
+  // console.log('hjj?.hhjjadfefeqwfwehhj', data);
   const [modal, setModal] = useState(false);
 
   const handleModalOpen = () => {

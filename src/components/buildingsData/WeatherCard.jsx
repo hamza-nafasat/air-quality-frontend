@@ -122,6 +122,7 @@ import WindIcon from '../../assets/svgs/buildings/WindIcon';
 import SunIcon from '../../assets/svgs/buildings/SunIcon';
 import WeatherCloudIcon from '../../assets/svgs/buildings/WeatherCloudIcon';
 import ThunderImage from '../../assets/images/buildings/thunder-img.svg';
+import getEnv from '../../config/config';
 
 const boxShadow = { boxShadow: '0px 3px 0px 0px rgba(100, 198, 234, 0.4)' };
 
@@ -146,8 +147,9 @@ const WeatherCard = () => {
   const [forecastData, setForecastData] = useState(null);
 
   const getWeatherData = useCallback(async () => {
-    const API_KEY = '1d878af3f008169d6504b3ce86e88395';
+    // const API_KEY = '1d878af3f008169d6504b3ce86e88395';
     const CITY = 'Lahore';
+    const API_KEY = getEnv('WEATHER_API_KEY');
 
     const currentWeatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${CITY}&appid=${API_KEY}&units=metric`;
     const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${CITY}&appid=${API_KEY}&units=metric`;

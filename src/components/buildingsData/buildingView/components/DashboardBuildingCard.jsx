@@ -267,7 +267,7 @@ function DashboardBuildingCard({ data }) {
       setIsDataReady(false);
     }
   }, [data]);
-  console.log('datadatadata', data);
+  // console.log('datadatadata', data);
 
   if (!isDataReady) {
     return <div className="p-4 text-gray-500 text-sm">Loading building data...</div>;

@@ -85,7 +85,7 @@ const Configuration = () => {
   };
 
   useEffect(() => {
-    console.log('this is user', user);
+    // console.log('this is user', user);
     if (user) {
       setForm({
         hostName: user?.customDbHost || '',
@@ -98,7 +98,7 @@ const Configuration = () => {
     }
     if (user?.interval) {
       const interval = intervalTimesInSeconds.find((item) => item.value == String(user?.interval));
-      console.log(interval, interval?.option, user?.interval);
+      // console.log(interval, interval?.option, user?.interval);
       setDefaultTextForInterval(interval?.option || 'Select Time Interval');
     }
 

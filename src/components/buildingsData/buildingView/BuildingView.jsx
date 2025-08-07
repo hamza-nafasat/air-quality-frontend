@@ -45,7 +45,7 @@ const BuildingView = () => {
   const { data: floors } = useGetAllFloorQuery(id);
   const [deleteModal, setDeleteModal] = useState(false);
   const [deleteBuilding] = useDeleteSingleBuildingMutation('');
-  console.log('complet building data', data);
+  // console.log('complet building data', data);
 
   useEffect(() => {
     if (isSuccess) {

@@ -1,32 +1,32 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import Lock from "../../assets/svgs/auth/Lock";
-import Mail from "../../assets/svgs/auth/Mail";
-import User from "../../assets/svgs/auth/User";
-import Button from "../../components/shared/small/Button";
-import TextField from "../../components/shared/small/TextField";
-import { useRegisterMutation } from "../../redux/apis/authApis";
-import { toast } from "react-toastify";
-import { userExist } from "../../redux/slices/authSlice";
-import { useDispatch } from "react-redux";
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import Lock from '../../assets/svgs/auth/Lock';
+import Mail from '../../assets/svgs/auth/Mail';
+import User from '../../assets/svgs/auth/User';
+import Button from '../../components/shared/small/Button';
+import TextField from '../../components/shared/small/TextField';
+import { useRegisterMutation } from '../../redux/apis/authApis';
+import { toast } from 'react-toastify';
+import { userExist } from '../../redux/slices/authSlice';
+import { useDispatch } from 'react-redux';
 
 const SignUp = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [checked, setChecked] = useState(true);
 
-  const [registerUser, { isLoading }] = useRegisterMutation("");
+  const [registerUser, { isLoading }] = useRegisterMutation('');
 
   const formSubmitHandler = async (e) => {
     e.preventDefault();
     if (!firstName || !lastName || !email || !password || !confirmPassword)
-      return toast.error("Please fill all the fields");
-    if (password !== confirmPassword) return toast.error("Passwords do not match");
+      return toast.error('Please fill all the fields');
+    if (password !== confirmPassword) return toast.error('Passwords do not match');
     try {
       const response = await registerUser({
         firstName,
@@ -34,14 +34,14 @@ const SignUp = () => {
         email,
         password,
       }).unwrap();
-      console.log("response while signUp ", response);
+      // console.log("response while signUp ", response);
       if (response?.success) {
         dispatch(userExist(response?.data));
         toast.success(response?.message);
-        return navigate("/dashboard");
+        return navigate('/dashboard');
       }
     } catch (error) {
-      console.log(" Error While Signing Up", error);
+      console.log(' Error While Signing Up', error);
     }
   };
 
@@ -102,9 +102,14 @@ const SignUp = () => {
               onChange={() => setChecked(!checked)}
               id="check"
             />
-            <p className="select-none w-full text-[12px] xl:text-[1rem]" onClick={() => setChecked(!checked)}>
-              I’m agree with the{" "}
-              <span className="text-primary-lightBlue font-bold text-[12px] xl:text-[1rem]">Terms & Conditions.</span>
+            <p
+              className="select-none w-full text-[12px] xl:text-[1rem]"
+              onClick={() => setChecked(!checked)}
+            >
+              I’m agree with the{' '}
+              <span className="text-primary-lightBlue font-bold text-[12px] xl:text-[1rem]">
+                Terms & Conditions.
+              </span>
             </p>
           </div>
         </section>
@@ -113,7 +118,7 @@ const SignUp = () => {
 
       <section className="flex w-full items-center justify-center gap-4 text-[12px] xl:text-[1rem]">
         <p>Already have account?</p>
-        <Link to={"/"} className="text-primary-lightBlue">
+        <Link to={'/'} className="text-primary-lightBlue">
           Login
         </Link>
       </section>

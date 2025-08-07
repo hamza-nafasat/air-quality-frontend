@@ -66,7 +66,7 @@ const Sensors = () => {
 
   const statusToggleHandler = async (id, status) => {
     try {
-      console.log(id, status);
+      // console.log(id, status);
       const response = await updateSensor({
         sensorId: id,
         data: { status: status ? 'false' : 'true' },

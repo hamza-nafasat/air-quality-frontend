@@ -4,7 +4,7 @@ import greyBuilding from '../../../../assets/images/buildings/greyBuilding.png';
 import LocationIcon from '../../../../assets/svgs/pages/LocationIcon';
 
 const BuildingDetails = ({ building }) => {
-  console.log('building', building);
+  // console.log('building', building);
   const bestAirQuality = building?.airQuality?.goodAirQuality;
   const worstAirQuality = building?.airQuality?.badAirQuality;
 

@@ -1,12 +1,12 @@
 /* eslint-disable react/prop-types */
-import { FaMapMarkerAlt } from "react-icons/fa";
-import { GoDotFill } from "react-icons/go";
-import Button from "../shared/small/Button";
-import getEnv from "../../config/config";
-import { stripePromise } from "../../utils/stripe";
+import { FaMapMarkerAlt } from 'react-icons/fa';
+import { GoDotFill } from 'react-icons/go';
+import Button from '../shared/small/Button';
+import getEnv from '../../config/config';
+import { stripePromise } from '../../utils/stripe';
 
 const Review = ({ plan }) => {
-  const totalAmount = parseFloat(plan.price.replace("$", ""));
+  const totalAmount = parseFloat(plan.price.replace('$', ''));
   const taxAmount = totalAmount * (30 / 100);
   const flooredTax = Math.floor(taxAmount * 100) / 100;
   const tax = flooredTax.toFixed(2);
@@ -16,16 +16,16 @@ const Review = ({ plan }) => {
   const makePaymentStripe = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${getEnv("SERVER_URL")}/api/subscription/create-session`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
+      const response = await fetch(`${getEnv('SERVER_URL')}/api/subscription/create-session`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           plan: plan?.type,
         }),
       });
       const data = await response.json();
-      console.log("Response FROM STRIPE CHECKOUT SESSION", data);
+      console.log('Response FROM STRIPE CHECKOUT SESSION', data);
       if (data?.sessionId) {
         const stripe = await stripePromise;
         const result = await stripe.redirectToCheckout({
@@ -34,9 +34,9 @@ const Review = ({ plan }) => {
         if (result?.error) console.error(result.error.message);
       } else if (data?.redirect_url) {
         window.location.replace(data?.redirect_url);
-      } else console.error("Failed to retrieve session ID");
+      } else console.error('Failed to retrieve session ID');
     } catch (error) {
-      console.error("Error creating checkout session", error);
+      console.error('Error creating checkout session', error);
     }
   };
 
@@ -48,7 +48,9 @@ const Review = ({ plan }) => {
             <FaMapMarkerAlt fontSize={22} />
             <p className="text-sm md:text-base font-[600]">Billing Address</p>
           </div>
-          <p className="text-sm md:text-md font-semibold my-2 md:my-4">5678 Maple Avenue, Anytown, CA, 90210, USA</p>
+          <p className="text-sm md:text-md font-semibold my-2 md:my-4">
+            5678 Maple Avenue, Anytown, CA, 90210, USA
+          </p>
           <PriceList title="Plan Selected:" value={plan.title} />
           <PriceList title="Monthly Fee:" value={plan.price} />
           <PriceList title="Tax:" value={`$${tax}`} />
@@ -87,7 +89,11 @@ const Review = ({ plan }) => {
         </div>
       </div>
       <div className="flex justify-end mt-5">
-        <Button text="Confirm & Subscribe" width="w-[160px] md:w-[268px]" onClick={makePaymentStripe} />
+        <Button
+          text="Confirm & Subscribe"
+          width="w-[160px] md:w-[268px]"
+          onClick={makePaymentStripe}
+        />
       </div>
     </div>
   );
@@ -100,7 +106,7 @@ const PriceList = ({ title, value }) => {
     <div className="flex items-center justify-between gap-4 mb-3">
       <p className="text-sm md:text-base">{title}</p>
       <p className="text-sm md:text-base font-medium md:font-semibold">
-        {title === "Monthly Fee:" ? `$${value}` : value}
+        {title === 'Monthly Fee:' ? `$${value}` : value}
       </p>
     </div>
   );

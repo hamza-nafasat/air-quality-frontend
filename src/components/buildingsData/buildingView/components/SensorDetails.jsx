@@ -136,7 +136,7 @@ const buildColumns = (navigate) => [
     name: 'Status',
     cell: (row) => <div>{row.status ? ` Active` : 'Inactive'}</div>,
     ignoreRowClick: true,
-    allowOverflow: true,
+    // allowOverflow: true,
   },
   {
     name: 'View',
@@ -158,7 +158,7 @@ const buildColumns = (navigate) => [
 /* ------------------------------------------------------------------ */
 const SensorDetails = ({ data }) => {
   const [modal, setModal] = useState(false);
-  console.log('datadatadatadata', data);
+  // console.log('datadatadatadata', data);
 
   const [sensorStatus, setSensorStatus] = useState({}); // { sensorId: boolean }
   const navigate = useNavigate();

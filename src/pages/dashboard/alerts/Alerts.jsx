@@ -8,6 +8,7 @@ import { CgArrowTopRightO } from 'react-icons/cg';
 import AddAlert from './components/AddAlert';
 import EditAlert from './components/EditAlert';
 import { useDeleteAlertMutation, useGetAlertsQuery } from '../../../redux/apis/alertApi';
+import { toast } from 'react-toastify';
 
 const Alerts = () => {
   const [modalType, setModalType] = useState(null);
@@ -15,7 +16,7 @@ const Alerts = () => {
   const { data, isLoading, isError } = useGetAlertsQuery();
   const [deleteAlert] = useDeleteAlertMutation('');
 
-  console.log('newwewewewewe', data);
+  // console.log('newwewewewewe', data);
 
   const staticAlerts = [
     {
@@ -45,11 +46,11 @@ const Alerts = () => {
   ];
   const handleDelete = async (row) => {
     const alertId = row._id;
-    console.log('alertId', alertId);
+    // console.log('alertId', alertId);
 
     try {
       const result = await deleteAlert(alertId).unwrap();
-      console.log('Deleted successfully:', result);
+      // console.log('Deleted successfully:', result);
       toast.success('Rule deleted successfully');
     } catch (err) {
       console.error('Delete failed:', err);
@@ -150,8 +151,8 @@ const Alerts = () => {
           <span className="text-black text-sm">{row.status}</span>
           <input
             type="checkbox"
-            // readOnly
             checked={row.status === 'enable'}
+            readOnly
             className="cursor-pointer"
           />
         </div>
@@ -161,7 +162,11 @@ const Alerts = () => {
       name: 'ACTIONS',
       cell: (row) => (
         <div className="flex items-end gap-2">
-          <FiEdit fontSize={18} onClick={() => handleOpenEditModal(row)} />
+          <FiEdit
+            className="cursor-pointer"
+            fontSize={18}
+            onClick={() => handleOpenEditModal(row)}
+          />
           <button className="bg-transparent border-none flex items-center justify-center cursor-pointer">
             <MdDelete onClick={() => handleDelete(row)} className="text-red-500 text-xl" />
           </button>

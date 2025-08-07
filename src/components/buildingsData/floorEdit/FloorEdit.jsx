@@ -31,7 +31,7 @@ function FloorEdit() {
       setPolygons(singleFloor?.twoDModelCanvasData ? singleFloor?.twoDModelCanvasData : []);
     }
   }, [data?.data]);
-  console.log('data', data);
+  // console.log('data', data);
 
   const updateFloorHandler = async () => {
     try {
@@ -40,7 +40,7 @@ function FloorEdit() {
       if (floor.floorRooms) dataForUpdate.rooms = floor.floorRooms;
       if (polygons) dataForUpdate.twoDModelCanvasData = polygons;
       if (selectedSensor.length > 0) dataForUpdate.sensors = selectedSensor;
-      console.log('sensorsExist', dataForUpdate);
+      // console.log('sensorsExist', dataForUpdate);
 
       const res = await updateFloor({ floorId: id, data: dataForUpdate }).unwrap();
       if (res?.message) toast.success(res.message);

@@ -104,7 +104,7 @@ const BuildingInfo = ({ name = '', thumbnail = '', address = '', sensors = 0 }) 
 };
 
 const SensorInfo = ({ data = [], id, type }) => {
-  console.log('hasTypehasType', type);
+  // console.log('hasTypehasType', type);
 
   const linkUrl = type ? `/dashboard/building-view/${id}` : `/dashboard/floor-view/${id}`;
   if (!Array.isArray(data) || data.length === 0) {

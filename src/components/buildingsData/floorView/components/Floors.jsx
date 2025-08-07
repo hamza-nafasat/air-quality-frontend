@@ -23,7 +23,7 @@ const Floors = ({ floors, floor }) => {
       list = list.filter(
         (b) => b.name?.toLowerCase().includes(term) || b.address?.toLowerCase().includes(term)
       );
-      console.log('list', list);
+      // console.log('list', list);
     }
 
     // sort by createdAt

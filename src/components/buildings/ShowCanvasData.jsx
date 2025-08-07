@@ -21,7 +21,7 @@ const ShowCanvasData = ({ image, polygons, view, heatmap = false, data = [] }) =
   const [selectedPolygon, setSelectedPolygon] = useState(null);
   const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
   // console.log('polygons', polygons);
-  console.log('selectedPolygon', selectedPolygon);
+  // console.log('selectedPolygon', selectedPolygon);
 
   // Function to handle polygon click detection
   const handlePolygonClick = (e, polygon) => {
@@ -51,7 +51,7 @@ const ShowCanvasData = ({ image, polygons, view, heatmap = false, data = [] }) =
       });
     }
   };
-  console.log('jgjjjjgjggjjgjgjggj', polygons);
+  // console.log('jgjjjjgjggjjgjgjggj', polygons);
   //  const navigate = useNavigate();
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -67,8 +67,8 @@ const ShowCanvasData = ({ image, polygons, view, heatmap = false, data = [] }) =
 
       if (heatmap) {
         // Draw heatmap-style polygons
-        console.log('polygonpolygon', polygons);
-        console.log('data', data);
+        // console.log('polygonpolygon', polygons);
+        // console.log('data', data);
         polygons.forEach((polygon) => {
           // if(polygon?.sensorAttached==)
           if (!polygon || !polygon.points) return;
@@ -177,7 +177,7 @@ const ShowCanvasData = ({ image, polygons, view, heatmap = false, data = [] }) =
             (d) => d.sensorId === polygon.sensorAttached && d.param === 'temperature'
           );
           const value = typeof sensorData?.value === 'number' ? sensorData.value : 50;
-          console.log('value', value);
+          // console.log('value', value);
 
           return (
             <div

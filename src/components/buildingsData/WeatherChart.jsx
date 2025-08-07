@@ -404,7 +404,7 @@ const WeatherChart = ({ data, loading }) => {
       });
     });
   }
-  console.log('withPercentages', withPercentages);
+  // console.log('withPercentages', withPercentages);
 
   // ✅ Update state when real API data is available
   useEffect(() => {

@@ -48,8 +48,8 @@ const UploadAddFloors = ({
   const { data } = useGetAllSensorsQuery();
   const { data: sensor } = useGetSingleSensorSqlQuery();
   const [availableSensors, setAvailableSensors] = useState([]);
-  console.log('availableSensors', availableSensors);
-  console.log('sensor', sensor);
+  // console.log('availableSensors', availableSensors);
+  // console.log('sensor', sensor);
   // console.log('availableSensors', data.data);
 
   const canvasRef = useRef(null);

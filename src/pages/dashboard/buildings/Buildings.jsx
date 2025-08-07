@@ -62,7 +62,7 @@ const Buildings = () => {
       list = list.filter(
         (b) => b.name?.toLowerCase().includes(term) || b.address?.toLowerCase().includes(term)
       );
-      console.log('list', list);
+      // console.log('list', list);
     }
 
     // sort by createdAt
@@ -98,7 +98,7 @@ const Buildings = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredSorted.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredSorted.length / itemsPerPage);
-  console.log('currentItemscurrentItems', currentItems);
+  // console.log('currentItemscurrentItems', currentItems);
   /* page nav handlers */
   const handleNextPage = () => currentPage < totalPages && setCurrentPage((p) => p + 1);
   const handlePrevPage = () => currentPage > 1 && setCurrentPage((p) => p - 1);

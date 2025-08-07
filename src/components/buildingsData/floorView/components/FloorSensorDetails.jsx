@@ -17,7 +17,7 @@ const columns = (navigate, sensorStatus) => [
     name: 'Status',
     cell: (row) => <div>{row.status ? ` Active` : 'Inactive'}</div>,
     ignoreRowClick: true,
-    allowOverflow: true,
+    // allowOverflow: true,
   },
   {
     name: 'View',

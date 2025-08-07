@@ -21,8 +21,8 @@ const Reports = () => {
     const query = searchTerm.toLowerCase();
     return building.buildingName?.toLowerCase().includes(query);
   });
-  console.log('searchTerm', filteredReports);
-  console.log('dtaaaaa', data);
+  // console.log('searchTerm', filteredReports);
+  // console.log('dtaaaaa', data);
 
   // On initial load, store all buildings' data
   useEffect(() => {

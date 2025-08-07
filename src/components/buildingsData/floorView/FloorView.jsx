@@ -42,7 +42,7 @@ const FloorView = () => {
   const [polygons, setPolygons] = useState([]);
   const { data: floor, isLoading } = useGetSingleFloorQuery(id);
   const [deleteFloor] = useDeleteSingleFloorMutation();
-  console.log('full data of floor', floor);
+  // console.log('full data of floor', floor);
 
   // const twoDModelCanvasData = floor?.data?.twoDModelCanvasData ?? [];
   // const sensors = floor?.data?.sensors ?? [];
@@ -79,7 +79,7 @@ const FloorView = () => {
     };
   };
   const enrichedResponse = enrichResponseData(floor);
-  console.log('new', enrichedResponse);
+  // console.log('new', enrichedResponse);
 
   const handleOpenDeleteModal = () => {
     confirmAlert({

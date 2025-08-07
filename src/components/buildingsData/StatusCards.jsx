@@ -231,7 +231,7 @@ const StatusCards = ({ data }) => {
     };
   });
 
-  console.log('updatedSensorsData', updatedSensorsData);
+  // console.log('updatedSensorsData', updatedSensorsData);
 
   if (isLoading) {
     return (

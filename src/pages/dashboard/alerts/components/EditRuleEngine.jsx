@@ -25,8 +25,8 @@ const EditRuleEngine = ({ isLoading, onClose, data, editData }) => {
   const [selectedBuildings, setSelectedBuildings] = useState([]);
   const [inputEmail, setInputEmail] = useState(false);
   const [addLoading, setAddLoading] = useState(false);
-  console.log('data', data);
-  console.log('editData', editData);
+  // console.log('data', data);
+  // console.log('editData', editData);
 
   const [formData, setFormData] = useState({
     alertName: '',
@@ -35,8 +35,8 @@ const EditRuleEngine = ({ isLoading, onClose, data, editData }) => {
     platform: '',
     status: '',
   });
-  console.log('formDataformData', editData);
-  console.log('datadatadatadata', data);
+  // console.log('formDataformData', editData);
+  // console.log('datadatadatadata', data);
 
   useEffect(() => {
     if (editData) {

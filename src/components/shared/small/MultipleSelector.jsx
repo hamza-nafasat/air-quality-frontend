@@ -13,7 +13,7 @@ const MultipleSelector = ({
   disabled = false,
   value = [], // ✅ new
 }) => {
-  console.log('onSelect');
+  // console.log('onSelect');
 
   const [isOpen, setIsOpen] = useState(false);
   const [selected, setSelected] = useState([]); // multiple selected

@@ -4,6 +4,7 @@ const config = Object.freeze({
   COUNTRY_TOKEN: import.meta.env.VITE_GET_COUNTRY_TOKEN,
   CURRENCY_TOKEN: import.meta.env.VITE_GET_CURRENCY_TOKEN,
   STRIPE_SECRET_KEY: import.meta.env.VITE_STRIPE_SECRET_KEY,
+  STRIPE_PUBLISH_KEY: import.meta.env.VITE_STRIPE_PUBLISH_KEY,
   WEATHER_API_KEY: import.meta.env.VITE_WEATHER_API_KEY,
 });
 

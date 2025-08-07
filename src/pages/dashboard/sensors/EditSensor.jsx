@@ -1,14 +1,14 @@
 /* eslint-disable react/prop-types */
-import { useState } from "react";
-import Select from "react-select";
-import { toast } from "react-toastify";
-import Button from "../../../components/shared/small/Button";
-import TextField from "../../../components/shared/small/TextField";
-import { useUpdateSensorMutation } from "../../../redux/apis/sensorApis";
-import { sensorOptionsForMultiSelect } from "./sensorOptions";
+import { useState } from 'react';
+import Select from 'react-select';
+import { toast } from 'react-toastify';
+import Button from '../../../components/shared/small/Button';
+import TextField from '../../../components/shared/small/TextField';
+import { useUpdateSensorMutation } from '../../../redux/apis/sensorApis';
+import { sensorOptionsForMultiSelect } from './sensorOptions';
 
 const EditSensor = ({ selectedSensor, onClose }) => {
-  const [updateSensor, { isLoading }] = useUpdateSensorMutation("");
+  const [updateSensor, { isLoading }] = useUpdateSensorMutation('');
   const [form, setForm] = useState({
     name: selectedSensor?.name,
     uniqueId: selectedSensor?.uniqueId,
@@ -17,12 +17,12 @@ const EditSensor = ({ selectedSensor, onClose }) => {
 
   const handleEditSensor = async () => {
     try {
-      if (!form?.name || !form?.uniqueId) return toast.error("Please fill all the fields");
+      if (!form?.name || !form?.uniqueId) return toast.error('Please fill all the fields');
       const response = await updateSensor({ sensorId: selectedSensor?._id, data: form }).unwrap();
       if (response?.success) toast.success(response?.message);
     } catch (error) {
-      console.log("Error while adding sensor", error);
-      toast.error(error?.data?.message || "Error while updating sensor");
+      console.log('Error while adding sensor', error);
+      toast.error(error?.data?.message || 'Error while updating sensor');
     } finally {
       onClose();
     }
@@ -30,7 +30,7 @@ const EditSensor = ({ selectedSensor, onClose }) => {
   const handleChangeFroMultiSelect = (selectedOptions) => {
     setForm({ ...form, parameters: selectedOptions.map((option) => option.value) });
   };
-  console.log("form", form);
+  // console.log("form", form);
 
   return (
     <div>
@@ -51,21 +51,23 @@ const EditSensor = ({ selectedSensor, onClose }) => {
             styles={{
               control: (baseStyles) => ({
                 ...baseStyles,
-                border: "1px solid #333",
-                borderRadius: "10px",
-                outline: "none",
-                minHeight: "50px",
-                fontSize: "14px",
+                border: '1px solid #333',
+                borderRadius: '10px',
+                outline: 'none',
+                minHeight: '50px',
+                fontSize: '14px',
               }),
               option: (baseStyles) => ({
                 ...baseStyles,
-                fontSize: "14px",
+                fontSize: '14px',
                 zIndex: 999,
               }),
             }}
             options={sensorOptionsForMultiSelect}
             onChange={handleChangeFroMultiSelect}
-            value={sensorOptionsForMultiSelect.filter((option) => form?.parameters?.includes(option?.value))}
+            value={sensorOptionsForMultiSelect.filter((option) =>
+              form?.parameters?.includes(option?.value)
+            )}
           />
         </div>
 

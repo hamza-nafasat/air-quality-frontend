@@ -202,7 +202,7 @@ const SingleAreaChart = ({ dataSets = defaultData }) => {
   /* ------------------------------------------------------------- */
   const [timeFrame, setTimeFrame] = useState('Daily');
   const [series, setSeries] = useState([{ name: 'Temperature', data: dataSets.Daily.data }]);
-  console.log('datadata', dataSets);
+  // console.log('datadata', dataSets);
 
   const [options, setOptions] = useState({
     chart: {

@@ -12,6 +12,7 @@ import AddRuleEngine from './components/AddRuleEngine';
 import EditRuleEngine from './components/EditRuleEngine';
 import { useGetAllBuildingsQuery } from '../../../redux/apis/buildingApis';
 import { useDeleteRuleMutation, useGetRulesQuery } from '../../../redux/apis/ruleEngineApi';
+import { toast } from 'react-toastify';
 
 const RuleEngines = () => {
   const [modalType, setModalType] = useState(null);
@@ -24,7 +25,7 @@ const RuleEngines = () => {
     _id: sensor._id,
     name: sensor.name,
   }));
-  console.log('sensorList', data);
+  // console.log('sensorList', data);
 
   const staticAlerts = [
     {
@@ -54,11 +55,11 @@ const RuleEngines = () => {
   ];
   const handleDelete = async (row) => {
     const ruleId = row._id;
-    console.log('ruleId', ruleId);
+    // console.log('ruleId', ruleId);
 
     try {
       const result = await deleteRule(ruleId).unwrap();
-      console.log('Deleted successfully:', result);
+      // console.log('Deleted successfully:', result);
       toast.success('Rule deleted successfully');
     } catch (err) {
       console.error('Delete failed:', err);
@@ -144,7 +145,7 @@ const RuleEngines = () => {
           <span className="text-black text-sm">{row.status}</span>
           <input
             type="checkbox"
-            // readOnly
+            readOnly
             checked={row.status === 'enable'}
             className="cursor-pointer"
           />
@@ -166,7 +167,11 @@ const RuleEngines = () => {
       name: 'ACTIONS',
       cell: (row) => (
         <div className="flex items-end gap-2">
-          <FiEdit fontSize={18} onClick={() => handleOpenEditModal(row)} />
+          <FiEdit
+            className="cursor-pointer"
+            fontSize={18}
+            onClick={() => handleOpenEditModal(row)}
+          />
           <button className="bg-transparent border-none flex items-center justify-center cursor-pointer">
             <MdDelete onClick={() => handleDelete(row)} className="text-red-500 text-xl" />
           </button>

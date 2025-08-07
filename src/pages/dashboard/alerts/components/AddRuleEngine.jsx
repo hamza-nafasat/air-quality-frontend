@@ -28,7 +28,7 @@ const AddRuleEngine = ({ onClose, isLoading, data }) => {
   const [accordionList, setAccordionList] = useState([{ id: 1, type: '' }]);
   const [selectedBuildings, setSelectedBuildings] = useState([]);
   const [inputEmail, setInputEmail] = useState(false);
-  console.log('addselectedBuildings', selectedBuildings);
+  // console.log('addselectedBuildings', selectedBuildings);
 
   const [formData, setFormData] = useState({
     alertName: '',

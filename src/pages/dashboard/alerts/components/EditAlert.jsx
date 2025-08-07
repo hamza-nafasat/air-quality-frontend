@@ -207,7 +207,7 @@ const alertType = [
 const severityType = [{ option: 'high' }, { option: 'medium' }, { option: 'low' }];
 
 const EditAlert = ({ onClose, editData }) => {
-  console.log('editData', editData);
+  // console.log('editData', editData);
 
   const [inputEmail, setInputEmail] = useState(false);
   const [updateAlert] = useUpdateAlertMutation();
@@ -218,6 +218,7 @@ const EditAlert = ({ onClose, editData }) => {
     severityType: '',
     email: '',
     platform: '',
+    status: '',
   });
 
   useEffect(() => {
@@ -228,6 +229,7 @@ const EditAlert = ({ onClose, editData }) => {
         severityType: editData?.severity || '',
         email: editData?.onMail || '',
         platform: editData?.platform || '',
+        status: editData?.status || '',
       });
       setInputEmail(editData?.platform === 'email');
     }
@@ -240,7 +242,7 @@ const EditAlert = ({ onClose, editData }) => {
     }));
   };
   const editId = editData._id;
-  console.log('editId', editId);
+  // console.log('editId', editId);
 
   const handleSave = async () => {
     setIsLoading(true);
@@ -251,6 +253,7 @@ const EditAlert = ({ onClose, editData }) => {
       severity: formData.severityType,
       onMail: formData.email,
       platform: formData.platform,
+      status: formData.status,
     };
 
     try {
@@ -292,6 +295,13 @@ const EditAlert = ({ onClose, editData }) => {
             value={formData.severityType}
             defaultText={formData.severityType}
             onSelect={(option) => setFormData({ ...formData, severityType: option.option })}
+          />
+          <Dropdown
+            label="Status"
+            options={[{ option: 'enable' }, { option: 'disable' }]}
+            value={formData.status}
+            defaultText={formData.status}
+            onSelect={(option) => setFormData({ ...formData, status: option.option })}
           />
 
           {formData.alertType === 'idle-engine' && <TextField label="Idle Time" type="time" />}

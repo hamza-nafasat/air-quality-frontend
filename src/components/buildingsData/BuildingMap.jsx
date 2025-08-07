@@ -113,7 +113,7 @@ const BuildingMap = ({ data, loading }) => {
     totalSensors: item.totalSensors,
     image: item.thumbnail?.url,
   }));
-  console.log('buildingsbuildingsbuildings', buildings);
+  // console.log('buildingsbuildingsbuildings', buildings);
 
   if (loading) {
     return (

@@ -48,7 +48,7 @@ const BuildingsData = () => {
 
   const { data, isLoading, error } = result;
 
-  console.log('data', data);
+  // console.log('data', data);
   const [dailyAverages, setDailyAverages] = useState([]);
 
   useEffect(() => {
@@ -71,7 +71,7 @@ const BuildingsData = () => {
     },
   ];
 
-  console.log('data:', seriesData);
+  // console.log('data:', seriesData);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
