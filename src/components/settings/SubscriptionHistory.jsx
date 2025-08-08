@@ -1,15 +1,15 @@
-import { useState } from "react";
-import Aside from "./Aside";
-import DataTable from "react-data-table-component";
+import { useState } from 'react';
+import Aside from './Aside';
+import DataTable from 'react-data-table-component';
 
-import { AiOutlineDownload } from "react-icons/ai";
-import { subscriptionHistoryData } from "../../data/data";
-import { useGetAllSubscriptionsQuery } from "../../redux/apis/subscriptionApis";
+import { AiOutlineDownload } from 'react-icons/ai';
+import { subscriptionHistoryData } from '../../data/data';
+import { useGetAllSubscriptionsQuery } from '../../redux/apis/subscriptionApis';
 
 const SubscriptionHistory = () => {
   const { data, isLoading, refetch } = useGetAllSubscriptionsQuery();
 
-  const [activeButton, setActiveButton] = useState("profile");
+  const [activeButton, setActiveButton] = useState('profile');
 
   const handleButtonClick = (buttonName) => {
     setActiveButton(buttonName);
@@ -17,21 +17,21 @@ const SubscriptionHistory = () => {
 
   const columns = [
     {
-      name: "Name",
-      selector: (row) => row.user.firstName + " " + row.user.lastName,
+      name: 'Name',
+      selector: (row) => row?.user?.firstName + ' ' + row?.user?.lastName,
     },
     {
-      name: "Plan",
+      name: 'Plan',
       selector: (row) => row?.plan,
     },
     {
-      name: "Status",
+      name: 'Status',
       cell: (row) =>
-        row.subscriptionStatus === "active" || row.subscriptionStatus === "trialing" ? (
+        row.subscriptionStatus === 'active' || row.subscriptionStatus === 'trialing' ? (
           <div className="bg-[#B2FFB0] rounded-[6px] text-sm w-[90px] h-8 grid place-items-center capitalize">
             {row.subscriptionStatus}
           </div>
-        ) : row.subscriptionStatus === "expired" ? (
+        ) : row.subscriptionStatus === 'expired' ? (
           <div className="bg-[#D3D3D3] rounded-[6px] text-sm w-[90px] h-8 grid place-items-center  capitalize">
             {row.subscriptionStatus}
           </div>
@@ -42,22 +42,22 @@ const SubscriptionHistory = () => {
         ),
     },
     {
-      name: "Last Updated",
+      name: 'Last Updated',
       selector: (row) =>
-        row?.updatedAt?.split("T")[0]?.split("-")[1] +
-        "/" +
-        row?.updatedAt?.split("T")[0]?.split("-")[2] +
-        "/" +
-        row?.updatedAt?.split("T")[0]?.split("-")[0],
+        row?.updatedAt?.split('T')[0]?.split('-')[1] +
+        '/' +
+        row?.updatedAt?.split('T')[0]?.split('-')[2] +
+        '/' +
+        row?.updatedAt?.split('T')[0]?.split('-')[0],
     },
     {
-      name: "CreatedAt",
+      name: 'CreatedAt',
       selector: (row) =>
-        row?.createdAt?.split("T")[0]?.split("-")[1] +
-        "/" +
-        row?.createdAt?.split("T")[0]?.split("-")[2] +
-        "/" +
-        row?.createdAt?.split("T")[0]?.split("-")[0],
+        row?.createdAt?.split('T')[0]?.split('-')[1] +
+        '/' +
+        row?.createdAt?.split('T')[0]?.split('-')[2] +
+        '/' +
+        row?.createdAt?.split('T')[0]?.split('-')[0],
     },
   ];
 
@@ -103,24 +103,24 @@ export default SubscriptionHistory;
 const tableStyles = {
   headCells: {
     style: {
-      fontSize: "16px",
+      fontSize: '16px',
       fontWeight: 600,
-      color: "rgba(17, 17, 17, 1)",
+      color: 'rgba(17, 17, 17, 1)',
     },
   },
   rows: {
     style: {
-      background: "rgba(123, 192, 247, 0.15)",
-      borderRadius: "6px",
-      padding: "14px 0",
-      margin: "10px 0",
-      borderBottomWidth: "0 !important",
+      background: 'rgba(123, 192, 247, 0.15)',
+      borderRadius: '6px',
+      padding: '14px 0',
+      margin: '10px 0',
+      borderBottomWidth: '0 !important',
     },
   },
   cells: {
     style: {
-      color: "rgba(17, 17, 17, 1)",
-      fontSize: "14px",
+      color: 'rgba(17, 17, 17, 1)',
+      fontSize: '14px',
     },
   },
 };

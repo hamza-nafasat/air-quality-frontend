@@ -299,7 +299,7 @@ export const planCards = [
     subtitle: 'Basic Plan',
 
     price: '49',
-    type: 'lifetime',
+    type: 'Every 3 years',
     featuresList: [
       'Manage up to 3 buildings',
       'Connect up to 10 sensors',

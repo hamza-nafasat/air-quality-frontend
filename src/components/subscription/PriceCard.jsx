@@ -1,12 +1,12 @@
 /* eslint-disable react/prop-types */
-import { GoDotFill } from "react-icons/go";
-import Button from "../shared/small/Button";
-import { getLocalizedPrice } from "../../utils/stripe";
-import { useState } from "react";
+import { GoDotFill } from 'react-icons/go';
+import Button from '../shared/small/Button';
+import { getLocalizedPrice } from '../../utils/stripe';
+import { useState } from 'react';
 
 const PriceCard = ({ card, onSelectPlan }) => {
   const [updatedPrice, setUpdatedPrice] = useState(`${card?.price} USD`);
-  getLocalizedPrice(`${card?.price}`, "USD").then((res) => {
+  getLocalizedPrice(`${card?.price}`, 'USD').then((res) => {
     setUpdatedPrice(`${res?.price} ${res?.currency}`);
   });
   return (

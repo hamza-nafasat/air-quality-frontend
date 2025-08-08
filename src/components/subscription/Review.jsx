@@ -1,11 +1,17 @@
 /* eslint-disable react/prop-types */
 import { FaMapMarkerAlt } from 'react-icons/fa';
 import { GoDotFill } from 'react-icons/go';
+import { useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 import Button from '../shared/small/Button';
 import getEnv from '../../config/config';
 import { stripePromise } from '../../utils/stripe';
+import { useGetCurrentSubscriptionQuery } from '../../redux/apis/subscriptionApis';
 
 const Review = ({ plan }) => {
+  const { user } = useSelector((state) => state.auth);
+  const { data: currentSubscription } = useGetCurrentSubscriptionQuery();
+  
   const totalAmount = parseFloat(plan.price.replace('$', ''));
   const taxAmount = totalAmount * (30 / 100);
   const flooredTax = Math.floor(taxAmount * 100) / 100;
@@ -15,6 +21,14 @@ const Review = ({ plan }) => {
 
   const makePaymentStripe = async (e) => {
     e.preventDefault();
+    
+    // Check if user already has an active subscription
+    if (currentSubscription?.data && 
+        ['active', 'trialing', 'past_due'].includes(currentSubscription.data.subscriptionStatus)) {
+      toast.warning('You already have an active subscription. Please cancel your current subscription first.');
+      return;
+    }
+
     try {
       const response = await fetch(`${getEnv('SERVER_URL')}/api/subscription/create-session`, {
         method: 'POST',
@@ -31,17 +45,40 @@ const Review = ({ plan }) => {
         const result = await stripe.redirectToCheckout({
           sessionId: data.sessionId,
         });
-        if (result?.error) console.error(result.error.message);
+        if (result?.error) {
+          console.error(result.error.message);
+          toast.error('Payment session failed to start');
+        }
       } else if (data?.redirect_url) {
         window.location.replace(data?.redirect_url);
-      } else console.error('Failed to retrieve session ID');
+      } else {
+        console.error('Failed to retrieve session ID');
+        toast.error('Failed to create payment session');
+      }
     } catch (error) {
       console.error('Error creating checkout session', error);
+      toast.error('Failed to create payment session');
     }
   };
 
+  // Show warning if user already has a subscription
+  const hasActiveSubscription = currentSubscription?.data && 
+    ['active', 'trialing', 'past_due'].includes(currentSubscription.data.subscriptionStatus);
+
   return (
     <div>
+      {hasActiveSubscription && (
+        <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+            <p className="text-yellow-800 text-sm">
+              You currently have an active {currentSubscription.data.plan} subscription. 
+              This new subscription will replace your current one.
+            </p>
+          </div>
+        </div>
+      )}
+
       <div className="mt-4 md:mt-5 bg-[white] p-4 md:p-6 grid grid-cols-1 lg:grid-cols-3 gap-4 rounded-lg">
         <div>
           <div className="flex items-center gap-2 text-[#03A5E0]">
@@ -90,7 +127,7 @@ const Review = ({ plan }) => {
       </div>
       <div className="flex justify-end mt-5">
         <Button
-          text="Confirm & Subscribe"
+          text={hasActiveSubscription ? "Upgrade Subscription" : "Confirm & Subscribe"}
           width="w-[160px] md:w-[268px]"
           onClick={makePaymentStripe}
         />
