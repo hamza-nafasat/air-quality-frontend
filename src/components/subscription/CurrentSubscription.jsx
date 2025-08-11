@@ -5,14 +5,17 @@ import { FaMapMarkerAlt, FaCalendarAlt, FaCreditCard } from 'react-icons/fa';
 import { GoDotFill } from 'react-icons/go';
 import Button from '../shared/small/Button';
 import Modal from '../shared/modal/Modal';
-import { useGetCurrentSubscriptionQuery, useCancelSubscriptionMutation } from '../../redux/apis/subscriptionApis';
+import {
+  useGetCurrentSubscriptionQuery,
+  useCancelSubscriptionMutation,
+} from '../../redux/apis/subscriptionApis';
 import { useGetMyProfileQuery } from '../../redux/apis/authApis';
 
 const CurrentSubscription = () => {
   const { user } = useSelector((state) => state.auth);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelAtPeriodEnd, setCancelAtPeriodEnd] = useState(true);
-  
+
   const { data: subscription, isLoading, refetch } = useGetCurrentSubscriptionQuery();
   const { refetch: refetchProfile } = useGetMyProfileQuery();
   const [cancelSubscription, { isLoading: isCanceling }] = useCancelSubscriptionMutation();
@@ -26,15 +29,15 @@ const CurrentSubscription = () => {
 
       await cancelSubscription({
         subscriptionId: subscription.data._id,
-        cancelAtPeriodEnd
+        cancelAtPeriodEnd,
       }).unwrap();
 
       toast.success(
-        cancelAtPeriodEnd 
+        cancelAtPeriodEnd
           ? 'Subscription will be canceled at the end of the current billing period'
           : 'Subscription canceled immediately'
       );
-      
+
       setShowCancelModal(false);
       refetch();
       refetchProfile();
@@ -43,6 +46,7 @@ const CurrentSubscription = () => {
       toast.error(error?.data?.message || 'Failed to cancel subscription');
     }
   };
+  console.log('subscription', subscription);
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -82,7 +86,7 @@ const CurrentSubscription = () => {
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
     });
   };
 
@@ -100,12 +104,7 @@ const CurrentSubscription = () => {
       <div className="text-center py-8">
         <h3 className="text-lg font-semibold text-gray-700 mb-2">Subscription Loading</h3>
         <p className="text-gray-500 mb-4">Loading your subscription details...</p>
-        <Button
-          text="Refresh"
-          onClick={() => refetch()}
-          bg="#03A5E0"
-          color="#fff"
-        />
+        <Button text="Refresh" onClick={() => refetch()} bg="#03A5E0" color="#fff" />
       </div>
     );
   }
@@ -117,7 +116,7 @@ const CurrentSubscription = () => {
         <p className="text-gray-500 mb-4">You don't have an active subscription at the moment.</p>
         <Button
           text="View Plans"
-          onClick={() => window.location.href = '/dashboard/subscription'}
+          onClick={() => (window.location.href = '/dashboard/subscription')}
           bg="#03A5E0"
           color="#fff"
         />
@@ -136,7 +135,11 @@ const CurrentSubscription = () => {
             <h2 className="text-xl font-semibold text-gray-800">Current Subscription</h2>
             <p className="text-gray-600">Manage your subscription details</p>
           </div>
-          <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(sub.subscriptionStatus)}`}>
+          <span
+            className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
+              sub.subscriptionStatus
+            )}`}
+          >
             {getStatusText(sub.subscriptionStatus)}
           </span>
         </div>
@@ -148,7 +151,7 @@ const CurrentSubscription = () => {
               <FaCreditCard className="text-lg" />
               <h3 className="font-semibold">Plan Details</h3>
             </div>
-            
+
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span className="text-gray-600">Plan:</span>
@@ -173,7 +176,7 @@ const CurrentSubscription = () => {
               <FaCalendarAlt className="text-lg" />
               <h3 className="font-semibold">Important Dates</h3>
             </div>
-            
+
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span className="text-gray-600">Start Date:</span>
@@ -221,59 +224,63 @@ const CurrentSubscription = () => {
       </div>
 
       {/* Cancel Subscription Modal */}
-      <Modal isOpen={showCancelModal} onClose={() => setShowCancelModal(false)}>
-        <div className="bg-white rounded-lg p-6 max-w-md mx-auto">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Cancel Subscription</h3>
-          
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <input
-                type="radio"
-                id="endOfPeriod"
-                checked={cancelAtPeriodEnd}
-                onChange={() => setCancelAtPeriodEnd(true)}
-                className="text-blue-600"
-              />
-              <label htmlFor="endOfPeriod" className="text-sm">
-                <div className="font-medium">Cancel at period end</div>
-                <div className="text-gray-600">Keep access until {formatDate(sub.subscriptionEndDate)}</div>
-              </label>
-            </div>
-            
-            <div className="flex items-center gap-3">
-              <input
-                type="radio"
-                id="immediate"
-                checked={!cancelAtPeriodEnd}
-                onChange={() => setCancelAtPeriodEnd(false)}
-                className="text-blue-600"
-              />
-              <label htmlFor="immediate" className="text-sm">
-                <div className="font-medium">Cancel immediately</div>
-                <div className="text-gray-600">Lose access right away</div>
-              </label>
-            </div>
-          </div>
+      {showCancelModal && (
+        <Modal isOpen={showCancelModal} onClose={() => setShowCancelModal(false)}>
+          <div className="bg-white rounded-lg p-6 max-w-md mx-auto">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">Cancel Subscription</h3>
 
-          <div className="flex gap-3 mt-6">
-            <Button
-              text="Keep Subscription"
-              onClick={() => setShowCancelModal(false)}
-              bg="#6b7280"
-              color="#fff"
-            />
-            <Button
-              text={isCanceling ? "Canceling..." : "Confirm Cancel"}
-              onClick={handleCancelSubscription}
-              disabled={isCanceling}
-              bg="#dc2626"
-              color="#fff"
-            />
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <input
+                  type="radio"
+                  id="endOfPeriod"
+                  checked={cancelAtPeriodEnd}
+                  onChange={() => setCancelAtPeriodEnd(true)}
+                  className="text-blue-600"
+                />
+                <label htmlFor="endOfPeriod" className="text-sm">
+                  <div className="font-medium">Cancel at period end</div>
+                  <div className="text-gray-600">
+                    Keep access until {formatDate(sub.subscriptionEndDate)}
+                  </div>
+                </label>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <input
+                  type="radio"
+                  id="immediate"
+                  checked={!cancelAtPeriodEnd}
+                  onChange={() => setCancelAtPeriodEnd(false)}
+                  className="text-blue-600"
+                />
+                <label htmlFor="immediate" className="text-sm">
+                  <div className="font-medium">Cancel immediately</div>
+                  <div className="text-gray-600">Lose access right away</div>
+                </label>
+              </div>
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <Button
+                text="Keep Subscription"
+                onClick={() => setShowCancelModal(false)}
+                bg="#6b7280"
+                color="#fff"
+              />
+              <Button
+                text={isCanceling ? 'Canceling...' : 'Confirm Cancel'}
+                onClick={handleCancelSubscription}
+                disabled={isCanceling}
+                bg="#dc2626"
+                color="#fff"
+              />
+            </div>
           </div>
-        </div>
-      </Modal>
+        </Modal>
+      )}
     </div>
   );
 };
 
-export default CurrentSubscription; 
+export default CurrentSubscription;
