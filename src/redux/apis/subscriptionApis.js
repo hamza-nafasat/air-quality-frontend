@@ -7,6 +7,7 @@ const subscriptionsApis = createApi({
     baseUrl: `${getEnv('SERVER_URL')}/api/subscription`,
     credentials: 'include',
   }),
+  tagTypes: ['Subscription'],
 
   endpoints: (builder) => ({
     getAllSubscriptions: builder.query({
@@ -14,30 +15,53 @@ const subscriptionsApis = createApi({
         url: '/all',
         method: 'GET',
       }),
+      providesTags: ['Subscription'],
     }),
-    
-    // Get current user's subscription - using the all endpoint and filtering
+
+    // Get current user's subscription - properly implemented
     getCurrentSubscription: builder.query({
       query: () => ({
-        url: '/all',
+        url: '/current',
         method: 'GET',
       }),
-      transformResponse: (response, meta, arg) => {
-        // Filter to get only the current user's subscription
-        if (response?.data && Array.isArray(response.data)) {
-          // Since we don't have user info in the response, we'll return the first active subscription
-          // In a real implementation, you'd want to filter by user ID
-          const currentSubscription = response.data.find(sub => 
-            sub.subscriptionStatus === 'active' || 
-            sub.subscriptionStatus === 'trialing' ||
-            sub.subscriptionStatus === 'past_due'
-          );
-          return { data: currentSubscription || null };
+      providesTags: ['Subscription'],
+      transformResponse: (response) => {
+        // Handle both successful response and no subscription cases
+        if (response && response.success && response.data) {
+          return {
+            success: true,
+            data: response.data,
+          };
         }
-        return { data: null };
+
+        // If no subscription found or error, return null data
+        return {
+          success: response?.success || false,
+          data: null,
+          message: response?.message || 'No subscription found',
+        };
       },
     }),
-    
+
+    // Get user subscription by ID (admin functionality)
+    getUserSubscription: builder.query({
+      query: (userId) => ({
+        url: `/user/${userId}`,
+        method: 'GET',
+      }),
+      providesTags: (result, error, userId) => [{ type: 'Subscription', id: userId }],
+    }),
+
+    // Create subscription session
+    createSubscriptionSession: builder.mutation({
+      query: (planData) => ({
+        url: '/create-session',
+        method: 'POST',
+        body: planData,
+      }),
+      invalidatesTags: ['Subscription'],
+    }),
+
     // Cancel subscription
     cancelSubscription: builder.mutation({
       query: ({ subscriptionId, cancelAtPeriodEnd = true }) => ({
@@ -45,13 +69,69 @@ const subscriptionsApis = createApi({
         method: 'POST',
         body: { cancelAtPeriodEnd },
       }),
+      invalidatesTags: ['Subscription'],
+      transformResponse: (response) => {
+        return response;
+      },
+      transformErrorResponse: (response) => {
+        return {
+          message: response?.data?.message || 'Failed to cancel subscription',
+          status: response?.status,
+        };
+      },
+    }),
+
+    // Resume subscription (for scheduled cancellations)
+    resumeSubscription: builder.mutation({
+      query: ({ subscriptionId }) => ({
+        url: '/resume',
+        method: 'POST',
+        body: { subscriptionId },
+      }),
+      invalidatesTags: ['Subscription'],
+    }),
+
+    // Get subscription history
+    getSubscriptionHistory: builder.query({
+      query: () => ({
+        url: '/history',
+        method: 'GET',
+      }),
+      providesTags: ['Subscription'],
+    }),
+
+    // Update subscription (change plan)
+    updateSubscription: builder.mutation({
+      query: ({ subscriptionId, newPlanType }) => ({
+        url: '/update',
+        method: 'PUT',
+        body: { subscriptionId, newPlanType },
+      }),
+      invalidatesTags: ['Subscription'],
+    }),
+
+    // Check subscription status
+    checkSubscriptionStatus: builder.query({
+      query: () => ({
+        url: '/status',
+        method: 'GET',
+      }),
+      providesTags: ['Subscription'],
     }),
   }),
 });
 
-export const { 
-  useGetAllSubscriptionsQuery, 
+export const {
+  useGetAllSubscriptionsQuery,
   useGetCurrentSubscriptionQuery,
-  useCancelSubscriptionMutation 
+  useGetUserSubscriptionQuery,
+  useCreateSubscriptionSessionMutation,
+  useCancelSubscriptionMutation,
+  useResumeSubscriptionMutation,
+  useGetSubscriptionHistoryQuery,
+  useUpdateSubscriptionMutation,
+  useCheckSubscriptionStatusQuery,
 } = subscriptionsApis;
+
 export default subscriptionsApis;
+// createSubscriptionSession:

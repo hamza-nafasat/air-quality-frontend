@@ -10,6 +10,7 @@ const Subscription = () => {
   const { user } = useSelector((state) => state.auth);
   const [isTabActive, setIsActiveTab] = useState('current');
   const [selectedPlan, setSelectedPlan] = useState(null);
+  console.log('selectedPlan', selectedPlan);
 
   const tabsHandler = (tab) => {
     setIsActiveTab(tab);

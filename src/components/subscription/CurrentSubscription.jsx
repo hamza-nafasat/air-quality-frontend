@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { FaMapMarkerAlt, FaCalendarAlt, FaCreditCard } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaCalendarAlt, FaCreditCard, FaCrown } from 'react-icons/fa';
 import { GoDotFill } from 'react-icons/go';
 import Button from '../shared/small/Button';
 import Modal from '../shared/modal/Modal';
 import {
   useGetCurrentSubscriptionQuery,
   useCancelSubscriptionMutation,
+  useGetUserSubscriptionQuery,
 } from '../../redux/apis/subscriptionApis';
 import { useGetMyProfileQuery } from '../../redux/apis/authApis';
 
@@ -17,13 +18,21 @@ const CurrentSubscription = () => {
   const [cancelAtPeriodEnd, setCancelAtPeriodEnd] = useState(true);
 
   const { data: subscription, isLoading, refetch } = useGetCurrentSubscriptionQuery();
+  const { data: serSubscription } = useGetUserSubscriptionQuery();
   const { refetch: refetchProfile } = useGetMyProfileQuery();
   const [cancelSubscription, { isLoading: isCanceling }] = useCancelSubscriptionMutation();
+  console.log('serSubscription', serSubscription);
 
   const handleCancelSubscription = async () => {
     try {
       if (!subscription?.data?._id) {
         toast.error('No subscription found to cancel');
+        return;
+      }
+
+      // Check if it's a lifetime plan - shouldn't be cancelable
+      if (subscription.data.plan === 'one-off') {
+        toast.error('Lifetime plans cannot be canceled');
         return;
       }
 
@@ -46,9 +55,11 @@ const CurrentSubscription = () => {
       toast.error(error?.data?.message || 'Failed to cancel subscription');
     }
   };
-  console.log('subscription', subscription);
 
-  const getStatusColor = (status) => {
+  const getStatusColor = (status, plan) => {
+    if (plan === 'one-off') {
+      return 'bg-purple-100 text-purple-800';
+    }
     switch (status) {
       case 'active':
       case 'trialing':
@@ -63,7 +74,10 @@ const CurrentSubscription = () => {
     }
   };
 
-  const getStatusText = (status) => {
+  const getStatusText = (status, plan) => {
+    if (plan === 'one-off') {
+      return 'Lifetime Access';
+    }
     switch (status) {
       case 'active':
         return 'Active';
@@ -80,6 +94,19 @@ const CurrentSubscription = () => {
     }
   };
 
+  const getPlanDisplayName = (plan) => {
+    switch (plan) {
+      case 'monthly':
+        return 'Monthly';
+      case 'yearly':
+        return 'Yearly';
+      case 'one-off':
+        return 'Lifetime';
+      default:
+        return plan;
+    }
+  };
+
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
     const date = new Date(dateString);
@@ -89,6 +116,9 @@ const CurrentSubscription = () => {
       day: 'numeric',
     });
   };
+
+  const isLifetimePlan = (plan) => plan === 'one-off';
+  const isRecurringPlan = (plan) => ['monthly', 'yearly'].includes(plan);
 
   if (isLoading) {
     return (
@@ -125,6 +155,7 @@ const CurrentSubscription = () => {
   }
 
   const sub = subscription.data;
+  const isLifetime = isLifetimePlan(sub.plan);
 
   return (
     <div className="space-y-6">
@@ -132,15 +163,21 @@ const CurrentSubscription = () => {
       <div className="bg-white rounded-lg shadow-md p-6">
         <div className="flex justify-between items-start mb-4">
           <div>
-            <h2 className="text-xl font-semibold text-gray-800">Current Subscription</h2>
-            <p className="text-gray-600">Manage your subscription details</p>
+            <div className="flex items-center gap-2">
+              <h2 className="text-xl font-semibold text-gray-800">Current Subscription</h2>
+              {isLifetime && <FaCrown className="text-purple-500 text-lg" />}
+            </div>
+            <p className="text-gray-600">
+              {isLifetime ? 'Your lifetime access details' : 'Manage your subscription details'}
+            </p>
           </div>
           <span
             className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
-              sub.subscriptionStatus
+              sub.subscriptionStatus,
+              sub.plan
             )}`}
           >
-            {getStatusText(sub.subscriptionStatus)}
+            {getStatusText(sub.subscriptionStatus, sub.plan)}
           </span>
         </div>
 
@@ -155,13 +192,21 @@ const CurrentSubscription = () => {
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span className="text-gray-600">Plan:</span>
-                <span className="font-medium capitalize">{sub.plan}</span>
+                <span className="font-medium">{getPlanDisplayName(sub.plan)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Subscription ID:</span>
+                <span className="text-gray-600">
+                  {isLifetime ? 'Purchase ID:' : 'Subscription ID:'}
+                </span>
                 <span className="font-mono text-sm">{sub.stripeSubscriptionId?.slice(-8)}</span>
               </div>
-              {sub.isTrial && (
+              {isLifetime && (
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Access:</span>
+                  <span className="font-medium text-purple-600">Unlimited</span>
+                </div>
+              )}
+              {sub.isTrial && !isLifetime && (
                 <div className="flex justify-between">
                   <span className="text-gray-600">Trial Period:</span>
                   <span className="font-medium text-green-600">Active</span>
@@ -174,28 +219,44 @@ const CurrentSubscription = () => {
           <div className="space-y-4">
             <div className="flex items-center gap-2 text-blue-600">
               <FaCalendarAlt className="text-lg" />
-              <h3 className="font-semibold">Important Dates</h3>
+              <h3 className="font-semibold">{isLifetime ? 'Purchase Date' : 'Important Dates'}</h3>
             </div>
 
             <div className="space-y-2">
               <div className="flex justify-between">
-                <span className="text-gray-600">Start Date:</span>
+                <span className="text-gray-600">
+                  {isLifetime ? 'Purchase Date:' : 'Start Date:'}
+                </span>
                 <span className="font-medium">{formatDate(sub.subscriptionStartDate)}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">End Date:</span>
-                <span className="font-medium">{formatDate(sub.subscriptionEndDate)}</span>
-              </div>
-              {sub.trialStartDate && (
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Trial Start:</span>
-                  <span className="font-medium">{formatDate(sub.trialStartDate)}</span>
-                </div>
+
+              {!isLifetime && (
+                <>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">
+                      {sub.plan === 'yearly' ? 'Renewal Date:' : 'Next Billing:'}
+                    </span>
+                    <span className="font-medium">{formatDate(sub.subscriptionEndDate)}</span>
+                  </div>
+                  {sub.trialStartDate && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Trial Start:</span>
+                      <span className="font-medium">{formatDate(sub.trialStartDate)}</span>
+                    </div>
+                  )}
+                  {sub.trialEndDate && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Trial End:</span>
+                      <span className="font-medium">{formatDate(sub.trialEndDate)}</span>
+                    </div>
+                  )}
+                </>
               )}
-              {sub.trialEndDate && (
+
+              {isLifetime && (
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Trial End:</span>
-                  <span className="font-medium">{formatDate(sub.trialEndDate)}</span>
+                  <span className="text-gray-600">Status:</span>
+                  <span className="font-medium text-purple-600">No Expiration</span>
                 </div>
               )}
             </div>
@@ -204,27 +265,58 @@ const CurrentSubscription = () => {
 
         {/* Action Buttons */}
         <div className="flex flex-wrap gap-3 mt-6 pt-4 border-t">
-          <Button
-            text="Manage Billing"
-            onClick={() => {
-              // This would redirect to Stripe billing portal
-              // You can implement this by creating a billing portal session
-              toast.info('Billing portal feature coming soon');
-            }}
-            bg="#03A5E0"
-            color="#fff"
-          />
-          <Button
-            text="Cancel Subscription"
-            onClick={() => setShowCancelModal(true)}
-            bg="#dc2626"
-            color="#fff"
-          />
+          {!isLifetime && (
+            <Button
+              text="Manage Billing"
+              onClick={() => {
+                // This would redirect to Stripe billing portal
+                toast.info('Billing portal feature coming soon');
+              }}
+              bg="#03A5E0"
+              color="#fff"
+            />
+          )}
+
+          {isRecurringPlan(sub.plan) && (
+            <Button
+              text="Cancel Subscription"
+              onClick={() => setShowCancelModal(true)}
+              bg="#dc2626"
+              color="#fff"
+            />
+          )}
+
+          {isLifetime && (
+            <Button
+              text="Download Invoice"
+              onClick={() => {
+                toast.info('Invoice download feature coming soon');
+              }}
+              bg="#6b7280"
+              color="#fff"
+            />
+          )}
         </div>
+
+        {/* Lifetime Plan Benefits */}
+        {isLifetime && (
+          <div className="mt-6 pt-4 border-t bg-purple-50 rounded-lg p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <FaCrown className="text-purple-500" />
+              <h4 className="font-semibold text-purple-800">Lifetime Benefits</h4>
+            </div>
+            <ul className="text-sm text-purple-700 space-y-1">
+              <li>• No recurring charges - ever!</li>
+              <li>• Access to all current and future features</li>
+              <li>• Priority customer support</li>
+              <li>• No renewal reminders or billing hassles</li>
+            </ul>
+          </div>
+        )}
       </div>
 
-      {/* Cancel Subscription Modal */}
-      {showCancelModal && (
+      {/* Cancel Subscription Modal - Only for recurring plans */}
+      {showCancelModal && !isLifetime && (
         <Modal isOpen={showCancelModal} onClose={() => setShowCancelModal(false)}>
           <div className="bg-white rounded-lg p-6 max-w-md mx-auto">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">Cancel Subscription</h3>
