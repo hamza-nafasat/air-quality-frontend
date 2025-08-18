@@ -1,15 +1,16 @@
-import { useEffect, useRef, useState } from "react";
-import { FaChevronDown } from "react-icons/fa";
-import { IoIosArrowForward, IoIosLogOut } from "react-icons/io";
-import { IoMenuOutline } from "react-icons/io5";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import profilePic from "../../../assets/images/header/profilepic.png";
-import NotificationIcon from "../../../assets/svgs/pages/NotificationIcon";
-import { useLogoutMutation } from "../../../redux/apis/authApis";
-import Aside from "../aside/Aside";
-import { useDispatch } from "react-redux";
-import { userNotExist } from "../../../redux/slices/authSlice";
+import { useEffect, useRef, useState } from 'react';
+import { FaChevronDown } from 'react-icons/fa';
+import { IoIosArrowForward, IoIosLogOut } from 'react-icons/io';
+import { IoMenuOutline } from 'react-icons/io5';
+import { Link, useLocation, useNavigate, useRoutes } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import profilePic from '../../../assets/images/header/profilepic.png';
+import NotificationIcon from '../../../assets/svgs/pages/NotificationIcon';
+import { useLogoutMutation } from '../../../redux/apis/authApis';
+import Aside from '../aside/Aside';
+import { useDispatch } from 'react-redux';
+import { userNotExist } from '../../../redux/slices/authSlice';
+import Button from '../../shared/small/Button';
 
 const Header = () => {
   const navigate = useNavigate();
@@ -20,8 +21,8 @@ const Header = () => {
   const profileRef = useRef();
   const notificationRef = useRef();
   const location = useLocation();
-  const pathname = location.pathname.split("/");
-  const path = pathname[pathname.length - 1].replaceAll("-", " ");
+  const pathname = location.pathname.split('/');
+  const path = pathname[pathname.length - 1].replaceAll('-', ' ');
   const [logout, { isLoading }] = useLogoutMutation();
 
   const mobileNavHandler = () => setMobileNav(!mobileNav);
@@ -39,15 +40,15 @@ const Header = () => {
   const logoutHandler = async () => {
     try {
       const response = await logout().unwrap();
-      console.log("response while logout ", response);
+      console.log('response while logout ', response);
       if (response?.success) {
-        toast.success("Logout Successfully");
+        toast.success('Logout Successfully');
         await dispatch(userNotExist());
-        return navigate("/login");
+        return navigate('/login');
       }
     } catch (error) {
-      console.log("Error while logout", error);
-      toast.error(error?.data?.message || "Error while logout");
+      console.log('Error while logout', error);
+      toast.error(error?.data?.message || 'Error while logout');
     }
   };
 
@@ -63,9 +64,9 @@ const Header = () => {
         setNotificationActive(false);
       }
     };
-    document.addEventListener("click", handleClickOutside);
+    document.addEventListener('click', handleClickOutside);
     return () => {
-      document.removeEventListener("click", handleClickOutside);
+      document.removeEventListener('click', handleClickOutside);
     };
   }, [profileRef, notificationRef]);
 
@@ -79,7 +80,11 @@ const Header = () => {
           {/* profile and notification */}
           <div className="flex items-center gap-2 md:gap-4">
             <div className="relative">
-              <div className="cursor-pointer" onClick={() => handleNotification()} ref={notificationRef}>
+              <div
+                className="cursor-pointer"
+                onClick={() => handleNotification()}
+                ref={notificationRef}
+              >
                 <NotificationIcon />
               </div>
               <div className="absolute top-[0px] right-[0px] bg-primary-lightBlue rounded-full w-[18px] h-[18px] text-white grid place-items-center text-[10px] font-medium border-2 border-white">
@@ -105,7 +110,7 @@ const Header = () => {
                   <div className="absolute top-[50px] right-0 bg-white shadow-md rounded-lg w-[150px] z-10 border">
                     <Link
                       className="flex items-center justify-between px-3 py-2 border-b"
-                      to={"/dashboard/profile"}
+                      to={'/dashboard/profile'}
                       onClick={() => setProfileActive(false)}
                     >
                       Profile
@@ -113,7 +118,7 @@ const Header = () => {
                     </Link>
                     <div
                       className={`flex cursor-pointer items-center justify-between px-3 py-2 cursor-pointer1${
-                        isLoading ? " opacity-50 cursor-not-allowed" : ""
+                        isLoading ? ' opacity-50 cursor-not-allowed' : ''
                       } `}
                       onClick={logoutHandler}
                     >
@@ -131,7 +136,7 @@ const Header = () => {
             </div>
           </div>
         </div>
-        {pathname[2] === "building-view" ? (
+        {pathname[2] === 'building-view' ? (
           <p></p>
         ) : (
           <h2 className="text-sm sm:text-md md:text-lg font-medium sm:font-semibold md:font-bold text-white uppercase truncate">
@@ -141,13 +146,13 @@ const Header = () => {
       </div>
       <div
         className={`fixed inset-0 w-full h-full bg-[#000000b9] z-50 transition-all duration-500 ${
-          mobileNav ? "opacity-100" : "opacity-0 pointer-events-none"
+          mobileNav ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
         onClick={() => setMobileNav(false)}
       >
         <div
           className={`absolute top-3 left-3 h-full transition-transform duration-500 ease-in-out ${
-            mobileNav ? "translate-x-0" : "-translate-x-full"
+            mobileNav ? 'translate-x-0' : '-translate-x-full'
           }`}
         >
           <Aside />
@@ -162,87 +167,100 @@ export default Header;
 const notificationLists = [
   {
     userProfile: profilePic,
-    title: "Exceeded Time Limit",
-    message: "Visitor stayed too long.",
-    time: "2m",
+    title: 'Exceeded Time Limit',
+    message: 'Visitor stayed too long.',
+    time: '2m',
   },
   {
     userProfile: profilePic,
-    title: "Exceeded Time Limit",
-    message: "Visitor stayed too long.",
-    time: "2m",
+    title: 'Exceeded Time Limit',
+    message: 'Visitor stayed too long.',
+    time: '2m',
   },
   {
     userProfile: profilePic,
-    title: "Exceeded Time Limit",
-    message: "Visitor stayed too long.",
-    time: "2m",
+    title: 'Exceeded Time Limit',
+    message: 'Visitor stayed too long.',
+    time: '2m',
   },
   {
     userProfile: profilePic,
-    title: "Exceeded Time Limit",
-    message: "Visitor stayed too long.",
-    time: "2m",
+    title: 'Exceeded Time Limit',
+    message: 'Visitor stayed too long.',
+    time: '2m',
   },
   {
     userProfile: profilePic,
-    title: "Vehicle Misuse Detected",
-    message: "Unauthorized vehicle use.",
-    time: "5m",
+    title: 'Vehicle Misuse Detected',
+    message: 'Unauthorized vehicle use.',
+    time: '5m',
   },
   {
     userProfile: profilePic,
-    title: "Lost Smart Badge",
-    message: "Badge reported missing.",
-    time: "10m",
+    title: 'Lost Smart Badge',
+    message: 'Badge reported missing.',
+    time: '10m',
   },
   {
     userProfile: profilePic,
-    title: "System Alert Triggered",
-    message: "Sensor detected issue.",
-    time: "15m",
+    title: 'System Alert Triggered',
+    message: 'Sensor detected issue.',
+    time: '15m',
   },
   {
     userProfile: profilePic,
-    title: "Motion Detected Alert",
-    message: "Unexpected motion seen.",
-    time: "20m",
+    title: 'Motion Detected Alert',
+    message: 'Unexpected motion seen.',
+    time: '20m',
   },
   {
     userProfile: profilePic,
-    title: "Low Battery Warning",
-    message: "Replace battery soon.",
-    time: "25m",
+    title: 'Low Battery Warning',
+    message: 'Replace battery soon.',
+    time: '25m',
   },
 ];
 
 const Notifications = () => {
+  const navigate = useNavigate();
+  const allNotificationHandle = () => {
+    navigate('/dashboard/notifications');
+  };
   return (
-    <div>
-      <h3 className="text-base md:text-md text-primary-lightBlue font-semibold px-3 pt-3 pb-2 border-b sticky top-0 left-0 bg-white">
-        Notifications
-      </h3>
-      <div className="mt-1">
-        {notificationLists.length > 0 ? (
-          notificationLists?.map((notification, i) => (
-            <div key={i} className="border-b py-1 px-2 flex items-center justify-between gap-1 cursor-pointer">
-              <div className="flex items-center gap-1">
-                <img
-                  src={notification.userProfile}
-                  alt="profile"
-                  className="w-[25px] h-[25px] object-cover rounded-full"
-                />
-                <div>
-                  <h3 className="text-xs font-medium">{notification.title}</h3>
-                  <p className="text-[10px] text-[#00000099]">{notification.message}</p>
+    <div className="relative">
+      <div>
+        <h3 className="text-base md:text-md text-primary-lightBlue font-semibold px-3 pt-3 pb-2 border-b sticky top-0 left-0 bg-white">
+          Notifications
+        </h3>
+        <div className="mt-1">
+          {notificationLists.length > 0 ? (
+            notificationLists?.map((notification, i) => (
+              <div
+                key={i}
+                className="border-b py-1 px-2 flex items-center justify-between gap-1 cursor-pointer"
+              >
+                <div className="flex items-center gap-1">
+                  <img
+                    src={notification.userProfile}
+                    alt="profile"
+                    className="w-[25px] h-[25px] object-cover rounded-full"
+                  />
+                  <div>
+                    <h3 className="text-xs font-medium">{notification.title}</h3>
+                    <p className="text-[10px] text-[#00000099]">{notification.message}</p>
+                  </div>
                 </div>
+                <p className="text-[#00000099] text-[10px]">{notification.time}</p>
               </div>
-              <p className="text-[#00000099] text-[10px]">{notification.time}</p>
-            </div>
-          ))
-        ) : (
-          <p className="p-3 text-sm text-center">No notifications yet!</p>
-        )}
+            ))
+          ) : (
+            <p className="p-3 text-sm text-center">No notifications yet!</p>
+          )}
+        </div>
+      </div>
+
+      <div className="text-base md:text-md text-primary-lightBlue font-semibold px-3 pt-3 pb-2 border-b sticky bottom-0 left-0 bg-white">
+        <Button text={'See all'} onClick={allNotificationHandle} />
       </div>
     </div>
   );

@@ -1,41 +1,42 @@
-import "leaflet-draw/dist/leaflet.draw.css";
-import "leaflet/dist/leaflet.css";
-import { lazy, Suspense, useEffect, useState } from "react";
-import "react-confirm-alert/src/react-confirm-alert.css";
-import { useDispatch, useSelector } from "react-redux";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import "slick-carousel/slick/slick-theme.css";
-import "slick-carousel/slick/slick.css";
-import EditBuilding from "./components/buildings/EditBuilding";
-import BuildingView from "./components/buildingsData/buildingView/BuildingView";
-import FloorView from "./components/buildingsData/floorView/FloorView";
-import ProtectedRoute from "./components/ProtectedRoutes";
-import ChangePassword from "./components/settings/ChangePassword";
-import Configuration from "./components/settings/Configuration";
-import SubscriptionHistory from "./components/settings/SubscriptionHistory";
-import AuthBg from "./components/shared/large/AuthBg";
-import Loader from "./components/shared/small/Loader";
-import ScrollToTop from "./components/shared/small/ScrollToTop";
-import AlertType from "./pages/dashboard/alerts";
-import Profile from "./pages/dashboard/profile/Profile";
-import Subscription from "./pages/dashboard/subscription/Subscription";
-import { useGetMyProfileFirstTimeMutation } from "./redux/apis/authApis";
-import { userExist, userNotExist } from "./redux/slices/authSlice";
-import FloorEdit from "./components/buildingsData/floorEdit/FloorEdit";
-import AddFloor from "./components/buildingsData/addFloor/AddFloor";
+import 'leaflet-draw/dist/leaflet.draw.css';
+import 'leaflet/dist/leaflet.css';
+import { lazy, Suspense, useEffect, useState } from 'react';
+import 'react-confirm-alert/src/react-confirm-alert.css';
+import { useDispatch, useSelector } from 'react-redux';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import 'slick-carousel/slick/slick-theme.css';
+import 'slick-carousel/slick/slick.css';
+import EditBuilding from './components/buildings/EditBuilding';
+import BuildingView from './components/buildingsData/buildingView/BuildingView';
+import FloorView from './components/buildingsData/floorView/FloorView';
+import ProtectedRoute from './components/ProtectedRoutes';
+import ChangePassword from './components/settings/ChangePassword';
+import Configuration from './components/settings/Configuration';
+import SubscriptionHistory from './components/settings/SubscriptionHistory';
+import AuthBg from './components/shared/large/AuthBg';
+import Loader from './components/shared/small/Loader';
+import ScrollToTop from './components/shared/small/ScrollToTop';
+import AlertType from './pages/dashboard/alerts';
+import Profile from './pages/dashboard/profile/Profile';
+import Subscription from './pages/dashboard/subscription/Subscription';
+import { useGetMyProfileFirstTimeMutation } from './redux/apis/authApis';
+import { userExist, userNotExist } from './redux/slices/authSlice';
+import FloorEdit from './components/buildingsData/floorEdit/FloorEdit';
+import AddFloor from './components/buildingsData/addFloor/AddFloor';
+import Notifications from './pages/dashboard/notifications/Notifications';
 
-const Dashboard = lazy(() => import("./pages/dashboard/index"));
-const Buildings = lazy(() => import("./pages/dashboard/buildings/Buildings"));
-const Devices = lazy(() => import("./pages/dashboard/devices/Devices"));
-const Reports = lazy(() => import("./pages/dashboard/reports/Reports"));
-const Sensors = lazy(() => import("./pages/dashboard/sensors/Sensors"));
-const SensorDetail = lazy(() => import("./pages/dashboard/sensors/SensorDetail"));
-const Settings = lazy(() => import("./pages/dashboard/settings/Settings"));
-const Login = lazy(() => import("./pages/auth/Login"));
-const ForgetPassword = lazy(() => import("./pages/auth/ForgetPassword"));
-const SignUp = lazy(() => import("./pages/auth/SignUp"));
-const ResetPassword = lazy(() => import("./pages/auth/ResetPassword"));
-const BuildingStepper = lazy(() => import("./components/buildings/BuildingStepper"));
+const Dashboard = lazy(() => import('./pages/dashboard/index'));
+const Buildings = lazy(() => import('./pages/dashboard/buildings/Buildings'));
+const Devices = lazy(() => import('./pages/dashboard/devices/Devices'));
+const Reports = lazy(() => import('./pages/dashboard/reports/Reports'));
+const Sensors = lazy(() => import('./pages/dashboard/sensors/Sensors'));
+const SensorDetail = lazy(() => import('./pages/dashboard/sensors/SensorDetail'));
+const Settings = lazy(() => import('./pages/dashboard/settings/Settings'));
+const Login = lazy(() => import('./pages/auth/Login'));
+const ForgetPassword = lazy(() => import('./pages/auth/ForgetPassword'));
+const SignUp = lazy(() => import('./pages/auth/SignUp'));
+const ResetPassword = lazy(() => import('./pages/auth/ResetPassword'));
+const BuildingStepper = lazy(() => import('./components/buildings/BuildingStepper'));
 
 function App() {
   const dispatch = useDispatch();
@@ -101,6 +102,7 @@ function App() {
             <Route path="configuration" element={<Configuration />} />
             <Route path="change-password" element={<ChangePassword />} />
             <Route path="profile" element={<Profile />} />
+            <Route path="notifications" element={<Notifications />} />
           </Route>
         </Routes>
       </BrowserRouter>
