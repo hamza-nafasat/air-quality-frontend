@@ -27,9 +27,11 @@ const Login = () => {
       if (response?.success) {
         dispatch(userExist(response?.data));
         socket.connect();
+        socket.on('connect', () => {
+          console.log('✅ [Frontend] Connected to server via socket:', socket.id);
+          socket.emit('register', response?.data?._id);
+        });
 
-        // Send user ID to register socket
-        socket.emit('register', response?.data?._id);
         toast.success(response?.message);
         return navigate('/dashboard');
       }

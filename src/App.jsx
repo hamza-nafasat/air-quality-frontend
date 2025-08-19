@@ -24,6 +24,8 @@ import { userExist, userNotExist } from './redux/slices/authSlice';
 import FloorEdit from './components/buildingsData/floorEdit/FloorEdit';
 import AddFloor from './components/buildingsData/addFloor/AddFloor';
 import Notifications from './pages/dashboard/notifications/Notifications';
+import { socket } from './sockets/socket';
+import { toast } from 'react-toastify';
 
 const Dashboard = lazy(() => import('./pages/dashboard/index'));
 const Buildings = lazy(() => import('./pages/dashboard/buildings/Buildings'));
@@ -54,6 +56,38 @@ function App() {
       })
       .finally(() => setLoading(false));
   }, [getUserProfile, dispatch]);
+
+  // ✅ Listen for socket notifications once
+  useEffect(() => {
+    const handleNotification = (notification) => {
+      console.log('🔔 [Frontend] New notification received:', notification);
+
+      toast.info(
+        notification.message
+        //   , {
+        //   position: 'top-right',
+        //   autoClose: 5000,
+        //   hideProgressBar: false,
+        //   closeOnClick: true,
+        //   pauseOnHover: true,
+        //   draggable: true,
+        //   theme: 'colored',
+        // }
+      );
+    };
+
+    socket.on('new-notification', handleNotification);
+
+    return () => {
+      socket.off('new-notification', handleNotification);
+    };
+  }, []);
+  // socket.on('new-notification', (notification) => {
+  //   console.log('🔔 [Frontend] New notification received:', notification);
+  //   toast.info();
+  //   // you can show toast here
+  //   // toast.info(notification.message);
+  // });
 
   return loading ? (
     <Loader />
