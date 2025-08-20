@@ -1,30 +1,3 @@
-// import { io } from 'socket.io-client';
-// import getEnv from '../../config/config.js';
-
-// // const baseUrl = getEnv('SERVER_URL');
-
-// // export const socket = io(baseUrl, {
-// //   autoConnect: false, // connect manually after login
-// // });
-
-// const baseUrl = getEnv('SERVER_URL');
-
-// export const socket = io(baseUrl, {
-//   autoConnect: false,
-// });
-
-// socket.on('connect', () => {
-//   console.log('✅ [Frontend] Connected to server via socket:', socket.id);
-// });
-
-// socket.on('disconnect', (reason) => {
-//   console.log('❌ [Frontend] Disconnected from server:', reason);
-// });
-
-// socket.on('connect_error', (err) => {
-//   console.error('🚨 [Frontend] Socket connection error:', err.message);
-// });
-
 import { io } from 'socket.io-client';
 import getEnv from '../config/config';
 // import getEnv from '../../config/config.js'; // adjust path

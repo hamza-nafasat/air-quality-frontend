@@ -58,30 +58,130 @@ function App() {
   }, [getUserProfile, dispatch]);
 
   // ✅ Listen for socket notifications once
-  useEffect(() => {
-    const handleNotification = (notification) => {
-      console.log('🔔 [Frontend] New notification received:', notification);
+  // useEffect(() => {
+  //   const handleNotification = (notification) => {
+  //     console.log('🔔 [Frontend] New notification received:', notification);
 
-      toast.info(
-        notification.message
-        //   , {
-        //   position: 'top-right',
-        //   autoClose: 5000,
-        //   hideProgressBar: false,
-        //   closeOnClick: true,
-        //   pauseOnHover: true,
-        //   draggable: true,
-        //   theme: 'colored',
-        // }
-      );
+  //     toast.info(
+  //       notification.message
+  //       //   , {
+  //       //   position: 'top-right',
+  //       //   autoClose: 5000,
+  //       //   hideProgressBar: false,
+  //       //   closeOnClick: true,
+  //       //   pauseOnHover: true,
+  //       //   draggable: true,
+  //       //   theme: 'colored',
+  //       // }
+  //     );
+  //   };
+
+  //   socket.on('new-notification', handleNotification);
+
+  //   return () => {
+  //     socket.off('new-notification', handleNotification);
+  //   };
+  // }, []);
+  // useEffect(() => {
+  //   if (user?._id) {
+  //     // ✅ Only connect if logged in
+  //     socket.auth = { userId: user._id }; // optional: pass userId in auth
+  //     socket.connect();
+
+  //     socket.on('connect', () => {
+  //       console.log('✅ [Frontend] Connected:', socket.id);
+  //       socket.emit('register', user._id); // tell backend who you are
+  //     });
+  //   } else {
+  //     // ✅ Disconnect when user logs out
+  //     if (socket.connected) {
+  //       socket.disconnect();
+  //       console.log('❌ [Frontend] Socket disconnected on logout');
+  //     }
+  //   }
+
+  //   // Cleanup listeners on dependency change
+  //   return () => {
+  //     socket.off('connect');
+  //   };
+  // }, [user]);
+
+  // useEffect(() => {
+  //   const handleNotification = (notification) => {
+  //     console.log('🔔 [Frontend] New notification received:', notification);
+
+  //     if (notification.severity === 'high') {
+  //       toast.error(
+  //         notification.message
+
+  //       );
+  //     } else if (notification.severity === 'low') {
+  //       toast.warning(
+  //         notification.message
+
+  //       );
+  //     } else {
+  //       toast.info(
+  //         notification.message
+
+  //       );
+  //     }
+  //   };
+
+  //   socket.on('new-notification', handleNotification);
+
+  //   return () => {
+  //     socket.off('new-notification', handleNotification);
+  //   };
+  // }, []);
+  useEffect(() => {
+    if (!user?._id) {
+      // Disconnect if logged out
+      if (socket.connected) {
+        socket.disconnect();
+        console.log('❌ [Frontend] Socket disconnected on logout');
+      }
+      return; // exit early
+    }
+
+    // Attach userId and connect
+    if (!socket.connected) {
+      socket.auth = { userId: user._id };
+      socket.connect();
+    }
+
+    // ✅ Handlers
+    const handleConnect = () => {
+      console.log('✅ [Frontend] Connected:', socket.id);
+      socket.emit('register', user._id);
     };
 
+    const handleNotification = (notification) => {
+      console.log('🔔 [Frontend] New notification:', notification);
+
+      switch (notification.severity) {
+        case 'high':
+          toast.error(notification.message);
+          break;
+        case 'low':
+          toast.warning(notification.message);
+          break;
+        default:
+          toast.info(notification.message);
+      }
+    };
+
+    // Attach listeners once
+    socket.on('connect', handleConnect);
     socket.on('new-notification', handleNotification);
 
+    // ✅ Cleanup when user changes or component unmounts
     return () => {
+      socket.off('connect', handleConnect);
       socket.off('new-notification', handleNotification);
     };
-  }, []);
+  }, [user]);
+
   // socket.on('new-notification', (notification) => {
   //   console.log('🔔 [Frontend] New notification received:', notification);
   //   toast.info();

@@ -8,9 +8,12 @@ import profilePic from '../../../assets/images/header/profilepic.png';
 import NotificationIcon from '../../../assets/svgs/pages/NotificationIcon';
 import { useLogoutMutation } from '../../../redux/apis/authApis';
 import Aside from '../aside/Aside';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { userNotExist } from '../../../redux/slices/authSlice';
 import Button from '../../shared/small/Button';
+import { useGetNotificationsByUserQuery } from '../../../redux/apis/notificationApis';
+import { BiSolidError } from 'react-icons/bi';
+import { RiErrorWarningFill } from 'react-icons/ri';
 
 const Header = () => {
   const navigate = useNavigate();
@@ -222,29 +225,44 @@ const notificationLists = [
 ];
 
 const Notifications = () => {
+  const { user } = useSelector((state) => state.auth);
+  const userID = user?._id;
+
+  const { data: response, isLoading } = useGetNotificationsByUserQuery(userID);
+  const notification = response?.data?.slice(0, 10) || [];
+
   const navigate = useNavigate();
   const allNotificationHandle = () => {
     navigate('/dashboard/notifications');
   };
+
   return (
     <div className="relative">
       <div>
         <h3 className="text-base md:text-md text-primary-lightBlue font-semibold px-3 pt-3 pb-2 border-b sticky top-0 left-0 bg-white">
           Notifications
         </h3>
+
         <div className="mt-1">
-          {notificationLists.length > 0 ? (
-            notificationLists?.map((notification, i) => (
+          {/* ✅ Loading State */}
+          {isLoading ? (
+            <div className="flex justify-center items-center p-6">
+              <div className="w-6 h-6 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
+            </div>
+          ) : notification.length > 0 ? (
+            notification.map((notification, i) => (
               <div
                 key={i}
                 className="border-b py-1 px-2 flex items-center justify-between gap-1 cursor-pointer"
               >
                 <div className="flex items-center gap-1">
-                  <img
-                    src={notification.userProfile}
-                    alt="profile"
-                    className="w-[25px] h-[25px] object-cover rounded-full"
-                  />
+                  <div>
+                    {notification.severity === 'high' ? (
+                      <RiErrorWarningFill className="text-red-500" />
+                    ) : (
+                      <BiSolidError className="text-yellow-400" />
+                    )}
+                  </div>
                   <div>
                     <h3 className="text-xs font-medium">{notification.title}</h3>
                     <p className="text-[10px] text-[#00000099]">{notification.message}</p>
