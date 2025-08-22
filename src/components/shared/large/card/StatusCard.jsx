@@ -77,6 +77,7 @@
 // };
 
 const StatusCard = ({ icon, type, status, from, progressIcon }) => {
+  
   return (
     <div
       className="min-w-[182px] p-4 bg-[white] text-black rounded-[16px] flex flex-col justify-center min-h-[131px] 

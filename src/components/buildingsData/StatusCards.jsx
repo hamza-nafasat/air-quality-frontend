@@ -197,6 +197,7 @@ const iconMap = {
 
 const StatusCards = ({ data }) => {
   const currentParameterValue = data?.allBuildingsSensorsAverageData;
+console.log("currentParameterValue",currentParameterValue);
 
   const isLoading = !currentParameterValue || currentParameterValue.length === 0;
 
@@ -231,7 +232,7 @@ const StatusCards = ({ data }) => {
     };
   });
 
-  // console.log('updatedSensorsData', updatedSensorsData);
+  console.log('updatedSensorsData', updatedSensorsData);
 
   if (isLoading) {
     return (

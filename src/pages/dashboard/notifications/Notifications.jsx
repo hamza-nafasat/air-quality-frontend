@@ -25,7 +25,17 @@ const Notifications = () => {
 
   const [updateNotification] = useUpdateNotificationMutation();
   const [deleteNotification] = useDeleteNotificationMutation();
+  function splitByDictionary(str) {
+    const dictionary = ['RULE', 'ENGINE', 'ALERT', 'MAIN']; // add more words here
+    let result = str;
 
+    dictionary.forEach((word) => {
+      result = result.replace(new RegExp(word, 'g'), ' ' + word + ' ');
+    });
+
+    // Clean extra spaces
+    return result.trim().replace(/\s+/g, ' ');
+  }
   // 👉 Columns definition for DataTable
   const columns = useMemo(
     () => [
@@ -49,6 +59,13 @@ const Notifications = () => {
             {row.severity.toUpperCase()}
           </span>
         ),
+      },
+      {
+        name: 'Origin',
+        selector: (row) => row.severity,
+        sortable: true,
+        width: '180px',
+        cell: (row) => <span className={`px-2 py-1 `}>{row.alert_source.toUpperCase()}</span>,
       },
       {
         name: 'Message',
