@@ -1,31 +1,31 @@
 /* eslint-disable react/prop-types */
-import { useEffect, useState } from "react";
-import BrowseFile from "../shared/large/BrowseFile";
-import TextField from "../shared/small/TextField";
-import Button from "../shared/small/Button";
-import Dropdown from "../shared/small/Dropdown";
-import { useDispatch, useSelector } from "react-redux";
-import { toast } from "react-toastify";
-import { setBuildingData } from "../../redux/slices/buildingSlice";
+import { useEffect, useState } from 'react';
+import BrowseFile from '../shared/large/BrowseFile';
+import TextField from '../shared/small/TextField';
+import Button from '../shared/small/Button';
+import Dropdown from '../shared/small/Dropdown';
+import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
+import { setBuildingData } from '../../redux/slices/buildingSlice';
 
 const buildingTypesOptions = [
-  { option: "Residential", value: "residential" },
-  { option: "Commercial", value: "commercial" },
-  { option: "Religious", value: "religious" },
-  { option: "Educational", value: "educational" },
-  { option: "Industrial", value: "industrial" },
-  { option: "Hospitality", value: "hospitality" },
-  { option: "Other", value: "other" },
+  { option: 'Residential', value: 'residential' },
+  { option: 'Commercial', value: 'commercial' },
+  { option: 'Religious', value: 'religious' },
+  { option: 'Educational', value: 'educational' },
+  { option: 'Industrial', value: 'industrial' },
+  { option: 'Hospitality', value: 'hospitality' },
+  { option: 'Other', value: 'other' },
 ];
 
 const GeneralInfo = ({ setCurrentStep }) => {
   const dispatch = useDispatch();
 
-  const [name, setName] = useState("");
-  const [type, setType] = useState("");
-  const [area, setArea] = useState("");
+  const [name, setName] = useState('');
+  const [type, setType] = useState('');
+  const [area, setArea] = useState('');
   const [floorsCount, setFloorsCount] = useState(1);
-  const [address, setAddress] = useState("");
+  const [address, setAddress] = useState('');
   const [thumbnail, setThumbnail] = useState(null);
   const [thumbnailPreview, setThumbNailPreview] = useState(null);
 
@@ -33,7 +33,7 @@ const GeneralInfo = ({ setCurrentStep }) => {
 
   const submitHandler = () => {
     if (!thumbnail || !thumbnailPreview || !name || !type || !area || !address || !floorsCount)
-      return toast.error("Please Enter all Fields");
+      return toast.error('Please Enter all Fields');
     dispatch(
       setBuildingData({
         ...buildingData,
@@ -62,13 +62,24 @@ const GeneralInfo = ({ setCurrentStep }) => {
   return (
     <div>
       <h3 className="text-sm md:text-base font-semibold text-[rgba(6,6,6,0.8)]">General Info</h3>
-      <BrowseFile setFile={setThumbnail} previewValue={thumbnailPreview} setPreviewValue={setThumbNailPreview} />
+      <BrowseFile
+        setFile={setThumbnail}
+        previewValue={thumbnailPreview}
+        setPreviewValue={setThumbNailPreview}
+      />
       <form className="mt-4 grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
         <div className="lg:col-span-6">
-          <TextField type="text" value={name} placeholder="Building Name" onChange={(e) => setName(e.target.value)} />
+          <TextField
+            label={'Building Name'}
+            type="text"
+            value={name}
+            placeholder="Building Name"
+            onChange={(e) => setName(e.target.value)}
+          />
         </div>
         <div className="lg:col-span-6">
           <Dropdown
+            label={'Building Type'}
             value={type}
             defaultText="Building Type"
             options={buildingTypesOptions}
@@ -76,10 +87,17 @@ const GeneralInfo = ({ setCurrentStep }) => {
           />
         </div>
         <div className="lg:col-span-6">
-          <TextField type="text" value={area} placeholder="Area (Sq Ft)" onChange={(e) => setArea(e.target.value)} />
+          <TextField
+            label={'Area'}
+            type="text"
+            value={area}
+            placeholder="Area (Sq Ft)"
+            onChange={(e) => setArea(e.target.value)}
+          />
         </div>
         <div className="lg:col-span-6">
           <TextField
+            label={'floors count'}
             type="number"
             value={floorsCount}
             placeholder="Floors Count"
@@ -87,7 +105,13 @@ const GeneralInfo = ({ setCurrentStep }) => {
           />
         </div>
         <div className="lg:col-span-6">
-          <TextField type="text" value={address} placeholder="Address" onChange={(e) => setAddress(e.target.value)} />
+          <TextField
+            label={'Address'}
+            type="text"
+            value={address}
+            placeholder="Address"
+            onChange={(e) => setAddress(e.target.value)}
+          />
         </div>
         <div className="lg:col-span-12 flex justify-end">
           <div className="flex items-center gap-4">

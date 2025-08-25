@@ -458,6 +458,7 @@
 // };
 
 // export default ShowCanvasData;
+
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../shared/small/Button';
@@ -476,72 +477,52 @@ const convertHexToRgba = (hex, opacity) => {
 };
 
 // Function to get heatmap gradient colors based on temperature
-const getHeatmapColor = (tempValue) => {
-  if (typeof tempValue !== 'number') return 'rgba(200,200,200,0.6)'; // gray for invalid
 
-  // Create gradient colors similar to your RingMeter but as rgba
-  if (tempValue >= 40) return 'rgba(220, 38, 127, 0.7)'; // hot pink/red
-  if (tempValue >= 35) return 'rgba(239, 68, 68, 0.7)'; // red-600
-  if (tempValue >= 30) return 'rgba(249, 115, 22, 0.7)'; // orange-500
-  if (tempValue >= 25) return 'rgba(234, 179, 8, 0.7)'; // yellow-400
-  if (tempValue >= 20) return 'rgba(163, 230, 53, 0.7)'; // lime-400
-  if (tempValue >= 15) return 'rgba(74, 222, 128, 0.7)'; // green-400
-  if (tempValue >= 10) return 'rgba(34, 197, 94, 0.7)'; // green-500
-  return 'rgba(21, 128, 61, 0.7)'; // green-700 for very cold
-};
-
-// Function to create gradient fill
-const createGradientFill = (ctx, centerX, centerY, radius, tempValue) => {
+// Function to create gradient fill based on level: 'Low' | 'Medium' | 'High'
+// For 'Medium', if baseColor is provided (e.g., polygon.color), use it as the gradient color
+const createGradientFill = (ctx, centerX, centerY, radius, level, baseColor) => {
   const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
 
-  if (typeof tempValue !== 'number') {
-    gradient.addColorStop(0, 'rgba(200,200,200,0.6)');
-    gradient.addColorStop(0.7, 'rgba(180,180,180,0.25)');
-    gradient.addColorStop(1, 'rgba(150,150,150,0)');
-    return gradient;
-  }
+  const levels = {
+    Low: ['rgba(59, 130, 246, 0.6)', 'rgba(59, 130, 246, 0.25)', 'rgba(59, 130, 246, 0)'],
+    Medium: ['rgba(34, 197, 94, 0.6)', 'rgba(34, 197, 94, 0.25)', 'rgba(34, 197, 94, 0)'],
+    High: ['rgba(239, 68, 68, 0.6)', 'rgba(239, 68, 68, 0.25)', 'rgba(239, 68, 68, 0)'],
+  };
 
-  // Create heat gradient from center to edge
-  if (tempValue >= 40) {
-    gradient.addColorStop(0, 'rgba(220, 38, 127, 0.7)');
-    gradient.addColorStop(0.6, 'rgba(239, 68, 68, 0.5)');
-    gradient.addColorStop(1, 'rgba(249, 115, 22, 0)');
-  } else if (tempValue >= 35) {
-    gradient.addColorStop(0, 'rgba(239, 68, 68, 0.6)');
-    gradient.addColorStop(0.6, 'rgba(249, 115, 22, 0.45)');
-    gradient.addColorStop(1, 'rgba(234, 179, 8, 0)');
-  } else if (tempValue >= 30) {
-    gradient.addColorStop(0, 'rgba(249, 115, 22, 0.55)');
-    gradient.addColorStop(0.6, 'rgba(234, 179, 8, 0.4)');
-    gradient.addColorStop(1, 'rgba(163, 230, 53, 0)');
-  } else if (tempValue >= 25) {
-    gradient.addColorStop(0, 'rgba(234, 179, 8, 0.5)');
-    gradient.addColorStop(0.6, 'rgba(163, 230, 53, 0.35)');
-    gradient.addColorStop(1, 'rgba(74, 222, 128, 0)');
-  } else if (tempValue >= 20) {
-    gradient.addColorStop(0, 'rgba(163, 230, 53, 0.45)');
-    gradient.addColorStop(0.6, 'rgba(74, 222, 128, 0.35)');
-    gradient.addColorStop(1, 'rgba(34, 197, 94, 0)');
+  let c0;
+  let c1;
+  let c2;
+  if (level === 'Medium' && baseColor) {
+    // Use polygon-specific color for Medium level, fading to transparent
+    try {
+      c0 = convertHexToRgba(baseColor, 0.6);
+      c1 = convertHexToRgba(baseColor, 0.25);
+      c2 = convertHexToRgba(baseColor, 0.0);
+    } catch (e) {
+      [c0, c1, c2] = levels.Medium;
+    }
   } else {
-    gradient.addColorStop(0, 'rgba(74, 222, 128, 0.4)');
-    gradient.addColorStop(0.6, 'rgba(34, 197, 94, 0.3)');
-    gradient.addColorStop(1, 'rgba(21, 128, 61, 0)');
+    [c0, c1, c2] = levels[level] || levels.Medium;
   }
-
+  gradient.addColorStop(0, c0);
+  gradient.addColorStop(0.6, c1);
+  // subtle warm halo for heatmap feel near the outer edge
+  gradient.addColorStop(0.85, 'rgba(250, 204, 21, 0.18)');
+  gradient.addColorStop(1, c2);
   return gradient;
 };
 
 // Helper function to generate random destructured/irregular shapes
-const generateRandomShape = (basePolygon, tempValue) => {
+const generateRandomShape = (basePolygon) => {
   // Calculate center point of the original polygon
   const centerX =
     basePolygon.points.reduce((sum, point) => sum + point.x, 0) / basePolygon.points.length;
   const centerY =
     basePolygon.points.reduce((sum, point) => sum + point.y, 0) / basePolygon.points.length;
 
-  // Base size influenced by temperature (hotter = larger) with more randomness
-  const baseSize = 100 + (tempValue || 0) * 2;
-  const randomSize = baseSize + Math.random() * 30;
+  // Fixed size for all shapes
+  const fixedDiameter = 200; // px
+  const randomSize = fixedDiameter;
 
   // Create random number of points (between 5-12 for irregular shapes)
   const numPoints = Math.floor(Math.random() * 9) + 16; // 16-24 points for smoother outline
@@ -552,7 +533,7 @@ const generateRandomShape = (basePolygon, tempValue) => {
     const angle = i * (360 / numPoints) * (Math.PI / 180);
 
     // Add significant randomness to radius and angle for destructured look
-    const radiusVariation = 0.6 + Math.random() * 0.4; // 60% to 100% of base radius for less spikiness
+    const radiusVariation = 0.6 + Math.random() * 0.5; // 60% to 100% of base radius for less spikiness
     const radius = (randomSize / 2) * radiusVariation;
 
     // Add angle variation for more organic/destructured shape
@@ -560,8 +541,8 @@ const generateRandomShape = (basePolygon, tempValue) => {
     const finalAngle = angle + angleVariation;
 
     // Add some noise to make it more irregular
-    const noiseX = (Math.random() - 0.5) * 6;
-    const noiseY = (Math.random() - 0.5) * 6;
+    const noiseX = (Math.random() - 0.5) * 4;
+    const noiseY = (Math.random() - 0.5) * 4;
 
     points.push({
       x: centerX + radius * Math.cos(finalAngle) + noiseX,
@@ -579,7 +560,7 @@ const generateRandomShape = (basePolygon, tempValue) => {
 };
 
 // Helper function to draw irregular shapes with gradient
-const drawIrregularShape = (ctx, shape, tempValue, strokeColor) => {
+const drawIrregularShape = (ctx, shape, level, strokeColor) => {
   if (shape.points.length < 3) return;
 
   ctx.beginPath();
@@ -601,7 +582,14 @@ const drawIrregularShape = (ctx, shape, tempValue, strokeColor) => {
   ctx.closePath();
 
   // Create and apply gradient fill
-  const gradient = createGradientFill(ctx, shape.centerX, shape.centerY, shape.radius, tempValue);
+  const gradient = createGradientFill(
+    ctx,
+    shape.centerX,
+    shape.centerY,
+    shape.radius,
+    level,
+    strokeColor
+  );
   ctx.save();
   ctx.lineJoin = 'round';
   ctx.lineCap = 'round';
@@ -617,6 +605,44 @@ const drawIrregularShape = (ctx, shape, tempValue, strokeColor) => {
   ctx.fillStyle = gradient;
   ctx.fill();
   ctx.globalAlpha = 1;
+  ctx.restore();
+
+  // Optional: small white hot core for High to mimic heat concentration
+  if (level === 'High') {
+    ctx.save();
+    ctx.filter = 'blur(6px)';
+    const core = ctx.createRadialGradient(
+      shape.centerX,
+      shape.centerY,
+      0,
+      shape.centerX,
+      shape.centerY,
+      Math.max(8, shape.radius * 0.35)
+    );
+    core.addColorStop(0, 'rgba(255,255,255,0.55)');
+    core.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = core;
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // Add a warm outer halo using screen blend for a heatmap glow
+  ctx.save();
+  ctx.globalCompositeOperation = 'screen';
+  ctx.filter = 'blur(20px)';
+  const halo = ctx.createRadialGradient(
+    shape.centerX,
+    shape.centerY,
+    Math.max(0, shape.radius * 0.55),
+    shape.centerX,
+    shape.centerY,
+    shape.radius * 1.15
+  );
+  halo.addColorStop(0, 'rgba(0,0,0,0)');
+  halo.addColorStop(0.7, 'rgba(250, 204, 21, 0.18)');
+  halo.addColorStop(1, 'rgba(250, 204, 21, 0)');
+  ctx.fillStyle = halo;
+  ctx.fill();
   ctx.restore();
 };
 
@@ -656,99 +682,492 @@ const ShowCanvasData = ({ image, polygons, view, heatmap = false, data = [] }) =
     }
   };
 
+  // useEffect(() => {
+  //   const canvas = canvasRef.current;
+  //   if (!canvas) return;
+
+  //   const ctx = canvas.getContext('2d');
+
+  //   // Clear the canvas and draw the image as background
+  //   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  //   const img = new Image();
+  //   img.onload = () => {
+  //     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+  //     if (heatmap) {
+  //       // Use normal blending so colors remain visible
+  //       const previousComposite = ctx.globalCompositeOperation;
+  //       ctx.globalCompositeOperation = 'source-over';
+
+  //       // ✅ Priority order
+  //       const priority = ['temperature', 'co2', 'humidity', 'tvoc', 'co', 'ch'];
+
+  //       polygons.forEach((polygon) => {
+  //         if (!polygon || !polygon.points) return;
+
+  //         // ✅ Pick first available parameter based on priority
+  //         let selectedParam = null;
+  //         let selectedValue = null;
+
+  //         if (polygon.sensorAttached?.latestValues?.length) {
+  //           for (const param of priority) {
+  //             const match = polygon.sensorAttached.latestValues.find(
+  //               (val) => val.parameter.toLowerCase() === param
+  //             );
+  //             if (match) {
+  //               selectedParam = param;
+  //               selectedValue = match.value;
+  //               break;
+  //             }
+  //           }
+  //         }
+
+  //         if (!selectedParam) return; // skip if polygon has none of the priority sensors
+
+  //         // Generate random irregular shape
+  //         const randomShape = generateRandomShape(polygon, selectedValue);
+
+  //         // Draw the irregular shape with gradient
+  //         drawIrregularShape(ctx, randomShape, selectedValue, polygon.color);
+
+  //         // Click detection for irregular shapes
+  //         canvas.addEventListener('click', (e) => {
+  //           const rect = canvas.getBoundingClientRect();
+  //           const mouseX = e.clientX - rect.left;
+  //           const mouseY = e.clientY - rect.top;
+
+  //           ctx.beginPath();
+  //           ctx.moveTo(randomShape.points[0].x, randomShape.points[0].y);
+  //           randomShape.points.forEach((point) => ctx.lineTo(point.x, point.y));
+  //           ctx.closePath();
+  //           const isInside = ctx.isPointInPath(mouseX, mouseY);
+
+  //           if (isInside) {
+  //             setSelectedPolygon(polygon);
+
+  //             // Position popup at shape center
+  //             const padding = 10;
+  //             setPopupPosition({
+  //               top: randomShape.centerY + padding,
+  //               left: randomShape.centerX + padding,
+  //             });
+  //           }
+  //         });
+
+  //         // ✅ Label with ID + parameter + value
+  //         const labelX = randomShape.centerX;
+  //         const labelY = randomShape.centerY - 15;
+
+  //         if (labelX && labelY) {
+  //           const padding = 4;
+  //           const text = `${polygon.id} (${selectedParam}: ${selectedValue ?? 'N/A'})`;
+  //           ctx.font = 'bold 11px Arial';
+  //           const textWidth = ctx.measureText(text).width;
+  //           const textHeight = 12;
+  //           const boxWidth = textWidth + padding * 2;
+  //           const boxHeight = textHeight + padding * 2;
+  //           const boxX = labelX - boxWidth / 2;
+  //           const boxY = labelY - textHeight - padding;
+
+  //           // Draw label box background with slight transparency
+  //           ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+  //           ctx.beginPath();
+  //           ctx.roundRect(boxX, boxY, boxWidth, boxHeight, 3);
+  //           ctx.fill();
+
+  //           // Border
+  //           ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
+  //           ctx.lineWidth = 1;
+  //           ctx.stroke();
+
+  //           // Text
+  //           ctx.fillStyle = '#0f172a';
+  //           ctx.fillText(text, boxX + padding, boxY + padding + textHeight - 2);
+  //         }
+  //       });
+
+  //       // Restore default blending
+  //       ctx.globalCompositeOperation = previousComposite;
+  //     } else {
+  //       // Draw normal polygons
+  //       polygons.forEach((polygon) => {
+  //         if (!polygon || !polygon.points) return;
+
+  //         ctx.beginPath();
+  //         ctx.moveTo(polygon.points[0].x, polygon.points[0].y);
+  //         polygon.points.forEach((point) => ctx.lineTo(point.x, point.y));
+  //         ctx.closePath();
+
+  //         // Fill polygon
+  //         ctx.fillStyle = polygon.fillColor
+  //           ? convertHexToRgba(polygon.fillColor, 0.5)
+  //           : 'rgba(255, 255, 255, 0.5)';
+  //         ctx.fill();
+
+  //         // Border
+  //         ctx.strokeStyle = polygon.color || '#000000';
+  //         ctx.lineWidth = 2;
+  //         ctx.stroke();
+
+  //         // Click detection
+  //         canvas.addEventListener('click', (e) => handlePolygonClick(e, polygon));
+
+  //         // Label
+  //         const labelX = polygon.points[0]?.x;
+  //         const labelY = polygon.points[0]?.y - 10;
+  //         if (labelX && labelY) {
+  //           const padding = 5;
+  //           const text = polygon.id;
+  //           ctx.font = '12px Arial';
+  //           const textWidth = ctx.measureText(text).width;
+  //           const textHeight = 14;
+  //           const boxWidth = textWidth + padding * 2;
+  //           const boxHeight = textHeight + padding * 2;
+  //           const boxX = labelX - padding;
+  //           const boxY = labelY - textHeight - padding;
+
+  //           ctx.fillStyle = '#FFFFFF';
+  //           ctx.beginPath();
+  //           ctx.moveTo(boxX + 4, boxY);
+  //           ctx.arcTo(boxX + boxWidth, boxY, boxX + boxWidth, boxY + boxHeight, 4);
+  //           ctx.arcTo(boxX + boxWidth, boxY + boxHeight, boxX, boxY + boxHeight, 4);
+  //           ctx.arcTo(boxX, boxY + boxHeight, boxX, boxY, 4);
+  //           ctx.arcTo(boxX, boxY, boxX + boxWidth, boxY, 4);
+  //           ctx.closePath();
+  //           ctx.fill();
+
+  //           ctx.fillStyle = '#000000';
+  //           ctx.fillText(text, boxX + padding, boxY + padding + textHeight - 4);
+  //         }
+  //       });
+  //     }
+  //   };
+  //   img.src = image;
+
+  //   return () => {
+  //     canvas.removeEventListener('click', handlePolygonClick);
+  //   };
+  // }, [image, polygons, heatmap]);
+  // useEffect(() => {
+  //   const canvas = canvasRef.current;
+  //   if (!canvas) return;
+
+  //   const ctx = canvas.getContext('2d');
+
+  //   // Clear and reset canvas
+  //   ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  //   const img = new Image();
+  //   img.onload = () => {
+  //     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+  //     if (heatmap) {
+  //       const previousComposite = ctx.globalCompositeOperation;
+  //       ctx.globalCompositeOperation = 'source-over';
+
+  //       const priority = ['temperature', 'co2', 'humidity', 'tvoc', 'co', 'ch'];
+  //       const labels = []; // store label info here
+
+  //       // --- PASS 1: draw all shapes ---
+  //       polygons.forEach((polygon) => {
+  //         if (!polygon || !polygon.points) return;
+
+  //         let selectedParam = null;
+  //         let selectedValue = null;
+
+  //         if (polygon.sensorAttached?.latestValues?.length) {
+  //           for (const param of priority) {
+  //             const match = polygon.sensorAttached.latestValues.find(
+  //               (val) => val.parameter.toLowerCase() === param
+  //             );
+  //             if (match) {
+  //               selectedParam = param;
+  //               selectedValue = match.value;
+  //               break;
+  //             }
+  //           }
+  //         }
+
+  //         if (!selectedParam) return;
+
+  //         const randomShape = generateRandomShape(polygon, selectedValue);
+  //         drawIrregularShape(ctx, randomShape, selectedValue, polygon.color);
+
+  //         // save label info for pass 2
+  //         labels.push({
+  //           x: randomShape.centerX,
+  //           y: randomShape.centerY - 20,
+  //           text: `${polygon.id} (${selectedParam}: ${selectedValue ?? 'N/A'})`,
+  //         });
+
+  //         // click detection
+  //         canvas.addEventListener('click', (e) => {
+  //           const rect = canvas.getBoundingClientRect();
+  //           const mouseX = e.clientX - rect.left;
+  //           const mouseY = e.clientY - rect.top;
+
+  //           ctx.beginPath();
+  //           ctx.moveTo(randomShape.points[0].x, randomShape.points[0].y);
+  //           randomShape.points.forEach((p) => ctx.lineTo(p.x, p.y));
+  //           ctx.closePath();
+  //           if (ctx.isPointInPath(mouseX, mouseY)) {
+  //             setSelectedPolygon(polygon);
+  //             setPopupPosition({
+  //               top: randomShape.centerY + 10,
+  //               left: randomShape.centerX + 10,
+  //             });
+  //           }
+  //         });
+  //       });
+
+  //       // --- PASS 2: draw labels on top ---
+  //       labels.forEach(({ x, y, text }) => {
+  //         const padding = 4;
+  //         ctx.font = 'bold 11px Arial';
+  //         const textWidth = ctx.measureText(text).width;
+  //         const textHeight = 12;
+  //         const boxWidth = textWidth + padding * 2;
+  //         const boxHeight = textHeight + padding * 2;
+  //         const boxX = x - boxWidth / 2;
+  //         const boxY = y - textHeight - padding;
+
+  //         ctx.fillStyle = 'rgba(255,255,255,0.85)';
+  //         ctx.beginPath();
+  //         ctx.roundRect(boxX, boxY, boxWidth, boxHeight, 3);
+  //         ctx.fill();
+
+  //         ctx.strokeStyle = 'rgba(0,0,0,0.25)';
+  //         ctx.lineWidth = 1;
+  //         ctx.stroke();
+
+  //         ctx.fillStyle = '#0f172a';
+  //         ctx.fillText(text, boxX + padding, boxY + padding + textHeight - 2);
+  //       });
+
+  //       ctx.globalCompositeOperation = previousComposite;
+  //     } else {
+  //       // --- normal polygon drawing (unchanged) ---
+  //       polygons.forEach((polygon) => {
+  //         if (!polygon || !polygon.points) return;
+
+  //         ctx.beginPath();
+  //         ctx.moveTo(polygon.points[0].x, polygon.points[0].y);
+  //         polygon.points.forEach((point) => ctx.lineTo(point.x, point.y));
+  //         ctx.closePath();
+
+  //         ctx.fillStyle = polygon.fillColor
+  //           ? convertHexToRgba(polygon.fillColor, 0.5)
+  //           : 'rgba(255, 255, 255, 0.5)';
+  //         ctx.fill();
+
+  //         ctx.strokeStyle = polygon.color || '#000000';
+  //         ctx.lineWidth = 2;
+  //         ctx.stroke();
+
+  //         canvas.addEventListener('click', (e) => handlePolygonClick(e, polygon));
+
+  //         const labelX = polygon.points[0]?.x;
+  //         const labelY = polygon.points[0]?.y - 10;
+  //         if (labelX && labelY) {
+  //           const padding = 5;
+  //           const text = polygon.id;
+  //           ctx.font = '12px Arial';
+  //           const textWidth = ctx.measureText(text).width;
+  //           const textHeight = 14;
+  //           const boxWidth = textWidth + padding * 2;
+  //           const boxHeight = textHeight + padding * 2;
+  //           const boxX = labelX - padding;
+  //           const boxY = labelY - textHeight - padding;
+
+  //           ctx.fillStyle = '#FFFFFF';
+  //           ctx.beginPath();
+  //           ctx.moveTo(boxX + 4, boxY);
+  //           ctx.arcTo(boxX + boxWidth, boxY, boxX + boxWidth, boxY + boxHeight, 4);
+  //           ctx.arcTo(boxX + boxWidth, boxY + boxHeight, boxX, boxY + boxHeight, 4);
+  //           ctx.arcTo(boxX, boxY + boxHeight, boxX, boxY, 4);
+  //           ctx.arcTo(boxX, boxY, boxX + boxWidth, boxY, 4);
+  //           ctx.closePath();
+  //           ctx.fill();
+
+  //           ctx.fillStyle = '#000000';
+  //           ctx.fillText(text, boxX + padding, boxY + padding + textHeight - 4);
+  //         }
+  //       });
+  //     }
+  //   };
+
+  //   img.src = image;
+
+  //   return () => {
+  //     canvas.removeEventListener('click', handlePolygonClick);
+  //   };
+  // }, [image, polygons, heatmap]);
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
 
-    // Clear the canvas and draw the image as background
+    // Clear and reset canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
     const img = new Image();
     img.onload = () => {
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
       if (heatmap) {
-        // Use normal blending so colors remain visible
         const previousComposite = ctx.globalCompositeOperation;
         ctx.globalCompositeOperation = 'source-over';
-        polygons
-          .filter((polygon) =>
-            polygon?.sensorAttached?.latestValues?.some((val) => val.parameter === 'temperature')
-          )
-          .forEach((polygon) => {
-            if (!polygon || !polygon.points) return;
 
-            const tempValue = polygon.sensorAttached.latestValues.find(
-              (v) => v.parameter === 'temperature'
-            )?.value;
+        const priority = ['temperature', 'co2', 'humidity', 'tvoc', 'co', 'ch'];
+        const labels = []; // store label info here
 
-            // Generate random irregular shape
-            const randomShape = generateRandomShape(polygon, tempValue);
+        // helper: classify Low/Medium/High
+        // const classifyLevel = (param, value) => {
+        //   if (value == null) return 'N/A';
 
-            // Draw the irregular shape with gradient
-            drawIrregularShape(ctx, randomShape, tempValue, polygon.color);
+        //   switch (param) {
+        //     case 'temperature':
+        //       if (value < 20) return 'Low';
+        //       if (value < 30) return 'Medium';
+        //       return 'High';
+        //     case 'co2':
+        //       if (value < 800) return 'Low';
+        //       if (value < 1200) return 'Medium';
+        //       return 'High';
+        //     case 'humidity':
+        //       if (value < 30) return 'Low';
+        //       if (value < 60) return 'Medium';
+        //       return 'High';
+        //     default:
+        //       if (value < 50) return 'Low';
+        //       if (value < 100) return 'Medium';
+        //       return 'High';
+        //   }
+        // };
+        // helper: classify Low/Medium/High (HARD CODED RANGES)
+        const classifyLevel = (param, value) => {
+          if (value == null) return 'N/A';
 
-            // Click detection for irregular shapes
-            canvas.addEventListener('click', (e) => {
-              const rect = canvas.getBoundingClientRect();
-              const mouseX = e.clientX - rect.left;
-              const mouseY = e.clientY - rect.top;
+          switch (param) {
+            case 'temperature': // Celsius
+              if (value < 18) return 'Low'; // < 18°C
+              if (value <= 28) return 'Medium'; // 18–28°C
+              return 'High'; // > 28°C
 
-              // Check if click is within the irregular shape bounds
-              ctx.beginPath();
-              ctx.moveTo(randomShape.points[0].x, randomShape.points[0].y);
-              randomShape.points.forEach((point) => ctx.lineTo(point.x, point.y));
-              ctx.closePath();
-              const isInside = ctx.isPointInPath(mouseX, mouseY);
+            case 'co2': // ppm
+              if (value < 800) return 'Low'; // < 800 ppm
+              if (value <= 1200) return 'Medium'; // 800–1200 ppm
+              return 'High'; // > 1200 ppm
 
-              if (isInside) {
-                setSelectedPolygon(polygon);
+            case 'humidity': // %
+              if (value < 30) return 'Low'; // < 30%
+              if (value <= 60) return 'Medium'; // 30–60%
+              return 'High'; // > 60%
 
-                // Position popup at shape center
-                const padding = 10;
-                setPopupPosition({
-                  top: randomShape.centerY + padding,
-                  left: randomShape.centerX + padding,
-                });
+            case 'tvoc': // ppb
+              if (value < 200) return 'Low'; // < 200 ppb
+              if (value <= 600) return 'Medium'; // 200–600 ppb
+              return 'High'; // > 600 ppb
+
+            case 'co': // ppm
+              if (value < 5) return 'Low'; // < 5 ppm
+              if (value <= 9) return 'Medium'; // 5–9 ppm
+              return 'High'; // > 9 ppm
+
+            case 'ch': // ppm (methane or hydrocarbons)
+              if (value < 50) return 'Low'; // < 50 ppm
+              if (value <= 100) return 'Medium'; // 50–100 ppm
+              return 'High'; // > 100 ppm
+
+            default: // fallback
+              if (value < 50) return 'Low';
+              if (value <= 100) return 'Medium';
+              return 'High';
+          }
+        };
+
+        // --- PASS 1: draw all shapes ---
+        polygons.forEach((polygon) => {
+          if (!polygon || !polygon.points) return;
+
+          let selectedParam = null;
+          let selectedValue = null;
+
+          if (polygon.sensorAttached?.latestValues?.length) {
+            for (const param of priority) {
+              const match = polygon.sensorAttached.latestValues.find(
+                (val) => val.parameter.toLowerCase() === param
+              );
+              if (match) {
+                selectedParam = param;
+                selectedValue = match.value;
+                break;
               }
-            });
+            }
+          }
 
-            // Label with ID + temperature (positioned at shape center)
-            const labelX = randomShape.centerX;
-            const labelY = randomShape.centerY - 15;
+          if (!selectedParam) return;
 
-            if (labelX && labelY) {
-              const padding = 4;
-              const text = `${polygon.id} (${tempValue ?? 'N/A'}°C)`;
-              ctx.font = 'bold 11px Arial';
-              const textWidth = ctx.measureText(text).width;
-              const textHeight = 12;
-              const boxWidth = textWidth + padding * 2;
-              const boxHeight = textHeight + padding * 2;
-              const boxX = labelX - boxWidth / 2;
-              const boxY = labelY - textHeight - padding;
+          const randomShape = generateRandomShape(polygon);
+          const level = classifyLevel(selectedParam, selectedValue);
+          // pass polygon.color as base for Medium level gradient
+          drawIrregularShape(ctx, randomShape, level, polygon.color || '#22c55e');
 
-              // Draw label box background with slight transparency (so blob color shows)
-              ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
-              ctx.beginPath();
-              ctx.roundRect(boxX, boxY, boxWidth, boxHeight, 3);
-              ctx.fill();
+          // save label info for pass 2
+          labels.push({
+            x: randomShape.centerX,
+            y: randomShape.centerY - 20,
+            text: `${polygon.id} (${selectedParam}: ${selectedValue ?? 'N/A'}) - ${level}`,
+          });
 
-              // Add subtle border to label
-              ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
-              ctx.lineWidth = 1;
-              ctx.stroke();
+          // click detection
+          canvas.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
 
-              // Draw text with better contrast
-              ctx.fillStyle = '#0f172a';
-              ctx.fillText(text, boxX + padding, boxY + padding + textHeight - 2);
+            ctx.beginPath();
+            ctx.moveTo(randomShape.points[0].x, randomShape.points[0].y);
+            randomShape.points.forEach((p) => ctx.lineTo(p.x, p.y));
+            ctx.closePath();
+            if (ctx.isPointInPath(mouseX, mouseY)) {
+              setSelectedPolygon(polygon);
+              setPopupPosition({
+                top: randomShape.centerY + 10,
+                left: randomShape.centerX + 10,
+              });
             }
           });
-        // Restore default blending
+        });
+
+        // --- PASS 2: draw labels on top ---
+        labels.forEach(({ x, y, text }) => {
+          const padding = 4;
+          ctx.font = 'bold 11px Arial';
+          const textWidth = ctx.measureText(text).width;
+          const textHeight = 12;
+          const boxWidth = textWidth + padding * 2;
+          const boxHeight = textHeight + padding * 2;
+          const boxX = x - boxWidth / 2;
+          const boxY = y - textHeight - padding;
+
+          ctx.fillStyle = 'rgba(255,255,255,0.85)';
+          ctx.beginPath();
+          ctx.roundRect(boxX, boxY, boxWidth, boxHeight, 3);
+          ctx.fill();
+
+          ctx.strokeStyle = 'rgba(0,0,0,0.25)';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+
+          ctx.fillStyle = '#0f172a';
+          ctx.fillText(text, boxX + padding, boxY + padding + textHeight - 2);
+        });
+
         ctx.globalCompositeOperation = previousComposite;
       } else {
-        // Draw normal polygons
+        // --- normal polygon drawing (unchanged) ---
         polygons.forEach((polygon) => {
           if (!polygon || !polygon.points) return;
 
@@ -757,20 +1176,17 @@ const ShowCanvasData = ({ image, polygons, view, heatmap = false, data = [] }) =
           polygon.points.forEach((point) => ctx.lineTo(point.x, point.y));
           ctx.closePath();
 
-          // Fill polygon with a semi-transparent color
           ctx.fillStyle = polygon.fillColor
             ? convertHexToRgba(polygon.fillColor, 0.5)
             : 'rgba(255, 255, 255, 0.5)';
           ctx.fill();
 
-          // Draw border of the polygon
           ctx.strokeStyle = polygon.color || '#000000';
           ctx.lineWidth = 2;
           ctx.stroke();
-          // Add event listener for the polygon click detection
+
           canvas.addEventListener('click', (e) => handlePolygonClick(e, polygon));
 
-          // Draw label for the polygon (ID)
           const labelX = polygon.points[0]?.x;
           const labelY = polygon.points[0]?.y - 10;
           if (labelX && labelY) {
@@ -784,7 +1200,6 @@ const ShowCanvasData = ({ image, polygons, view, heatmap = false, data = [] }) =
             const boxX = labelX - padding;
             const boxY = labelY - textHeight - padding;
 
-            // Draw label box background
             ctx.fillStyle = '#FFFFFF';
             ctx.beginPath();
             ctx.moveTo(boxX + 4, boxY);
@@ -795,13 +1210,13 @@ const ShowCanvasData = ({ image, polygons, view, heatmap = false, data = [] }) =
             ctx.closePath();
             ctx.fill();
 
-            // Draw the polygon ID inside the label box
             ctx.fillStyle = '#000000';
             ctx.fillText(text, boxX + padding, boxY + padding + textHeight - 4);
           }
         });
       }
     };
+
     img.src = image;
 
     return () => {

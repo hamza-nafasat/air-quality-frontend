@@ -20,7 +20,7 @@ const alertType = [
 
 const severityType = [{ option: 'high' }, { option: 'medium' }, { option: 'low' }];
 
-const AddRuleEngine = ({ onClose, isLoading, data }) => {
+const AddRuleEngine = ({ onClose, isLoading, data = [] }) => {
   const [createRuleEngine] = useCreateRuleMutation();
   // const { refetch } = useGetAllRuleEnginesQuery();
   const [addLoading, setAddLoading] = useState(false);
@@ -115,6 +115,8 @@ const AddRuleEngine = ({ onClose, isLoading, data }) => {
       </div>
     );
   }
+  console.log('data', data);
+
   return (
     <div className="">
       {/* Form */}

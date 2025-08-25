@@ -1,28 +1,31 @@
 /* eslint-disable react/prop-types */
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import { useCreateBuildingMutation, useDeleteSingleBuildingMutation } from "../../redux/apis/buildingApis";
-import { useCreateFloorMutation } from "../../redux/apis/floorApis";
-import { removeBuildingData } from "../../redux/slices/buildingSlice";
-import Button from "../shared/small/Button";
-import TextField from "../shared/small/TextField";
-import UploadAddFloors from "./uploads/UploadAddFloors";
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import {
+  useCreateBuildingMutation,
+  useDeleteSingleBuildingMutation,
+} from '../../redux/apis/buildingApis';
+import { useCreateFloorMutation } from '../../redux/apis/floorApis';
+import { removeBuildingData } from '../../redux/slices/buildingSlice';
+import Button from '../shared/small/Button';
+import TextField from '../shared/small/TextField';
+import UploadAddFloors from './uploads/UploadAddFloors';
 
 const AddFloors = ({ setCurrentStep }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [addBuilding, { isLoading: isAddBuilding }] = useCreateBuildingMutation("");
-  const [deleteBuilding, { isLoading: isDeleteBuilding }] = useDeleteSingleBuildingMutation("");
+  const [addBuilding, { isLoading: isAddBuilding }] = useCreateBuildingMutation('');
+  const [deleteBuilding, { isLoading: isDeleteBuilding }] = useDeleteSingleBuildingMutation('');
   const [addFloor, { isLoading: isAddFloor }] = useCreateFloorMutation();
 
   const { buildingData } = useSelector((state) => state.building);
   const [floorsCount, setFloorsCount] = useState([{}]);
   const [floorsState, setFloorsState] = useState([]);
   const [accordionState, setAccordionState] = useState([]);
-  const [buildingId, setBuildingId] = useState("");
+  const [buildingId, setBuildingId] = useState('');
 
   const toggleAccordion = (index) =>
     setAccordionState((prev) => prev.map((isOpen, i) => (i === index ? !isOpen : isOpen)));
@@ -43,12 +46,12 @@ const AddFloors = ({ setCurrentStep }) => {
   const mainSaveHandler = async () => {
     try {
       const formData = new FormData();
-      formData.append("name", buildingData?.name);
-      formData.append("type", buildingData?.type);
-      formData.append("area", buildingData?.area);
-      formData.append("address", buildingData?.address);
-      formData.append("position", buildingData?.position);
-      formData.append("thumbnail", buildingData?.thumbnail);
+      formData.append('name', buildingData?.name);
+      formData.append('type', buildingData?.type);
+      formData.append('area', buildingData?.area);
+      formData.append('address', buildingData?.address);
+      formData.append('position', buildingData?.position);
+      formData.append('thumbnail', buildingData?.thumbnail);
       const addBuildingResponse = await addBuilding(formData).unwrap();
       if (addBuildingResponse?.success) {
         const buildingId = addBuildingResponse?.buildingId;
@@ -63,26 +66,26 @@ const AddFloors = ({ setCurrentStep }) => {
             !floor?.twoDModelCoordinates ||
             !floor?.selectedSensors?.length
           ) {
-            return toast.error("Please Enter all Fields to Save");
+            return toast.error('Please Enter all Fields to Save');
           }
           const formData = new FormData();
-          formData.append("name", floor?.floorName);
-          formData.append("rooms", floor?.roomsCount);
-          formData.append("file", floor?.twoDModal);
-          formData.append("sensors", floor?.selectedSensors?.join(","));
-          formData.append("twoDModelCanvasData", JSON.stringify(floor?.twoDModelCoordinates));
-          formData.append("buildingId", buildingId);
+          formData.append('name', floor?.floorName);
+          formData.append('rooms', floor?.roomsCount);
+          formData.append('file', floor?.twoDModal);
+          formData.append('sensors', floor?.selectedSensors?.join(','));
+          formData.append('twoDModelCanvasData', JSON.stringify(floor?.twoDModelCoordinates));
+          formData.append('buildingId', buildingId);
           floorPromises.push(addFloor(formData).unwrap());
         }
       } else {
         await deleteBuilding(buildingId);
       }
-      toast.success("Your Building and its floors created successfully");
+      toast.success('Your Building and its floors created successfully');
       dispatch(removeBuildingData());
       return navigate(`/dashboard/buildings`);
     } catch (error) {
-      console.log("error while creating building", error);
-      toast.error(error?.data?.message || "Error while creating building");
+      console.log('error while creating building', error);
+      toast.error(error?.data?.message || 'Error while creating building');
       await deleteBuilding(buildingId);
     }
   };
@@ -142,7 +145,7 @@ export default AddFloors;
 const AddFloor = ({ floorsState, setFloorsState, floorIndex, openNextAccordion }) => {
   const [twoDModal, setTwoDModal] = useState();
   const [twoDModalPreview, setTwoDModalPreview] = useState();
-  const [floorName, setFloorName] = useState("");
+  const [floorName, setFloorName] = useState('');
   const [roomsCount, setRoomsCount] = useState(1);
   const [selectedSensors, setSelectedSensors] = useState([]);
   const [twoDModelCoordinates, setTwoDModelCoordinates] = useState([]);
@@ -157,7 +160,7 @@ const AddFloor = ({ floorsState, setFloorsState, floorIndex, openNextAccordion }
       selectedSensors?.length === 0
     ) {
       console.log(
-        "Please Enter all Fields to Save",
+        'Please Enter all Fields to Save',
         floorName,
         roomsCount,
         twoDModal,
@@ -165,7 +168,7 @@ const AddFloor = ({ floorsState, setFloorsState, floorIndex, openNextAccordion }
         twoDModelCoordinates,
         selectedSensors
       );
-      return toast.error("Please Enter all Fields to Save");
+      return toast.error('Please Enter all Fields to Save');
     }
 
     // Save floor data into the floorsState
@@ -184,10 +187,11 @@ const AddFloor = ({ floorsState, setFloorsState, floorIndex, openNextAccordion }
 
   return (
     <div>
-      <h3 className="text-sm font-semibold text-[rgba(6,6,6,0.8)]">Add Floors</h3>
+      <h3 className="text-lg font-medium  text-[rgba(6,6,6,0.8)]">Add Floors</h3>
       <form className="grid grid-cols-1 lg:grid-cols-12 gap-4 my-4">
         <div className="lg:col-span-6">
           <TextField
+            label={'Floor Name'}
             type="text"
             placeholder="Floor Name"
             value={floorName}
@@ -196,6 +200,7 @@ const AddFloor = ({ floorsState, setFloorsState, floorIndex, openNextAccordion }
         </div>
         <div className="lg:col-span-6">
           <TextField
+            label={'Room Count'}
             type="text"
             placeholder="Rooms Count"
             value={roomsCount}
@@ -204,7 +209,9 @@ const AddFloor = ({ floorsState, setFloorsState, floorIndex, openNextAccordion }
         </div>
       </form>
       <div className="flex items-center justify-between gap-4">
-        <h3 className="text-sm md:text-base font-semibold text-[rgba(6,6,6,0.8)]">Upload 2D Model Of Floor</h3>
+        <h3 className="text-sm md:text-base font-semibold text-[rgba(6,6,6,0.8)]">
+          Upload 2D Model Of Floor
+        </h3>
       </div>
       <div className="my-4 flex justify-center">
         <UploadAddFloors
