@@ -36,6 +36,7 @@ const AddRuleEngine = ({ onClose, isLoading, data = [] }) => {
     email: '',
     platform: '',
     status: '',
+    building: '',
   });
 
   const handleAddAccordion = () => {
@@ -64,12 +65,12 @@ const AddRuleEngine = ({ onClose, isLoading, data = [] }) => {
   };
 
   const handleSave = async () => {
-    const { alertName, email, severityType, platform, status } = formData;
+    const { alertName, email, severityType, platform, status, building } = formData;
 
     if (!alertName || !severityType || !platform || !status)
       return toast.error('All fields are required');
     if (platform === 'email' && !email) return toast.error('Email is required');
-    if (!selectedBuildings.length) return toast.error('Select at least one building');
+    // if (!selectedBuildings.length) return toast.error('Select at least one building');
 
     const alerts = accordionList
       .map((item) => {
@@ -95,7 +96,8 @@ const AddRuleEngine = ({ onClose, isLoading, data = [] }) => {
         platform,
         status,
         onMail: email,
-        building: selectedBuildings.map((b) => b._id), // ✅ convert here
+        // building: selectedBuildings.map((b) => b._id), // ✅ convert here
+        building: formData.building,
       }).unwrap();
 
       toast.success('Rule Engine created successfully');
@@ -149,13 +151,22 @@ const AddRuleEngine = ({ onClose, isLoading, data = [] }) => {
             value={selectedBuildings}
             onSelect={(selected) => setSelectedBuildings(selected.map((s) => s._id))}
           /> */}
-          <MultipleSelector
+          {/* <MultipleSelector
             label="Buildings"
             options={data} // [{ _id, name }]
             value={selectedBuildings} // should be full objects
             onSelect={(selected) => setSelectedBuildings(selected)} // don't map to _id here
-          />
+          /> */}
 
+          <div>
+            <Dropdown
+              label="Building"
+              options={data.map((b) => ({ option: b.name, value: b._id }))} // 👈 format correctly
+              onSelect={
+                (option) => setFormData({ ...formData, building: option.value }) // 👈 store building _id
+              }
+            />
+          </div>
           <div>
             <Dropdown
               label="Status"
