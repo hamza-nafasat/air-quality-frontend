@@ -27,7 +27,8 @@ const Header = () => {
   const pathname = location.pathname.split('/');
   const path = pathname[pathname.length - 1].replaceAll('-', ' ');
   const [logout, { isLoading }] = useLogoutMutation();
-
+  const count = useSelector((state) => state.notification.count);
+  const displayCount = count > 9 ? '9+' : count;
   const mobileNavHandler = () => setMobileNav(!mobileNav);
 
   const handleProfile = () => {
@@ -91,7 +92,7 @@ const Header = () => {
                 <NotificationIcon />
               </div>
               <div className="absolute top-[0px] right-[0px] bg-primary-lightBlue rounded-full w-[18px] h-[18px] text-white grid place-items-center text-[10px] font-medium border-2 border-white">
-                21
+                {displayCount}
               </div>
               {notificationActive && (
                 <div className="absolute top-[57px] right-[-60px] sm:right-0 bg-white drop-shadow-md rounded-lg w-[240px] sm:w-[280px] h-[300px] border z-10 overflow-y-scroll custom-scrollbar">

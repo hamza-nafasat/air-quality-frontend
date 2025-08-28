@@ -34,7 +34,7 @@ import Button from '../../shared/small/Button';
 import Dropdown from '../../shared/small/Dropdown';
 import TextField from '../../shared/small/TextField';
 import { getCroppedImg } from '../utils/addBuildingFeature';
-import { useGetAllSensorsQuery, useGetSingleSensorSqlQuery } from '../../../redux/apis/sensorApis';
+import { useGetAllSensorsQuery } from '../../../redux/apis/sensorApis';
 
 const UploadAddFloors = ({
   setFile,
@@ -46,10 +46,10 @@ const UploadAddFloors = ({
   setSelectedSensor,
 }) => {
   const { data } = useGetAllSensorsQuery();
-  const { data: sensor } = useGetSingleSensorSqlQuery();
+  // const { data: sensor } = useGetSingleSensorSqlQuery();
   const [availableSensors, setAvailableSensors] = useState([]);
-  // console.log('availableSensors', availableSensors);
-  // console.log('sensor', sensor);
+  console.log('setSelectedSensor', selectedSensor);
+  // console.log('sensor', data);
   // console.log('availableSensors', data.data);
 
   const canvasRef = useRef(null);
@@ -83,7 +83,14 @@ const UploadAddFloors = ({
     if (!Array.isArray(data?.data)) return;
 
     // Build the new array and save it.
-    setAvailableSensors(data.data.map(({ _id, name }) => ({ option: name, value: _id })));
+    setAvailableSensors(
+      data.data
+        .filter((sensor) => sensor.isConnected === false) // only not connected
+        .map(({ _id, name }) => ({
+          option: name,
+          value: _id,
+        }))
+    );
   }, [data?.data]); // run when the payload itself changes
   const sensorOnSelectHandler = (selectedOption) => {
     setSelectedSensor([...selectedSensor, selectedOption?.value]);
@@ -405,7 +412,7 @@ const UploadAddFloors = ({
 
             <div className="flex justify-center gap-3">
               <Button
-                disabled={!roomName}
+                disabled={!roomName || selectedSensor.length === 0}
                 text="Add"
                 width="w-fit"
                 onClick={() => {

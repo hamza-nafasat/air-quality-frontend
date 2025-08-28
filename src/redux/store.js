@@ -11,13 +11,14 @@ import reportsApi from './apis/reportsApi';
 import alertApi from './apis/alertApi';
 import ruleEngineApi from './apis/ruleEngineApi';
 import notificationApis from './apis/notificationApis';
+import notificationSlice from './slices/notificationSlice';
 
 const store = configureStore({
   reducer: {
     // slices
     [authSlice.name]: authSlice.reducer,
     [buildingSlice.name]: buildingSlice.reducer,
-
+    [notificationSlice.name]: notificationSlice.reducer,
     // apis
     [authApis.reducerPath]: authApis.reducer,
     [buildingApis.reducerPath]: buildingApis.reducer,

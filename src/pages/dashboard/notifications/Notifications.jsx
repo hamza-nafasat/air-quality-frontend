@@ -13,8 +13,7 @@ import { toast } from 'react-toastify';
 import { MdOutlineVisibility } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 
-const severityOrder = { high: 1, low: 2 };
-
+const severityOrder = { high: 1, medium: 2, low: 3 };
 const Notifications = () => {
   const { user } = useSelector((state) => state.auth);
   const userID = user?._id;
@@ -51,15 +50,23 @@ const Notifications = () => {
         selector: (row) => row.severity,
         sortable: true,
         width: '120px',
-        cell: (row) => (
-          <span
-            className={`px-2 py-1 rounded text-white ${
-              row.severity === 'high' ? 'bg-red-500' : 'bg-green-500'
-            }`}
-          >
-            {row.severity.toUpperCase()}
-          </span>
-        ),
+        cell: (row) => {
+          const severityColors = {
+            high: 'bg-red-500',
+            medium: 'bg-yellow-500',
+            low: 'bg-green-500',
+          };
+
+          return (
+            <span
+              className={`px-2 py-1 rounded text-white ${
+                severityColors[row.severity] || 'bg-gray-400'
+              }`}
+            >
+              {row.severity.toUpperCase()}
+            </span>
+          );
+        },
       },
       {
         name: 'Origin',
@@ -86,15 +93,19 @@ const Notifications = () => {
         cell: (row) => (
           <div className="flex gap-2">
             <MdOutlineVisibility
-              className="text-xl text-gray-400 cursor-pointer"
+              className="text-xl text-gray-400 cursor-pointer hover:text-gray-600 hover:scale-110 transition duration-200"
               onClick={() => handleView(row.building)}
             />
             <IoCheckmarkDone
-              className={`text-xl cursor-pointer ${row.isRead ? 'text-blue-500' : 'text-gray-600'}`}
+              className={`text-xl cursor-pointer ${
+                row.isRead
+                  ? 'text-blue-500 hover:text-blue-700'
+                  : 'text-gray-600 hover:text-gray-800'
+              } hover:scale-110 transition duration-200`}
               onClick={() => handleUpdate(row._id)}
             />
             <MdDelete
-              className="text-xl text-red-400 cursor-pointer"
+              className="text-xl text-red-400 cursor-pointer hover:text-red-600 hover:scale-110 transition duration-200"
               onClick={() => handleDelete(row._id)}
             />
           </div>
@@ -145,7 +156,6 @@ const Notifications = () => {
         highlightOnHover
         pointerOnHover
         fixedHeader
-        // fixedHeaderScrollHeight="400px"
         noDataComponent="No notifications found"
       />
     </div>

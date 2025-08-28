@@ -26,6 +26,7 @@ import AddFloor from './components/buildingsData/addFloor/AddFloor';
 import Notifications from './pages/dashboard/notifications/Notifications';
 import { socket } from './sockets/socket';
 import { toast } from 'react-toastify';
+import { setCount } from './redux/slices/notificationSlice';
 
 const Dashboard = lazy(() => import('./pages/dashboard/index'));
 const Buildings = lazy(() => import('./pages/dashboard/buildings/Buildings'));
@@ -170,15 +171,22 @@ function App() {
           toast.info(notification.message);
       }
     };
-
+    const handleNotificationCount = (count) => {
+      console.log('🔢 [Frontend] Notification count:', count);
+      dispatch(setCount(count));
+      // optional: store it in state so you can show a badge in UI
+      // setNotificationCount(count);
+    };
     // Attach listeners once
     socket.on('connect', handleConnect);
     socket.on('new-notification', handleNotification);
+    socket.on('notification-count', handleNotificationCount);
 
     // ✅ Cleanup when user changes or component unmounts
     return () => {
       socket.off('connect', handleConnect);
       socket.off('new-notification', handleNotification);
+      socket.off('notification-count', handleNotificationCount);
     };
   }, [user]);
 
