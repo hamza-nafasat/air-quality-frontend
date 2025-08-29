@@ -179,13 +179,13 @@ function App() {
     };
     // Attach listeners once
     socket.on('connect', handleConnect);
-    socket.on('new-notification', handleNotification);
+    // socket.on('new-notification', handleNotification);
     socket.on('notification-count', handleNotificationCount);
 
     // ✅ Cleanup when user changes or component unmounts
     return () => {
       socket.off('connect', handleConnect);
-      socket.off('new-notification', handleNotification);
+      // socket.off('new-notification', handleNotification);
       socket.off('notification-count', handleNotificationCount);
     };
   }, [user]);
