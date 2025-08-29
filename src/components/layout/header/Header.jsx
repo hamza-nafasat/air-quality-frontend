@@ -236,7 +236,6 @@ const Notifications = () => {
   const allNotificationHandle = () => {
     navigate('/dashboard/notifications');
   };
-
   return (
     <div className="relative">
       <div>
@@ -247,8 +246,10 @@ const Notifications = () => {
         <div className="mt-1">
           {/* ✅ Loading State */}
           {isLoading ? (
-            <div className="flex justify-center items-center p-6">
-              <div className="w-6 h-6 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
+            <div className=" h-[180px] flex items-center justify-center ">
+              <div className="flex justify-center items-center p-6">
+                <div className="w-6 h-6 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
+              </div>
             </div>
           ) : notification.length > 0 ? (
             notification.map((notification, i) => (

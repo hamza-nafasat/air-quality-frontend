@@ -1111,6 +1111,8 @@ const ShowCanvasData = ({ image, polygons, view, heatmap = false, data = [] }) =
 
           const randomShape = generateRandomShape(polygon);
           const level = classifyLevel(selectedParam, selectedValue);
+          console.log('selectedValue', selectedValue);
+
           // pass polygon.color as base for Medium level gradient
           drawIrregularShape(ctx, randomShape, level, polygon.color || '#22c55e');
 
