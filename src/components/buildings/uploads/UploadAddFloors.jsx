@@ -48,7 +48,7 @@ const UploadAddFloors = ({
   const { data } = useGetAllSensorsQuery();
   // const { data: sensor } = useGetSingleSensorSqlQuery();
   const [availableSensors, setAvailableSensors] = useState([]);
-  console.log('setSelectedSensor', selectedSensor);
+  // console.log('setSelectedSensor', selectedSensor);
   // console.log('sensor', data);
   // console.log('availableSensors', data.data);
 
@@ -175,6 +175,30 @@ const UploadAddFloors = ({
       });
     }
   }, [image, polygons, currentPolygon, canvasRef, color, isDrawingEnabled]);
+  useEffect(() => {
+    if (previewValue) {
+      const img = new Image();
+      img.src = previewValue;
+      img.onload = () => {
+        setImage(img);
+        setIsDrawingEnabled(true);
+      };
+    }
+  }, [previewValue]);
+
+  // ✅ Always redraw when polygons change
+  useEffect(() => {
+    if (canvasRef.current && image) {
+      drawCanvas({
+        canvasRef,
+        isDrawingEnabled: true,
+        image,
+        polygons,
+        currentPolygon,
+        color,
+      });
+    }
+  }, [image, polygons, currentPolygon, color]);
 
   return (
     <div className="relative">

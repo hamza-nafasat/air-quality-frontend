@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -8,7 +7,7 @@ import {
   useDeleteSingleBuildingMutation,
 } from '../../redux/apis/buildingApis';
 import { useCreateFloorMutation } from '../../redux/apis/floorApis';
-import { removeBuildingData } from '../../redux/slices/buildingSlice';
+import { removeBuildingData, setBuildingData } from '../../redux/slices/buildingSlice';
 import Button from '../shared/small/Button';
 import TextField from '../shared/small/TextField';
 import UploadAddFloors from './uploads/UploadAddFloors';
@@ -26,6 +25,7 @@ const AddFloors = ({ setCurrentStep }) => {
   const [floorsState, setFloorsState] = useState([]);
   const [accordionState, setAccordionState] = useState([]);
   const [buildingId, setBuildingId] = useState('');
+  console.log('buildingData', buildingData);
 
   const toggleAccordion = (index) =>
     setAccordionState((prev) => prev.map((isOpen, i) => (i === index ? !isOpen : isOpen)));
@@ -141,48 +141,46 @@ const AddFloors = ({ setCurrentStep }) => {
 
 export default AddFloors;
 
-// Reusing your AddFloor Component
-const AddFloor = ({ floorsState, setFloorsState, floorIndex, openNextAccordion }) => {
-  const [twoDModal, setTwoDModal] = useState();
-  const [twoDModalPreview, setTwoDModalPreview] = useState();
+const AddFloor = ({ floorIndex }) => {
+  const dispatch = useDispatch();
+  // const router = useRouter();
+  const buildingData = useSelector((state) => state.building.buildingData);
+
   const [floorName, setFloorName] = useState('');
   const [roomsCount, setRoomsCount] = useState(1);
-  const [selectedSensors, setSelectedSensors] = useState([]);
+
+  const [twoDModal, setTwoDModal] = useState(null); // keep File if new upload
+  const [twoDModalPreview, setTwoDModalPreview] = useState('');
   const [twoDModelCoordinates, setTwoDModelCoordinates] = useState([]);
+  const [selectedSensors, setSelectedSensors] = useState([]);
 
-  const saveStateHandler = () => {
-    if (
-      !floorName ||
-      !roomsCount ||
-      !twoDModal ||
-      !twoDModalPreview ||
-      !twoDModelCoordinates ||
-      selectedSensors?.length === 0
-    ) {
-      console.log(
-        'Please Enter all Fields to Save',
-        floorName,
-        roomsCount,
-        twoDModal,
-        twoDModalPreview,
-        twoDModelCoordinates,
-        selectedSensors
-      );
-      return toast.error('Please Enter all Fields to Save');
+  // ✅ Restore data when user comes back
+  useEffect(() => {
+    const floorData = buildingData?.floors?.[floorIndex];
+    if (floorData) {
+      setFloorName(floorData.floorName || '');
+      setRoomsCount(floorData.roomsCount || 1);
+      setTwoDModalPreview(floorData.twoDModalPreview || '');
+      setTwoDModelCoordinates(floorData.twoDModelCoordinates || []);
+      setSelectedSensors(floorData.selectedSensors || []);
     }
+  }, [buildingData, floorIndex]);
 
-    // Save floor data into the floorsState
-    const newFloorState = [...floorsState];
-    newFloorState[floorIndex] = {
+  // ✅ Save floor to Redux and go back
+  const handleSaveFloor = () => {
+    const floorData = {
       floorName,
       roomsCount,
-      twoDModal,
-      twoDModalPreview,
-      selectedSensors,
+      twoDModalPreview, // save only preview string
       twoDModelCoordinates,
+      selectedSensors,
     };
-    setFloorsState(newFloorState);
-    openNextAccordion();
+
+    const updatedFloors = [...(buildingData?.floors || [])];
+    updatedFloors[floorIndex] = floorData;
+
+    dispatch(setBuildingData({ ...buildingData, floors: updatedFloors }));
+    // router.back();
   };
 
   return (
@@ -226,7 +224,7 @@ const AddFloor = ({ floorsState, setFloorsState, floorIndex, openNextAccordion }
       </div>
       {/* add sensor section */}
       <div className="flex items-center justify-end gap-4">
-        <Button type="button" text="Save" width="w-[128px]" onClick={saveStateHandler} />
+        <Button type="button" text="Save" width="w-[128px]" onClick={handleSaveFloor} />
       </div>
     </div>
   );
