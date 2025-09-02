@@ -66,21 +66,37 @@ const UploadModelImage = ({
   const [roomName, setRoomName] = useState('');
   const [color, setColor] = useState('#ffff00');
   const [currentSensor, setCurrentSensor] = useState(null);
+  const [currentSensorName, setCurrentSensorName] = useState('');
+  console.log('selectedPolygon', selectedPolygon);
+  console.log('currentSensor', currentSensor);
+  console.log('currentPolygon', currentPolygon);
+  console.log('roomName', roomName);
+  console.log('polygons', polygons);
+  console.log('availableSensors', availableSensors);
 
   useEffect(() => {
     // Guard: run only when the payload is really an array.
     if (!Array.isArray(data?.data)) return;
+    // setAvailableSensors(data.data.map(({ _id, name }) => ({ option: name, value: _id })));
 
     // Build the new array and save it.
-    setAvailableSensors(data.data.map(({ _id, name }) => ({ option: name, value: _id })));
+    // setAvailableSensors(data.data.map(({ _id, name }) => ({ option: name, value: _id })));
+    setAvailableSensors(
+      data.data
+        .filter((sensor) => sensor.isConnected === false) // only not connected
+        .map(({ _id, name }) => ({
+          option: name,
+          value: _id,
+        }))
+    );
   }, [data?.data]); // run when the payload itself changes
 
   const sensorOnSelectHandler = (selectedOption) => {
     setSelectedSensor([...selectedSensor, selectedOption?.value]);
     setCurrentSensor(selectedOption?.value);
+    setCurrentSensorName(selectedOption?.option); // store the name
     setAvailableSensors(availableSensors.filter((sensor) => sensor.value !== selectedOption.value));
   };
-
   const openSensorPopup = (polygon) => {
     setSelectedPolygon(polygon);
     setSensorPopup(true);
@@ -183,6 +199,14 @@ const UploadModelImage = ({
             openSensorPopup,
             handleReEditPolygon,
             handlePolygonClick,
+            selectedColor: color,
+            setSelectedPolygon,
+            setCurrentSensor,
+            setSensorPopup,
+            selectedSensor,
+            setSelectedSensor,
+            availableSensors,
+            setAvailableSensors,
           })
         }
         onMouseDown={(event) =>
@@ -375,7 +399,8 @@ const UploadModelImage = ({
                     color,
                     setPolygons,
                     setSensorPopup,
-                    setCurrentSensor
+                    setCurrentSensor,
+                    currentSensorName // ✅ use state
                   );
                   setSensorPopup(false);
                 }}

@@ -184,6 +184,13 @@ export const handleCanvasClick = ({
   handleReEditPolygon,
   handlePolygonClick,
   selectedColor,
+  setSelectedPolygon,
+  setCurrentSensor,
+  setSensorPopup,
+  selectedSensor,
+  setSelectedSensor,
+  availableSensors,
+  setAvailableSensors,
 }) => {
   const canvas = canvasRef.current;
   const rect = canvas.getBoundingClientRect();
@@ -196,8 +203,18 @@ export const handleCanvasClick = ({
   }
 
   if (isDeleteMode) {
-    handleDeletePolygon(x, y, polygons, setPolygons, canvasRef);
-    return;
+    handleDeletePolygon(
+      x,
+      y,
+      polygons,
+      setPolygons,
+      canvasRef,
+      selectedSensor,
+      setSelectedSensor,
+      availableSensors,
+      setAvailableSensors
+    );
+    return; // stop further logic
   }
 
   if (isCopyMode && draggedPolygon) {
@@ -449,18 +466,48 @@ export const handleCanvasMouseDown = ({
 };
 
 // Delete polygon
-export const handleDeletePolygon = (x, y, polygons, setPolygons, canvasRef) => {
+export const handleDeletePolygon = (
+  x,
+  y,
+  polygons,
+  setPolygons,
+  canvasRef,
+  selectedSensor,
+  setSelectedSensor,
+  availableSensors,
+  setAvailableSensors
+) => {
   const canvas = canvasRef.current;
-  const updatedPolygons = polygons.filter((polygon) => {
+  const updatedPolygons = [];
+  const freedSensors = [];
+
+  polygons.forEach((polygon) => {
     const path = new Path2D();
     path.moveTo(polygon.points[0].x, polygon.points[0].y);
     polygon.points.forEach((point) => path.lineTo(point.x, point.y));
     path.closePath();
 
-    // Check if the clicked point is inside the polygon
-    return !canvas.getContext('2d').isPointInPath(path, x, y);
+    if (!canvas.getContext('2d').isPointInPath(path, x, y)) {
+      // keep this polygon
+      updatedPolygons.push(polygon);
+    } else {
+      // polygon is deleted, free its sensor
+      if (polygon.sensorAttached) {
+        freedSensors.push({
+          option: polygon.sensorName, // now this exists
+          value: polygon.sensorAttached,
+        });
+      }
+    }
   });
+
   setPolygons(updatedPolygons);
+
+  // Remove deleted sensors from selectedSensor
+  if (freedSensors.length) {
+    setSelectedSensor(selectedSensor.filter((s) => !freedSensors.some((f) => f.value === s)));
+    setAvailableSensors([...availableSensors, ...freedSensors]);
+  }
 };
 
 // Polygon Label Position
@@ -484,7 +531,8 @@ export const sensorInfoSubmitHandler = (
   color,
   setPolygons,
   setSensorPopup,
-  setCurrentSensor
+  setCurrentSensor,
+  sensorName // <-- pass this
 ) => {
   if (floorName) {
     const updatedPolygons = polygons.map((polygon) =>
@@ -493,6 +541,7 @@ export const sensorInfoSubmitHandler = (
             ...polygon,
             id: floorName,
             sensorAttached: currentSensor,
+            sensorName: sensorName, // store name here
             color: color,
             fillColor: color,
             labelPoint: polygon.labelPoint || 'first',

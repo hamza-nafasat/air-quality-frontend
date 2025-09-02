@@ -22,6 +22,7 @@ function FloorEdit() {
   const [updateFloor, { isLoading: isUpdatingFloor }] = useUpdateSingleFloorMutation('');
   const { refetch } = useGetAllSensorsQuery();
   const [selectedSensor, setSelectedSensor] = useState([]);
+  console.log('selectedSensor', selectedSensor);
 
   useEffect(() => {
     if (data?.data) {
