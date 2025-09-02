@@ -17,7 +17,7 @@ export const drawCanvas = ({ canvasRef, isDrawingEnabled, image, polygons, curre
   const canvas = canvasRef.current;
   if (!canvas || !isDrawingEnabled) return;
 
-  const context = canvas.getContext("2d");
+  const context = canvas.getContext('2d');
   context.clearRect(0, 0, canvas.width, canvas.height);
 
   if (image) {
@@ -34,27 +34,27 @@ export const drawCanvas = ({ canvasRef, isDrawingEnabled, image, polygons, curre
     context.closePath();
 
     // Fill the polygon with the color
-    context.fillStyle = `${polygon.color}${90}` || "#03a5e060";
-    context.strokeStyle = polygon.fillColor || "#03a5e0";
+    context.fillStyle = `${polygon.color}${90}` || '#03a5e060';
+    context.strokeStyle = polygon.fillColor || '#03a5e0';
     context.fill();
 
     // Draw the border with the specified color
-    context.strokeStyle = polygon.fillColor || polygon.color || "#03a5e060";
+    context.strokeStyle = polygon.fillColor || polygon.color || '#03a5e060';
     context.lineWidth = 2;
     context.stroke();
 
     // Determine the label position based on `labelPoint`
     let idX, idY;
-    if (polygon?.labelPoint === "first" && polygon.points[0]) {
+    if (polygon?.labelPoint === 'first' && polygon.points[0]) {
       idX = polygon.points[0].x;
       idY = polygon.points[0].y - 5;
-    } else if (polygon?.labelPoint === "second" && polygon.points[1]) {
+    } else if (polygon?.labelPoint === 'second' && polygon.points[1]) {
       idX = polygon.points[1].x;
       idY = polygon.points[1].y - 5;
-    } else if (polygon?.labelPoint === "third" && polygon.points[2]) {
+    } else if (polygon?.labelPoint === 'third' && polygon.points[2]) {
       idX = polygon.points[2].x;
       idY = polygon.points[2].y - 5;
-    } else if (polygon?.labelPoint === "fourth" && polygon.points[3]) {
+    } else if (polygon?.labelPoint === 'fourth' && polygon.points[3]) {
       idX = polygon.points[3].x;
       idY = polygon.points[3].y - 5;
     }
@@ -62,7 +62,7 @@ export const drawCanvas = ({ canvasRef, isDrawingEnabled, image, polygons, curre
     const padding = 4;
     const text = polygon.id;
 
-    context.font = "12px Arial";
+    context.font = '12px Arial';
     const textWidth = context.measureText(text).width;
     const textHeight = 14;
     const boxWidth = textWidth + padding * 2;
@@ -71,7 +71,7 @@ export const drawCanvas = ({ canvasRef, isDrawingEnabled, image, polygons, curre
     const boxY = idY - textHeight - padding;
 
     // Draw the box background
-    context.fillStyle = "#FFFFFF";
+    context.fillStyle = '#FFFFFF';
     context.beginPath();
     context.moveTo(boxX + 4, boxY);
     context.arcTo(boxX + boxWidth, boxY, boxX + boxWidth, boxY + boxHeight, 4);
@@ -82,7 +82,7 @@ export const drawCanvas = ({ canvasRef, isDrawingEnabled, image, polygons, curre
     context.fill();
 
     // Draw the text inside the box
-    context.fillStyle = "#000000";
+    context.fillStyle = '#000000';
     context.fillText(text, boxX + padding, boxY + padding + textHeight - 4);
   });
 
@@ -90,13 +90,80 @@ export const drawCanvas = ({ canvasRef, isDrawingEnabled, image, polygons, curre
     context.beginPath();
     context.moveTo(currentPolygon[0].x, currentPolygon[0].y);
     currentPolygon.forEach((point) => context.lineTo(point.x, point.y));
-    context.strokeStyle = "#03a5e0";
+    context.strokeStyle = '#03a5e0';
     context.lineWidth = 2;
     context.stroke();
   }
 };
 
 // Add point to current polygon
+// export const handleCanvasClick = ({
+//   event,
+//   canvasRef,
+//   isDeleteMode,
+//   handleDeletePolygon,
+//   isCopyMode,
+//   draggedPolygon,
+//   polygonCount,
+//   polygons,
+//   setPolygons,
+//   setPolygonCount,
+//   setDraggedPolygon,
+//   isEditMode,
+//   currentPolygon,
+//   setCurrentPolygon,
+//   openSensorPopup,
+//   isUpdateMode,
+//   handleReEditPolygon,
+//   handlePolygonClick,
+//   selectedColor, // Pass selected color here
+// }) => {
+//   const canvas = canvasRef.current;
+//   const rect = canvas.getBoundingClientRect();
+//   const x = event.clientX - rect.left;
+//   const y = event.clientY - rect.top;
+
+//   if (isUpdateMode) {
+//     handleReEditPolygon({ x, y, canvasRef, polygons, handlePolygonClick });
+//   }
+
+//   if (isDeleteMode) {
+//     handleDeletePolygon(x, y, polygons, setPolygons, canvasRef);
+//   } else if (isCopyMode && draggedPolygon) {
+//     // Handle copy-pasting of polygons
+//     const newPolygon = {
+//       ...draggedPolygon,
+//       id: `F1-PS${polygonCount}`,
+//       points: draggedPolygon.points.map((point) => ({
+//         x: point.x + (x - draggedPolygon.points[0].x),
+//         y: point.y + (y - draggedPolygon.points[0].y),
+//       })),
+//       fillColor: draggedPolygon.fillColor, // Copy the color as well
+//     };
+//     setPolygons([...polygons, newPolygon]);
+//     setPolygonCount(polygonCount + 1);
+//     setDraggedPolygon(null);
+//   } else if (isEditMode) {
+//     // Handle creating a new polygon
+//     const newPolygon = [...currentPolygon, { x, y }];
+//     setCurrentPolygon(newPolygon);
+
+//     if (newPolygon.length === 4) {
+//       const polygonWithId = {
+//         points: newPolygon,
+//         id: `F1-PS${polygonCount}`,
+//         color: selectedColor,
+//         fillColor: selectedColor,
+//       };
+//       setPolygons([...polygons, polygonWithId]);
+//       setPolygonCount(polygonCount + 1);
+//       setCurrentPolygon([]);
+//       openSensorPopup(polygonWithId);
+//     }
+//   }
+// };
+
+// Add points until user closes polygon (click near the first point)
 export const handleCanvasClick = ({
   event,
   canvasRef,
@@ -112,11 +179,11 @@ export const handleCanvasClick = ({
   isEditMode,
   currentPolygon,
   setCurrentPolygon,
-  openSensorPopup,
+  openSensorPopup, // modal trigger
   isUpdateMode,
   handleReEditPolygon,
   handlePolygonClick,
-  selectedColor, // Pass selected color here
+  selectedColor,
 }) => {
   const canvas = canvasRef.current;
   const rect = canvas.getBoundingClientRect();
@@ -125,12 +192,15 @@ export const handleCanvasClick = ({
 
   if (isUpdateMode) {
     handleReEditPolygon({ x, y, canvasRef, polygons, handlePolygonClick });
+    return;
   }
 
   if (isDeleteMode) {
     handleDeletePolygon(x, y, polygons, setPolygons, canvasRef);
-  } else if (isCopyMode && draggedPolygon) {
-    // Handle copy-pasting of polygons
+    return;
+  }
+
+  if (isCopyMode && draggedPolygon) {
     const newPolygon = {
       ...draggedPolygon,
       id: `F1-PS${polygonCount}`,
@@ -138,28 +208,45 @@ export const handleCanvasClick = ({
         x: point.x + (x - draggedPolygon.points[0].x),
         y: point.y + (y - draggedPolygon.points[0].y),
       })),
-      fillColor: draggedPolygon.fillColor, // Copy the color as well
+      fillColor: draggedPolygon.fillColor,
     };
     setPolygons([...polygons, newPolygon]);
     setPolygonCount(polygonCount + 1);
     setDraggedPolygon(null);
-  } else if (isEditMode) {
-    // Handle creating a new polygon
-    const newPolygon = [...currentPolygon, { x, y }];
-    setCurrentPolygon(newPolygon);
+    return;
+  }
 
-    if (newPolygon.length === 4) {
-      const polygonWithId = {
-        points: newPolygon,
-        id: `F1-PS${polygonCount}`,
-        color: selectedColor,
-        fillColor: selectedColor,
-      };
-      setPolygons([...polygons, polygonWithId]);
-      setPolygonCount(polygonCount + 1);
-      setCurrentPolygon([]);
-      openSensorPopup(polygonWithId);
+  if (isEditMode) {
+    const newPoint = { x, y };
+
+    // Check if user clicked near the first point to close polygon
+    if (currentPolygon.length >= 3) {
+      const firstPoint = currentPolygon[0];
+      const distance = Math.sqrt(
+        Math.pow(newPoint.x - firstPoint.x, 2) + Math.pow(newPoint.y - firstPoint.y, 2)
+      );
+
+      if (distance < 10) {
+        // Close polygon
+        const polygonWithId = {
+          points: [...currentPolygon, firstPoint], // close the shape
+          id: `F1-PS${polygonCount}`,
+          color: selectedColor,
+          fillColor: selectedColor,
+        };
+
+        setPolygons([...polygons, polygonWithId]);
+        setPolygonCount(polygonCount + 1);
+        setCurrentPolygon([]);
+
+        // 🔥 Open modal after closing polygon
+        openSensorPopup(polygonWithId);
+        return;
+      }
     }
+
+    // Otherwise keep adding points
+    setCurrentPolygon([...currentPolygon, newPoint]);
   }
 };
 
@@ -246,26 +333,28 @@ export const exportSVG = async ({ canvasRef, image, polygons }) => {
   polygons.forEach((polygon) => {
     if (!polygon || !polygon.points) return;
 
-    const fillColor = `${polygon.color}${90}` || "#21db1a";
-    const strokeColor = polygon.fillColor || polygon.color || "#03a5e060";
+    const fillColor = `${polygon.color}${90}` || '#21db1a';
+    const strokeColor = polygon.fillColor || polygon.color || '#03a5e060';
 
-    svgContent += `<polygon points="${polygon.points.map((point) => `${point.x},${point.y}`).join(" ")}" id="${
-      polygon.id
-    }" sensorAttached="${polygon.sensorAttached || ""}" fill="${fillColor}" stroke="${strokeColor}" stroke-width="2"/>`;
+    svgContent += `<polygon points="${polygon.points
+      .map((point) => `${point.x},${point.y}`)
+      .join(' ')}" id="${polygon.id}" sensorAttached="${
+      polygon.sensorAttached || ''
+    }" fill="${fillColor}" stroke="${strokeColor}" stroke-width="2"/>`;
 
-    svgContent += `<text x="${polygon.points[0].x}" y="${polygon.points[0].y - 10}" font-size="12" fill="black">${
-      polygon.id
-    }</text>`;
+    svgContent += `<text x="${polygon.points[0].x}" y="${
+      polygon.points[0].y - 10
+    }" font-size="12" fill="black">${polygon.id}</text>`;
   });
 
-  svgContent += "</svg>";
+  svgContent += '</svg>';
 
   // Create a blob and download the SVG file
-  const blob = new Blob([svgContent], { type: "image/svg+xml" });
+  const blob = new Blob([svgContent], { type: 'image/svg+xml' });
   const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
+  const link = document.createElement('a');
   link.href = url;
-  link.download = "parking-slot.svg";
+  link.download = 'parking-slot.svg';
   link.click();
   URL.revokeObjectURL(url);
 };
@@ -347,7 +436,7 @@ export const handleCanvasMouseDown = ({
     polygon.points.forEach((point) => path.lineTo(point.x, point.y));
     path.closePath();
 
-    return canvas.getContext("2d").isPointInPath(path, x, y);
+    return canvas.getContext('2d').isPointInPath(path, x, y);
   });
 
   if (selectedPolygon) {
@@ -369,7 +458,7 @@ export const handleDeletePolygon = (x, y, polygons, setPolygons, canvasRef) => {
     path.closePath();
 
     // Check if the clicked point is inside the polygon
-    return !canvas.getContext("2d").isPointInPath(path, x, y);
+    return !canvas.getContext('2d').isPointInPath(path, x, y);
   });
   setPolygons(updatedPolygons);
 };
@@ -406,7 +495,7 @@ export const sensorInfoSubmitHandler = (
             sensorAttached: currentSensor,
             color: color,
             fillColor: color,
-            labelPoint: polygon.labelPoint || "first",
+            labelPoint: polygon.labelPoint || 'first',
           }
         : polygon
     );
@@ -414,7 +503,7 @@ export const sensorInfoSubmitHandler = (
     setCurrentSensor(null);
     setSensorPopup(false);
   } else {
-    alert("without sensor id and sensor name polygon not draw");
+    alert('without sensor id and sensor name polygon not draw');
   }
 };
 
@@ -426,7 +515,7 @@ export const handleReEditPolygon = ({ x, y, canvasRef, polygons, handlePolygonCl
     path.moveTo(polygon.points[0].x, polygon.points[0].y);
     polygon.points.forEach((point) => path.lineTo(point.x, point.y));
     path.closePath();
-    return canvas.getContext("2d").isPointInPath(path, x, y);
+    return canvas.getContext('2d').isPointInPath(path, x, y);
   });
   if (clickedPolygon) {
     handlePolygonClick(clickedPolygon.id, clickedPolygon.sensorAttached);
@@ -461,7 +550,7 @@ export const sensorInfoUpdateHandler = (
   if (setReEditModalOpen) {
     setReEditModalOpen(false); // Close the modal
   } else {
-    console.error("setReEditModalOpen is not a function");
+    console.error('setReEditModalOpen is not a function');
   }
 };
 
@@ -473,15 +562,17 @@ export const handleCancelPolygon = (
   setSelectedPolygon
 ) => {
   setSensorPopup(false);
-  setPolygons((prevPolygons) => prevPolygons.filter((polygon) => polygon.id !== selectedPolygon?.id));
+  setPolygons((prevPolygons) =>
+    prevPolygons.filter((polygon) => polygon.id !== selectedPolygon?.id)
+  );
   setCurrentPolygon([]);
   setSelectedPolygon(null);
 };
 
-export const convertImageSrcToFile = async (imageSrc, fileName = "image.png") => {
+export const convertImageSrcToFile = async (imageSrc, fileName = 'image.png') => {
   const res = await fetch(imageSrc);
   const blob = await res.blob();
-  return new File([blob], fileName, { type: "image/png" });
+  return new File([blob], fileName, { type: 'image/png' });
 };
 
 // export const convertImageSrcToFile = async (imageSrc, fileName = "image.png", fileType = "image/png") => {

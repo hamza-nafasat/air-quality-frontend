@@ -1,3 +1,256 @@
+// import { useEffect, useState } from 'react';
+// import { useDispatch, useSelector } from 'react-redux';
+// import { useNavigate } from 'react-router-dom';
+// import { toast } from 'react-toastify';
+// import {
+//   useCreateBuildingMutation,
+//   useDeleteSingleBuildingMutation,
+// } from '../../redux/apis/buildingApis';
+// import { useCreateFloorMutation } from '../../redux/apis/floorApis';
+// import { removeBuildingData, setBuildingData } from '../../redux/slices/buildingSlice';
+// import Button from '../shared/small/Button';
+// import TextField from '../shared/small/TextField';
+// import UploadAddFloors from './uploads/UploadAddFloors';
+
+// const AddFloors = ({ setCurrentStep }) => {
+//   const dispatch = useDispatch();
+//   const navigate = useNavigate();
+
+//   const [addBuilding, { isLoading: isAddBuilding }] = useCreateBuildingMutation('');
+//   const [deleteBuilding, { isLoading: isDeleteBuilding }] = useDeleteSingleBuildingMutation('');
+//   const [addFloor, { isLoading: isAddFloor }] = useCreateFloorMutation();
+
+//   const { buildingData } = useSelector((state) => state.building);
+//   const [floorsCount, setFloorsCount] = useState([{}]);
+//   const [floorsState, setFloorsState] = useState([]);
+//   const [accordionState, setAccordionState] = useState([]);
+//   const [buildingId, setBuildingId] = useState('');
+//   console.log('buildingData', buildingData);
+
+//   const toggleAccordion = (index) =>
+//     setAccordionState((prev) => prev.map((isOpen, i) => (i === index ? !isOpen : isOpen)));
+//   const openNextAccordion = (index) =>
+//     setAccordionState((prev) => prev.map((isOpen, i) => (i === index + 1 ? true : false)));
+//   // Check if all floors are filled to enable the Next button
+//   const allFloorsFilled =
+//     floorsState.length === floorsCount.length &&
+//     floorsState.every(
+//       (floor) =>
+//         floor.floorName &&
+//         floor.roomsCount &&
+//         floor.twoDModal &&
+//         floor.selectedSensors?.length &&
+//         floor.twoDModelCoordinates?.length
+//     );
+//   console.log('allFloorsFilled', allFloorsFilled);
+//   console.log('floorsState', floorsState);
+//   console.log('floorsCount', floorsCount);
+
+//   const mainSaveHandler = async () => {
+//     try {
+//       const formData = new FormData();
+//       formData.append('name', buildingData?.name);
+//       formData.append('type', buildingData?.type);
+//       formData.append('area', buildingData?.area);
+//       formData.append('address', buildingData?.address);
+//       formData.append('position', buildingData?.position);
+//       formData.append('thumbnail', buildingData?.thumbnail);
+//       const addBuildingResponse = await addBuilding(formData).unwrap();
+//       if (addBuildingResponse?.success) {
+//         const buildingId = addBuildingResponse?.buildingId;
+//         setBuildingId(String(buildingId));
+//         const floorPromises = [];
+//         for (let i = 0; i < floorsState.length; i++) {
+//           const floor = floorsState[i];
+//           if (
+//             !floor?.floorName ||
+//             !floor?.roomsCount ||
+//             !floor?.twoDModal ||
+//             !floor?.twoDModelCoordinates ||
+//             !floor?.selectedSensors?.length
+//           ) {
+//             return toast.error('Please Enter all Fields to Save');
+//           }
+//           const formData = new FormData();
+//           formData.append('name', floor?.floorName);
+//           formData.append('rooms', floor?.roomsCount);
+//           formData.append('file', floor?.twoDModal);
+//           formData.append('sensors', floor?.selectedSensors?.join(','));
+//           formData.append('twoDModelCanvasData', JSON.stringify(floor?.twoDModelCoordinates));
+//           formData.append('buildingId', buildingId);
+//           floorPromises.push(addFloor(formData).unwrap());
+//         }
+//       } else {
+//         await deleteBuilding(buildingId);
+//       }
+//       toast.success('Your Building and its floors created successfully');
+//       dispatch(removeBuildingData());
+//       return navigate(`/dashboard/buildings`);
+//     } catch (error) {
+//       console.log('error while creating building', error);
+//       toast.error(error?.data?.message || 'Error while creating building');
+//       await deleteBuilding(buildingId);
+//     }
+//   };
+
+//   useEffect(() => {
+//     if (buildingData?.floorsCount) {
+//       const length = Number(buildingData?.floorsCount);
+//       const floorsCounts = [{}];
+//       for (let i = 0; i < length - 1; i++) {
+//         floorsCounts.push({});
+//       }
+//       setFloorsCount(floorsCounts);
+//       setAccordionState(Array(length).fill(false));
+//     }
+//   }, [buildingData]);
+
+//   return (
+//     <div>
+//       {floorsCount.map((floor, i) => (
+//         <Accordion
+//           key={i}
+//           title={`Floor ${i + 1}`}
+//           isOpen={accordionState[i]}
+//           toggleAccordion={() => toggleAccordion(i)}
+//         >
+//           <AddFloor
+//             floorsState={floorsState}
+//             setFloorsState={setFloorsState}
+//             floorIndex={i}
+//             openNextAccordion={() => openNextAccordion(i)}
+//           />
+//         </Accordion>
+//       ))}
+//       <div className="flex items-center justify-end gap-4">
+//         <Button
+//           type="button"
+//           text="Back"
+//           width="w-[128px]"
+//           bg="bg-[#9caabe]"
+//           onClick={() => setCurrentStep((prevStep) => prevStep - 1)}
+//         />
+//         <Button
+//           type="button"
+//           text="Add Building"
+//           width="w-[128px]"
+//           onClick={mainSaveHandler}
+//           disabled={!allFloorsFilled || isAddBuilding || isAddFloor || isDeleteBuilding}
+//         />
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default AddFloors;
+
+// const AddFloor = ({ floorIndex }) => {
+//   const dispatch = useDispatch();
+//   const buildingData = useSelector((state) => state.building.buildingData);
+
+//   const [floorName, setFloorName] = useState('');
+//   const [roomsCount, setRoomsCount] = useState(1);
+//   const [twoDModal, setTwoDModal] = useState(null);
+//   const [twoDModalPreview, setTwoDModalPreview] = useState('');
+//   const [twoDModelCoordinates, setTwoDModelCoordinates] = useState([]);
+//   const [selectedSensors, setSelectedSensors] = useState([]);
+
+//   useEffect(() => {
+//     const floorData = buildingData?.floors?.[floorIndex];
+//     if (floorData) {
+//       setFloorName(floorData.floorName || '');
+//       setRoomsCount(floorData.roomsCount || 1);
+//       setTwoDModalPreview(floorData.twoDModalPreview || '');
+//       setTwoDModelCoordinates(floorData.twoDModelCoordinates || []);
+//       setSelectedSensors(floorData.selectedSensors || []);
+//     }
+//   }, [buildingData, floorIndex]);
+
+//   const handleSaveFloor = () => {
+//     const floorData = {
+//       floorName,
+//       roomsCount,
+//       twoDModal,
+//       twoDModalPreview,
+//       twoDModelCoordinates,
+//       selectedSensors,
+//     };
+
+//     // ✅ Update Redux
+//     const updatedFloors = [...(buildingData?.floors || [])];
+//     updatedFloors[floorIndex] = floorData;
+//     dispatch(setBuildingData({ ...buildingData, floors: updatedFloors }));
+
+//     // ✅ Update Parent State
+//     const updatedFloorsState = [...floorsState];
+//     updatedFloorsState[floorIndex] = floorData;
+//     setFloorsState(updatedFloorsState);
+
+//     toast.success(`Floor ${floorIndex + 1} saved`);
+//   };
+
+//   return (
+//     <div>
+//       <h3 className="text-lg font-medium  text-[rgba(6,6,6,0.8)]">Add Floors</h3>
+//       <form className="grid grid-cols-1 lg:grid-cols-12 gap-4 my-4">
+//         <div className="lg:col-span-6">
+//           <TextField
+//             label={'Floor Name'}
+//             type="text"
+//             placeholder="Floor Name"
+//             value={floorName}
+//             onChange={(e) => setFloorName(e.target.value)}
+//           />
+//         </div>
+//         <div className="lg:col-span-6">
+//           <TextField
+//             label={'Room Count'}
+//             type="text"
+//             placeholder="Rooms Count"
+//             value={roomsCount}
+//             onChange={(e) => setRoomsCount(e.target.value)}
+//           />
+//         </div>
+//       </form>
+//       <div className="flex items-center justify-between gap-4">
+//         <h3 className="text-sm md:text-base font-semibold text-[rgba(6,6,6,0.8)]">
+//           Upload 2D Model Of Floor
+//         </h3>
+//       </div>
+//       <div className="my-4 flex justify-center">
+//         <UploadAddFloors
+//           setFile={setTwoDModal}
+//           previewValue={twoDModalPreview}
+//           setPreviewValue={setTwoDModalPreview}
+//           polygons={twoDModelCoordinates}
+//           setPolygons={setTwoDModelCoordinates}
+//           selectedSensor={selectedSensors}
+//           setSelectedSensor={setSelectedSensors}
+//         />
+//       </div>
+//       {/* add sensor section */}
+//       <div className="flex items-center justify-end gap-4">
+//         <Button type="button" text="Save" width="w-[128px]" onClick={handleSaveFloor} />
+//       </div>
+//     </div>
+//   );
+// };
+
+// // Accordion Component (basic structure)
+// const Accordion = ({ title, isOpen, toggleAccordion, children }) => {
+//   return (
+//     <div className="mb-4">
+//       <button
+//         className="w-full text-left px-4 py-3 font-semibold bg-[#b1e9ff] border border-primary-lightBlue rounded-lg"
+//         onClick={toggleAccordion} // Toggle open/close
+//       >
+//         {title}
+//       </button>
+//       {isOpen && <div className="p-4">{children}</div>}
+//     </div>
+//   );
+// };
+
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -29,9 +282,11 @@ const AddFloors = ({ setCurrentStep }) => {
 
   const toggleAccordion = (index) =>
     setAccordionState((prev) => prev.map((isOpen, i) => (i === index ? !isOpen : isOpen)));
+
   const openNextAccordion = (index) =>
     setAccordionState((prev) => prev.map((isOpen, i) => (i === index + 1 ? true : false)));
-  // Check if all floors are filled to enable the Next button
+
+  // ✅ Validation check
   const allFloorsFilled =
     floorsState.length === floorsCount.length &&
     floorsState.every(
@@ -42,6 +297,9 @@ const AddFloors = ({ setCurrentStep }) => {
         floor.selectedSensors?.length &&
         floor.twoDModelCoordinates?.length
     );
+  console.log('allFloorsFilled', allFloorsFilled);
+  console.log('floorsState', floorsState);
+  console.log('floorsCount', floorsCount);
 
   const mainSaveHandler = async () => {
     try {
@@ -53,9 +311,11 @@ const AddFloors = ({ setCurrentStep }) => {
       formData.append('position', buildingData?.position);
       formData.append('thumbnail', buildingData?.thumbnail);
       const addBuildingResponse = await addBuilding(formData).unwrap();
+
       if (addBuildingResponse?.success) {
         const buildingId = addBuildingResponse?.buildingId;
         setBuildingId(String(buildingId));
+
         const floorPromises = [];
         for (let i = 0; i < floorsState.length; i++) {
           const floor = floorsState[i];
@@ -80,6 +340,7 @@ const AddFloors = ({ setCurrentStep }) => {
       } else {
         await deleteBuilding(buildingId);
       }
+
       toast.success('Your Building and its floors created successfully');
       dispatch(removeBuildingData());
       return navigate(`/dashboard/buildings`);
@@ -90,14 +351,28 @@ const AddFloors = ({ setCurrentStep }) => {
     }
   };
 
+  // useEffect(() => {
+  //   if (buildingData?.floorsCount) {
+  //     const length = Number(buildingData?.floorsCount);
+  //     const floorsCounts = Array(length).fill({});
+  //     setFloorsCount(floorsCounts);
+
+  //     // initialize same length empty array for floorsState
+  //     setFloorsState(Array(length).fill({}));
+
+  //     setAccordionState(Array(length).fill(false));
+  //   }
+  // }, [buildingData]);
   useEffect(() => {
     if (buildingData?.floorsCount) {
       const length = Number(buildingData?.floorsCount);
-      const floorsCounts = [{}];
-      for (let i = 0; i < length - 1; i++) {
-        floorsCounts.push({});
-      }
-      setFloorsCount(floorsCounts);
+
+      // If we already have floors in Redux, use them, otherwise create empty slots
+      const existingFloors = buildingData.floors || [];
+      const newFloorsState = Array.from({ length }, (_, i) => existingFloors[i] || {});
+
+      setFloorsCount(Array.from({ length }, () => ({})));
+      setFloorsState(newFloorsState);
       setAccordionState(Array(length).fill(false));
     }
   }, [buildingData]);
@@ -119,6 +394,7 @@ const AddFloors = ({ setCurrentStep }) => {
           />
         </Accordion>
       ))}
+
       <div className="flex items-center justify-end gap-4">
         <Button
           type="button"
@@ -141,20 +417,18 @@ const AddFloors = ({ setCurrentStep }) => {
 
 export default AddFloors;
 
-const AddFloor = ({ floorIndex }) => {
+// ✅ FIXED: Accept floorsState + setFloorsState props
+const AddFloor = ({ floorsState, setFloorsState, floorIndex, openNextAccordion }) => {
   const dispatch = useDispatch();
-  // const router = useRouter();
   const buildingData = useSelector((state) => state.building.buildingData);
 
   const [floorName, setFloorName] = useState('');
   const [roomsCount, setRoomsCount] = useState(1);
-
-  const [twoDModal, setTwoDModal] = useState(null); // keep File if new upload
+  const [twoDModal, setTwoDModal] = useState(null);
   const [twoDModalPreview, setTwoDModalPreview] = useState('');
   const [twoDModelCoordinates, setTwoDModelCoordinates] = useState([]);
   const [selectedSensors, setSelectedSensors] = useState([]);
 
-  // ✅ Restore data when user comes back
   useEffect(() => {
     const floorData = buildingData?.floors?.[floorIndex];
     if (floorData) {
@@ -166,21 +440,30 @@ const AddFloor = ({ floorIndex }) => {
     }
   }, [buildingData, floorIndex]);
 
-  // ✅ Save floor to Redux and go back
   const handleSaveFloor = () => {
     const floorData = {
       floorName,
       roomsCount,
-      twoDModalPreview, // save only preview string
+      twoDModal,
+      twoDModalPreview,
       twoDModelCoordinates,
       selectedSensors,
     };
 
+    // ✅ Update Redux
     const updatedFloors = [...(buildingData?.floors || [])];
     updatedFloors[floorIndex] = floorData;
-
     dispatch(setBuildingData({ ...buildingData, floors: updatedFloors }));
-    // router.back();
+
+    // ✅ Update Parent State
+    const updatedFloorsState = [...floorsState];
+    updatedFloorsState[floorIndex] = floorData;
+    setFloorsState(updatedFloorsState);
+
+    toast.success(`Floor ${floorIndex + 1} saved`);
+
+    // auto-open next accordion
+    openNextAccordion();
   };
 
   return (
@@ -206,6 +489,7 @@ const AddFloor = ({ floorIndex }) => {
           />
         </div>
       </form>
+
       <div className="flex items-center justify-between gap-4">
         <h3 className="text-sm md:text-base font-semibold text-[rgba(6,6,6,0.8)]">
           Upload 2D Model Of Floor
@@ -222,7 +506,7 @@ const AddFloor = ({ floorIndex }) => {
           setSelectedSensor={setSelectedSensors}
         />
       </div>
-      {/* add sensor section */}
+
       <div className="flex items-center justify-end gap-4">
         <Button type="button" text="Save" width="w-[128px]" onClick={handleSaveFloor} />
       </div>
@@ -230,13 +514,13 @@ const AddFloor = ({ floorIndex }) => {
   );
 };
 
-// Accordion Component (basic structure)
+// Accordion Component (unchanged)
 const Accordion = ({ title, isOpen, toggleAccordion, children }) => {
   return (
     <div className="mb-4">
       <button
         className="w-full text-left px-4 py-3 font-semibold bg-[#b1e9ff] border border-primary-lightBlue rounded-lg"
-        onClick={toggleAccordion} // Toggle open/close
+        onClick={toggleAccordion}
       >
         {title}
       </button>
