@@ -29,7 +29,7 @@ const AddRuleEngine = ({ onClose, isLoading, data = [] }) => {
   const [selectedBuildings, setSelectedBuildings] = useState([]);
   const [inputEmail, setInputEmail] = useState(false);
   // console.log('addselectedBuildings', selectedBuildings);
-
+  // const { data } = useGetAllSensorsQuery();
   const [formData, setFormData] = useState({
     alertName: '',
     severityType: '',

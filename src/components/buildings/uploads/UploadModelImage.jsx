@@ -405,7 +405,7 @@ const UploadModelImage = ({
                   setSensorPopup(false);
                 }}
               />
-              <Button
+              {/* <Button
                 width="w-fit"
                 text="cancel"
                 onClick={() =>
@@ -415,6 +415,23 @@ const UploadModelImage = ({
                     selectedPolygon,
                     setCurrentPolygon,
                     setSelectedPolygon
+                  )
+                }
+              /> */}
+              <Button
+                width="w-fit"
+                text="cancel"
+                onClick={() =>
+                  handleCancelPolygon(
+                    setSensorPopup,
+                    setPolygons,
+                    selectedPolygon,
+                    setCurrentPolygon,
+                    setSelectedPolygon,
+                    setAvailableSensors,
+                    selectedSensor,
+                    setSelectedSensor,
+                    data // pass sensors data
                   )
                 }
               />

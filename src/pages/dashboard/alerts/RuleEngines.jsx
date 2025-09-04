@@ -10,14 +10,17 @@ import { FiEdit } from 'react-icons/fi';
 import { CgArrowTopRightO } from 'react-icons/cg';
 import AddRuleEngine from './components/AddRuleEngine';
 import EditRuleEngine from './components/EditRuleEngine';
-import { useGetAllBuildingsQuery } from '../../../redux/apis/buildingApis';
+// import { useGetAllBuildingsQuery } from '../../../redux/apis/buildingApis';
+import { useGetAllSensorsQuery } from '../../../redux/apis/sensorApis';
 import { useDeleteRuleMutation, useGetRulesQuery } from '../../../redux/apis/ruleEngineApi';
 import { toast } from 'react-toastify';
 
 const RuleEngines = () => {
   const [modalType, setModalType] = useState(null);
   const [selectedAlert, setSelectedAlert] = useState(null);
-  const { data, isLoading, isSuccess } = useGetAllBuildingsQuery('');
+  // const { data, isLoading, isSuccess } = useGetAllBuildingsQuery('');
+  const { data, isLoading } = useGetAllSensorsQuery();
+
   const { data: rule, isError } = useGetRulesQuery();
   const [deleteRule] = useDeleteRuleMutation('');
   // const response = await deleteRule(id).unwrap();

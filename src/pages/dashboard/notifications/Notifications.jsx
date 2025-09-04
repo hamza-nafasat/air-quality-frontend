@@ -92,10 +92,10 @@ const Notifications = () => {
         width: '120px',
         cell: (row) => (
           <div className="flex gap-2">
-            <MdOutlineVisibility
+            {/* <MdOutlineVisibility
               className="text-xl text-gray-400 cursor-pointer hover:text-gray-600 hover:scale-110 transition duration-200"
               onClick={() => handleView(row.building)}
-            />
+            /> */}
             <IoCheckmarkDone
               className={`text-xl cursor-pointer ${
                 row.isRead

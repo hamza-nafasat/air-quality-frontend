@@ -6,7 +6,7 @@ import { Link, useLocation, useNavigate, useRoutes } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import profilePic from '../../../assets/images/header/profilepic.png';
 import NotificationIcon from '../../../assets/svgs/pages/NotificationIcon';
-import { useLogoutMutation } from '../../../redux/apis/authApis';
+import { useLogoutMutation, useUpdateMyProfileMutation } from '../../../redux/apis/authApis';
 import Aside from '../aside/Aside';
 import { useDispatch, useSelector } from 'react-redux';
 import { userNotExist } from '../../../redux/slices/authSlice';
@@ -14,6 +14,8 @@ import Button from '../../shared/small/Button';
 import { useGetNotificationsByUserQuery } from '../../../redux/apis/notificationApis';
 import { BiSolidError } from 'react-icons/bi';
 import { RiErrorWarningFill } from 'react-icons/ri';
+import { MdEdit } from 'react-icons/md';
+import Modal from '../../shared/large/modal/Modal';
 
 const Header = () => {
   const navigate = useNavigate();
@@ -21,12 +23,18 @@ const Header = () => {
   const [profileActive, setProfileActive] = useState(false);
   const [notificationActive, setNotificationActive] = useState(false);
   const [mobileNav, setMobileNav] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
   const profileRef = useRef();
   const notificationRef = useRef();
   const location = useLocation();
   const pathname = location.pathname.split('/');
   const path = pathname[pathname.length - 1].replaceAll('-', ' ');
   const [logout, { isLoading }] = useLogoutMutation();
+  const [updateProfile, { isLoading: updating }] = useUpdateMyProfileMutation();
+  const { user } = useSelector((state) => state.auth);
+  // console.log('user', user.headerImage.url);
+
   const count = useSelector((state) => state.notification.count);
   const displayCount = count > 9 ? '9+' : count;
   const mobileNavHandler = () => setMobileNav(!mobileNav);
@@ -35,10 +43,34 @@ const Header = () => {
     setProfileActive(!profileActive);
     setNotificationActive(false);
   };
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setSelectedFile(e.target.files[0]);
+    }
+  };
 
   const handleNotification = () => {
     setNotificationActive(!notificationActive);
     setProfileActive(false);
+  };
+  const handleUpload = async () => {
+    if (!selectedFile) {
+      toast.error('Please select an image!');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', selectedFile); // ✅ correct variable
+    formData.append('updateTarget', 'headerImage'); // tells backend to update headerImage
+
+    try {
+      const res = await updateProfile(formData).unwrap();
+      toast.success('Header image updated successfully!');
+      setShowModal(false);
+      setSelectedFile(null);
+    } catch (err) {
+      toast.error(err?.data?.message || 'Failed to update image');
+    }
   };
 
   const logoutHandler = async () => {
@@ -76,7 +108,55 @@ const Header = () => {
 
   return (
     <>
-      <div className="px-2 sm:px-6 py-3 sm:py-4 flex flex-col justify-between gap-3 bg-[url('assets/images/header/header-bg.png')] bg-no-repeat bg-cover bg-center h-[202px]">
+      {showModal && (
+        <Modal onClose={() => setShowModal(false)} title="Upload Header Image">
+          <div className="flex flex-col gap-3">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="border p-2 rounded"
+            />
+            {selectedFile && (
+              <img
+                src={URL.createObjectURL(selectedFile)}
+                alt="preview"
+                className="w-full h-40 object-cover rounded-lg"
+              />
+            )}
+            <div className="flex justify-end gap-2 mt-3">
+              <Button text="Cancel" onClick={() => setShowModal(false)} />
+              <Button
+                text={updating ? 'Uploading...' : 'Upload'}
+                onClick={handleUpload}
+                disabled={updating}
+              />
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      <div className="hidden lg:block relative">
+        <div className="absolute size-14 flex items-center justify-center z-50">
+          <div
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowModal(true);
+            }}
+            className="size-7 rounded-lg bg-primary-lightBlue flex items-center justify-center cursor-pointer"
+          >
+            <MdEdit />
+          </div>
+        </div>
+      </div>
+
+      <div
+        className="px-2 sm:px-6 py-3 sm:py-4 flex flex-col justify-between gap-3 bg-no-repeat bg-cover bg-center h-[202px]"
+        style={{
+          backgroundImage: `url(${user?.headerImage?.url || '/assets/header-bg.png'})`,
+        }}
+      >
+        {/* <div className="px-2 sm:px-6 py-3 sm:py-4 flex flex-col justify-between gap-3 bg-[url('assets/images/header/header-bg.png')] bg-no-repeat bg-cover bg-center h-[202px]"> */}
         <div className="flex items-center justify-between">
           <div className="opacity-100 lg:opacity-0 cursor-pointer" onClick={mobileNavHandler}>
             <IoMenuOutline color="#fff" size={30} />

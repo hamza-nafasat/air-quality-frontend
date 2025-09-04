@@ -603,19 +603,55 @@ export const sensorInfoUpdateHandler = (
   }
 };
 
+// export const handleCancelPolygon = (
+//   setSensorPopup,
+//   setPolygons,
+//   selectedPolygon,
+//   setCurrentPolygon,
+//   setSelectedPolygon
+// ) => {
+//   setSensorPopup(false);
+//   setPolygons((prevPolygons) =>
+//     prevPolygons.filter((polygon) => polygon.id !== selectedPolygon?.id)
+//   );
+//   setCurrentPolygon([]);
+//   setSelectedPolygon(null);
+// };
+
 export const handleCancelPolygon = (
   setSensorPopup,
   setPolygons,
   selectedPolygon,
   setCurrentPolygon,
-  setSelectedPolygon
+  setSelectedPolygon,
+  setAvailableSensors,
+  selectedSensor,
+  setSelectedSensor,
+  data // pass latest sensors data
 ) => {
   setSensorPopup(false);
+
+  // Remove polygon
   setPolygons((prevPolygons) =>
     prevPolygons.filter((polygon) => polygon.id !== selectedPolygon?.id)
   );
+
   setCurrentPolygon([]);
   setSelectedPolygon(null);
+
+  // Find back sensors that are not connected
+  const notConnectedSensors = data?.data?.filter((sensor) => sensor.isConnected === false) || [];
+
+  // Reset available sensors list
+  setAvailableSensors(
+    notConnectedSensors.map(({ _id, name }) => ({
+      option: name,
+      value: _id,
+    }))
+  );
+
+  // Clear selected sensors
+  setSelectedSensor([]);
 };
 
 export const convertImageSrcToFile = async (imageSrc, fileName = 'image.png') => {

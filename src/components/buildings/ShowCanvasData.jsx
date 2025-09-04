@@ -458,7 +458,6 @@
 // };
 
 // export default ShowCanvasData;
-
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../shared/small/Button';
@@ -476,71 +475,49 @@ const convertHexToRgba = (hex, opacity) => {
   return `rgba(${r}, ${g}, ${b}, ${opacity})`;
 };
 
-// Function to get heatmap gradient colors based on temperature
-
-// Function to create gradient fill based on level: 'Low' | 'Medium' | 'High'
-// For 'Medium', if baseColor is provided (e.g., polygon.color), use it as the gradient color
+// For gradient we always use the backend-provided color and fade it to 5% opacity
 const createGradientFill = (ctx, centerX, centerY, radius, level, baseColor) => {
   const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
 
-  const levels = {
-    Low: ['rgba(59, 130, 246, 0.6)', 'rgba(59, 130, 246, 0.25)', 'rgba(59, 130, 246, 0)'],
-    Medium: ['rgba(34, 197, 94, 0.6)', 'rgba(34, 197, 94, 0.25)', 'rgba(34, 197, 94, 0)'],
-    High: ['rgba(239, 68, 68, 0.6)', 'rgba(239, 68, 68, 0.25)', 'rgba(239, 68, 68, 0)'],
-  };
-
-  let c0;
-  let c1;
-  let c2;
-  if (level === 'Medium' && baseColor) {
-    // Use polygon-specific color for Medium level, fading to transparent
-    try {
-      c0 = convertHexToRgba(baseColor, 0.6);
-      c1 = convertHexToRgba(baseColor, 0.25);
-      c2 = convertHexToRgba(baseColor, 0.0);
-    } catch (e) {
-      [c0, c1, c2] = levels.Medium;
-    }
-  } else {
-    [c0, c1, c2] = levels[level] || levels.Medium;
+  // If a backend color is provided, use it (100% → 5% opacity)
+  if (baseColor) {
+    gradient.addColorStop(0, convertHexToRgba(baseColor, 1.0)); // center: full
+    gradient.addColorStop(1, convertHexToRgba(baseColor, 0.05)); // edge: 5%
+    return gradient;
   }
+
+  // Fallback palette (should rarely hit if backend color exists)
+  const levels = {
+    Low: ['rgba(59, 130, 246, 1)', 'rgba(59, 130, 246, 0.05)'],
+    Medium: ['rgba(34, 197, 94, 1)', 'rgba(34, 197, 94, 0.05)'],
+    High: ['rgba(239, 68, 68, 1)', 'rgba(239, 68, 68, 0.05)'],
+  };
+  const [c0, c1] = levels[level] || levels.Medium;
+
   gradient.addColorStop(0, c0);
-  gradient.addColorStop(0.6, c1);
-  // subtle warm halo for heatmap feel near the outer edge
-  gradient.addColorStop(0.85, 'rgba(250, 204, 21, 0.18)');
-  gradient.addColorStop(1, c2);
+  gradient.addColorStop(1, c1);
   return gradient;
 };
 
 // Helper function to generate random destructured/irregular shapes
 const generateRandomShape = (basePolygon) => {
-  // Calculate center point of the original polygon
   const centerX =
     basePolygon.points.reduce((sum, point) => sum + point.x, 0) / basePolygon.points.length;
   const centerY =
     basePolygon.points.reduce((sum, point) => sum + point.y, 0) / basePolygon.points.length;
 
-  // Fixed size for all shapes
   const fixedDiameter = 200; // px
   const randomSize = fixedDiameter;
 
-  // Create random number of points (between 5-12 for irregular shapes)
   const numPoints = Math.floor(Math.random() * 9) + 16; // 16-24 points for smoother outline
   const points = [];
 
-  // Generate irregular points around the center
   for (let i = 0; i < numPoints; i++) {
     const angle = i * (360 / numPoints) * (Math.PI / 180);
-
-    // Add significant randomness to radius and angle for destructured look
-    const radiusVariation = 0.6 + Math.random() * 0.5; // 60% to 100% of base radius for less spikiness
+    const radiusVariation = 0.6 + Math.random() * 0.5; // 60% to 100%
     const radius = (randomSize / 2) * radiusVariation;
-
-    // Add angle variation for more organic/destructured shape
-    const angleVariation = (Math.random() - 0.5) * 0.3; // ±15% angle variation for smoother edges
+    const angleVariation = (Math.random() - 0.5) * 0.3; // ±15%
     const finalAngle = angle + angleVariation;
-
-    // Add some noise to make it more irregular
     const noiseX = (Math.random() - 0.5) * 4;
     const noiseY = (Math.random() - 0.5) * 4;
 
@@ -562,26 +539,24 @@ const generateRandomShape = (basePolygon) => {
 // Helper function to draw irregular shapes with gradient
 const drawIrregularShape = (ctx, shape, level, strokeColor) => {
   if (shape.points.length < 3) return;
+  console.log('level,strokeColor', level, strokeColor);
 
   ctx.beginPath();
   ctx.moveTo(shape.points[0].x, shape.points[0].y);
 
-  // Create smooth curves between points for more organic look
   for (let i = 1; i < shape.points.length; i++) {
     const currentPoint = shape.points[i];
     const nextPoint = shape.points[(i + 1) % shape.points.length];
 
-    // Use quadratic curves for smoother, more organic edges
     const controlX = (currentPoint.x + nextPoint.x) / 2 + (Math.random() - 0.5) * 10;
     const controlY = (currentPoint.y + nextPoint.y) / 2 + (Math.random() - 0.5) * 10;
 
     ctx.quadraticCurveTo(controlX, controlY, currentPoint.x, currentPoint.y);
   }
 
-  // Close the path back to start
   ctx.closePath();
 
-  // Create and apply gradient fill
+  // Use backend color for gradient (1.0 → 0.05 opacity)
   const gradient = createGradientFill(
     ctx,
     shape.centerX,
@@ -590,6 +565,7 @@ const drawIrregularShape = (ctx, shape, level, strokeColor) => {
     level,
     strokeColor
   );
+
   ctx.save();
   ctx.lineJoin = 'round';
   ctx.lineCap = 'round';
@@ -653,355 +629,30 @@ const ShowCanvasData = ({ image, polygons, view, heatmap = false, data = [] }) =
   const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
   console.log('polygons', polygons);
 
-  // Function to handle polygon click detection
   const handlePolygonClick = (e, polygon) => {
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
 
-    // Get the context and begin a path for the polygon
     const ctx = canvas.getContext('2d');
     ctx.beginPath();
     ctx.moveTo(polygon.points[0].x, polygon.points[0].y);
     polygon.points.forEach((point) => ctx.lineTo(point.x, point.y));
     ctx.closePath();
 
-    // Check if the click is inside the polygon path
     const isInside = ctx.isPointInPath(mouseX, mouseY);
     if (isInside) {
-      setSelectedPolygon(polygon); // Set selected polygon to display in the popup
-
-      // Calculate the position for the popup near the polygon
-      const { x, y } = polygon.points[0]; // Take the first point of the polygon
-      const padding = 10; // Adjust padding from the polygon
+      setSelectedPolygon(polygon);
+      const { x, y } = polygon.points[0];
+      const padding = 10;
       setPopupPosition({
-        top: y + padding, // Position the popup just below the polygon
-        left: x + padding, // Position the popup just to the right of the polygon
+        top: y + padding,
+        left: x + padding,
       });
     }
   };
 
-  // useEffect(() => {
-  //   const canvas = canvasRef.current;
-  //   if (!canvas) return;
-
-  //   const ctx = canvas.getContext('2d');
-
-  //   // Clear the canvas and draw the image as background
-  //   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  //   const img = new Image();
-  //   img.onload = () => {
-  //     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-  //     if (heatmap) {
-  //       // Use normal blending so colors remain visible
-  //       const previousComposite = ctx.globalCompositeOperation;
-  //       ctx.globalCompositeOperation = 'source-over';
-
-  //       // ✅ Priority order
-  //       const priority = ['temperature', 'co2', 'humidity', 'tvoc', 'co', 'ch'];
-
-  //       polygons.forEach((polygon) => {
-  //         if (!polygon || !polygon.points) return;
-
-  //         // ✅ Pick first available parameter based on priority
-  //         let selectedParam = null;
-  //         let selectedValue = null;
-
-  //         if (polygon.sensorAttached?.latestValues?.length) {
-  //           for (const param of priority) {
-  //             const match = polygon.sensorAttached.latestValues.find(
-  //               (val) => val.parameter.toLowerCase() === param
-  //             );
-  //             if (match) {
-  //               selectedParam = param;
-  //               selectedValue = match.value;
-  //               break;
-  //             }
-  //           }
-  //         }
-
-  //         if (!selectedParam) return; // skip if polygon has none of the priority sensors
-
-  //         // Generate random irregular shape
-  //         const randomShape = generateRandomShape(polygon, selectedValue);
-
-  //         // Draw the irregular shape with gradient
-  //         drawIrregularShape(ctx, randomShape, selectedValue, polygon.color);
-
-  //         // Click detection for irregular shapes
-  //         canvas.addEventListener('click', (e) => {
-  //           const rect = canvas.getBoundingClientRect();
-  //           const mouseX = e.clientX - rect.left;
-  //           const mouseY = e.clientY - rect.top;
-
-  //           ctx.beginPath();
-  //           ctx.moveTo(randomShape.points[0].x, randomShape.points[0].y);
-  //           randomShape.points.forEach((point) => ctx.lineTo(point.x, point.y));
-  //           ctx.closePath();
-  //           const isInside = ctx.isPointInPath(mouseX, mouseY);
-
-  //           if (isInside) {
-  //             setSelectedPolygon(polygon);
-
-  //             // Position popup at shape center
-  //             const padding = 10;
-  //             setPopupPosition({
-  //               top: randomShape.centerY + padding,
-  //               left: randomShape.centerX + padding,
-  //             });
-  //           }
-  //         });
-
-  //         // ✅ Label with ID + parameter + value
-  //         const labelX = randomShape.centerX;
-  //         const labelY = randomShape.centerY - 15;
-
-  //         if (labelX && labelY) {
-  //           const padding = 4;
-  //           const text = `${polygon.id} (${selectedParam}: ${selectedValue ?? 'N/A'})`;
-  //           ctx.font = 'bold 11px Arial';
-  //           const textWidth = ctx.measureText(text).width;
-  //           const textHeight = 12;
-  //           const boxWidth = textWidth + padding * 2;
-  //           const boxHeight = textHeight + padding * 2;
-  //           const boxX = labelX - boxWidth / 2;
-  //           const boxY = labelY - textHeight - padding;
-
-  //           // Draw label box background with slight transparency
-  //           ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
-  //           ctx.beginPath();
-  //           ctx.roundRect(boxX, boxY, boxWidth, boxHeight, 3);
-  //           ctx.fill();
-
-  //           // Border
-  //           ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
-  //           ctx.lineWidth = 1;
-  //           ctx.stroke();
-
-  //           // Text
-  //           ctx.fillStyle = '#0f172a';
-  //           ctx.fillText(text, boxX + padding, boxY + padding + textHeight - 2);
-  //         }
-  //       });
-
-  //       // Restore default blending
-  //       ctx.globalCompositeOperation = previousComposite;
-  //     } else {
-  //       // Draw normal polygons
-  //       polygons.forEach((polygon) => {
-  //         if (!polygon || !polygon.points) return;
-
-  //         ctx.beginPath();
-  //         ctx.moveTo(polygon.points[0].x, polygon.points[0].y);
-  //         polygon.points.forEach((point) => ctx.lineTo(point.x, point.y));
-  //         ctx.closePath();
-
-  //         // Fill polygon
-  //         ctx.fillStyle = polygon.fillColor
-  //           ? convertHexToRgba(polygon.fillColor, 0.5)
-  //           : 'rgba(255, 255, 255, 0.5)';
-  //         ctx.fill();
-
-  //         // Border
-  //         ctx.strokeStyle = polygon.color || '#000000';
-  //         ctx.lineWidth = 2;
-  //         ctx.stroke();
-
-  //         // Click detection
-  //         canvas.addEventListener('click', (e) => handlePolygonClick(e, polygon));
-
-  //         // Label
-  //         const labelX = polygon.points[0]?.x;
-  //         const labelY = polygon.points[0]?.y - 10;
-  //         if (labelX && labelY) {
-  //           const padding = 5;
-  //           const text = polygon.id;
-  //           ctx.font = '12px Arial';
-  //           const textWidth = ctx.measureText(text).width;
-  //           const textHeight = 14;
-  //           const boxWidth = textWidth + padding * 2;
-  //           const boxHeight = textHeight + padding * 2;
-  //           const boxX = labelX - padding;
-  //           const boxY = labelY - textHeight - padding;
-
-  //           ctx.fillStyle = '#FFFFFF';
-  //           ctx.beginPath();
-  //           ctx.moveTo(boxX + 4, boxY);
-  //           ctx.arcTo(boxX + boxWidth, boxY, boxX + boxWidth, boxY + boxHeight, 4);
-  //           ctx.arcTo(boxX + boxWidth, boxY + boxHeight, boxX, boxY + boxHeight, 4);
-  //           ctx.arcTo(boxX, boxY + boxHeight, boxX, boxY, 4);
-  //           ctx.arcTo(boxX, boxY, boxX + boxWidth, boxY, 4);
-  //           ctx.closePath();
-  //           ctx.fill();
-
-  //           ctx.fillStyle = '#000000';
-  //           ctx.fillText(text, boxX + padding, boxY + padding + textHeight - 4);
-  //         }
-  //       });
-  //     }
-  //   };
-  //   img.src = image;
-
-  //   return () => {
-  //     canvas.removeEventListener('click', handlePolygonClick);
-  //   };
-  // }, [image, polygons, heatmap]);
-  // useEffect(() => {
-  //   const canvas = canvasRef.current;
-  //   if (!canvas) return;
-
-  //   const ctx = canvas.getContext('2d');
-
-  //   // Clear and reset canvas
-  //   ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  //   const img = new Image();
-  //   img.onload = () => {
-  //     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-  //     if (heatmap) {
-  //       const previousComposite = ctx.globalCompositeOperation;
-  //       ctx.globalCompositeOperation = 'source-over';
-
-  //       const priority = ['temperature', 'co2', 'humidity', 'tvoc', 'co', 'ch'];
-  //       const labels = []; // store label info here
-
-  //       // --- PASS 1: draw all shapes ---
-  //       polygons.forEach((polygon) => {
-  //         if (!polygon || !polygon.points) return;
-
-  //         let selectedParam = null;
-  //         let selectedValue = null;
-
-  //         if (polygon.sensorAttached?.latestValues?.length) {
-  //           for (const param of priority) {
-  //             const match = polygon.sensorAttached.latestValues.find(
-  //               (val) => val.parameter.toLowerCase() === param
-  //             );
-  //             if (match) {
-  //               selectedParam = param;
-  //               selectedValue = match.value;
-  //               break;
-  //             }
-  //           }
-  //         }
-
-  //         if (!selectedParam) return;
-
-  //         const randomShape = generateRandomShape(polygon, selectedValue);
-  //         drawIrregularShape(ctx, randomShape, selectedValue, polygon.color);
-
-  //         // save label info for pass 2
-  //         labels.push({
-  //           x: randomShape.centerX,
-  //           y: randomShape.centerY - 20,
-  //           text: `${polygon.id} (${selectedParam}: ${selectedValue ?? 'N/A'})`,
-  //         });
-
-  //         // click detection
-  //         canvas.addEventListener('click', (e) => {
-  //           const rect = canvas.getBoundingClientRect();
-  //           const mouseX = e.clientX - rect.left;
-  //           const mouseY = e.clientY - rect.top;
-
-  //           ctx.beginPath();
-  //           ctx.moveTo(randomShape.points[0].x, randomShape.points[0].y);
-  //           randomShape.points.forEach((p) => ctx.lineTo(p.x, p.y));
-  //           ctx.closePath();
-  //           if (ctx.isPointInPath(mouseX, mouseY)) {
-  //             setSelectedPolygon(polygon);
-  //             setPopupPosition({
-  //               top: randomShape.centerY + 10,
-  //               left: randomShape.centerX + 10,
-  //             });
-  //           }
-  //         });
-  //       });
-
-  //       // --- PASS 2: draw labels on top ---
-  //       labels.forEach(({ x, y, text }) => {
-  //         const padding = 4;
-  //         ctx.font = 'bold 11px Arial';
-  //         const textWidth = ctx.measureText(text).width;
-  //         const textHeight = 12;
-  //         const boxWidth = textWidth + padding * 2;
-  //         const boxHeight = textHeight + padding * 2;
-  //         const boxX = x - boxWidth / 2;
-  //         const boxY = y - textHeight - padding;
-
-  //         ctx.fillStyle = 'rgba(255,255,255,0.85)';
-  //         ctx.beginPath();
-  //         ctx.roundRect(boxX, boxY, boxWidth, boxHeight, 3);
-  //         ctx.fill();
-
-  //         ctx.strokeStyle = 'rgba(0,0,0,0.25)';
-  //         ctx.lineWidth = 1;
-  //         ctx.stroke();
-
-  //         ctx.fillStyle = '#0f172a';
-  //         ctx.fillText(text, boxX + padding, boxY + padding + textHeight - 2);
-  //       });
-
-  //       ctx.globalCompositeOperation = previousComposite;
-  //     } else {
-  //       // --- normal polygon drawing (unchanged) ---
-  //       polygons.forEach((polygon) => {
-  //         if (!polygon || !polygon.points) return;
-
-  //         ctx.beginPath();
-  //         ctx.moveTo(polygon.points[0].x, polygon.points[0].y);
-  //         polygon.points.forEach((point) => ctx.lineTo(point.x, point.y));
-  //         ctx.closePath();
-
-  //         ctx.fillStyle = polygon.fillColor
-  //           ? convertHexToRgba(polygon.fillColor, 0.5)
-  //           : 'rgba(255, 255, 255, 0.5)';
-  //         ctx.fill();
-
-  //         ctx.strokeStyle = polygon.color || '#000000';
-  //         ctx.lineWidth = 2;
-  //         ctx.stroke();
-
-  //         canvas.addEventListener('click', (e) => handlePolygonClick(e, polygon));
-
-  //         const labelX = polygon.points[0]?.x;
-  //         const labelY = polygon.points[0]?.y - 10;
-  //         if (labelX && labelY) {
-  //           const padding = 5;
-  //           const text = polygon.id;
-  //           ctx.font = '12px Arial';
-  //           const textWidth = ctx.measureText(text).width;
-  //           const textHeight = 14;
-  //           const boxWidth = textWidth + padding * 2;
-  //           const boxHeight = textHeight + padding * 2;
-  //           const boxX = labelX - padding;
-  //           const boxY = labelY - textHeight - padding;
-
-  //           ctx.fillStyle = '#FFFFFF';
-  //           ctx.beginPath();
-  //           ctx.moveTo(boxX + 4, boxY);
-  //           ctx.arcTo(boxX + boxWidth, boxY, boxX + boxWidth, boxY + boxHeight, 4);
-  //           ctx.arcTo(boxX + boxWidth, boxY + boxHeight, boxX, boxY + boxHeight, 4);
-  //           ctx.arcTo(boxX, boxY + boxHeight, boxX, boxY, 4);
-  //           ctx.arcTo(boxX, boxY, boxX + boxWidth, boxY, 4);
-  //           ctx.closePath();
-  //           ctx.fill();
-
-  //           ctx.fillStyle = '#000000';
-  //           ctx.fillText(text, boxX + padding, boxY + padding + textHeight - 4);
-  //         }
-  //       });
-  //     }
-  //   };
-
-  //   img.src = image;
-
-  //   return () => {
-  //     canvas.removeEventListener('click', handlePolygonClick);
-  //   };
-  // }, [image, polygons, heatmap]);
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -1020,71 +671,91 @@ const ShowCanvasData = ({ image, polygons, view, heatmap = false, data = [] }) =
         ctx.globalCompositeOperation = 'source-over';
 
         const priority = ['temperature', 'co2', 'humidity', 'tvoc', 'co', 'ch'];
-        const labels = []; // store label info here
+        const labels = [];
 
-        // helper: classify Low/Medium/High
-        // const classifyLevel = (param, value) => {
-        //   if (value == null) return 'N/A';
-
-        //   switch (param) {
-        //     case 'temperature':
-        //       if (value < 20) return 'Low';
-        //       if (value < 30) return 'Medium';
-        //       return 'High';
-        //     case 'co2':
-        //       if (value < 800) return 'Low';
-        //       if (value < 1200) return 'Medium';
-        //       return 'High';
-        //     case 'humidity':
-        //       if (value < 30) return 'Low';
-        //       if (value < 60) return 'Medium';
-        //       return 'High';
-        //     default:
-        //       if (value < 50) return 'Low';
-        //       if (value < 100) return 'Medium';
-        //       return 'High';
-        //   }
-        // };
-        // helper: classify Low/Medium/High (HARD CODED RANGES)
-        const classifyLevel = (param, value) => {
-          if (value == null) return 'N/A';
-
-          switch (param) {
-            case 'temperature': // Celsius
-              if (value < 18) return 'Low'; // < 18°C
-              if (value <= 28) return 'Medium'; // 18–28°C
-              return 'High'; // > 28°C
-
-            case 'co2': // ppm
-              if (value < 800) return 'Low'; // < 800 ppm
-              if (value <= 1200) return 'Medium'; // 800–1200 ppm
-              return 'High'; // > 1200 ppm
-
-            case 'humidity': // %
-              if (value < 30) return 'Low'; // < 30%
-              if (value <= 60) return 'Medium'; // 30–60%
-              return 'High'; // > 60%
-
-            case 'tvoc': // ppb
-              if (value < 200) return 'Low'; // < 200 ppb
-              if (value <= 600) return 'Medium'; // 200–600 ppb
-              return 'High'; // > 600 ppb
-
-            case 'co': // ppm
-              if (value < 5) return 'Low'; // < 5 ppm
-              if (value <= 9) return 'Medium'; // 5–9 ppm
-              return 'High'; // > 9 ppm
-
-            case 'ch': // ppm (methane or hydrocarbons)
-              if (value < 50) return 'Low'; // < 50 ppm
-              if (value <= 100) return 'Medium'; // 50–100 ppm
-              return 'High'; // > 100 ppm
-
-            default: // fallback
-              if (value < 50) return 'Low';
-              if (value <= 100) return 'Medium';
-              return 'High';
+        // Dynamic classify using backend parameterValues
+        const classifyLevel = (param, value, parameterValues) => {
+          if (value == null) {
+            console.log('❌ No value provided');
+            return { severity: 'N/A', color: '#999' };
           }
+
+          const roundedValue = Math.round(value);
+          console.log('👉 classifyLevel param:', param, 'value:', value, 'rounded:', roundedValue);
+
+          // normalize ranges
+          const ranges = parameterValues
+            ?.filter((r) => r.name?.toLowerCase() === param?.toLowerCase())
+            .map((r) => ({
+              name: r.name,
+              min: parseFloat(r.min),
+              max: parseFloat(r.max),
+              severity: r.severity,
+              color: r.color,
+            }));
+
+          console.log('📦 filtered ranges for', param, ':', ranges);
+
+          if (!ranges?.length) {
+            console.log('❌ No ranges found for param', param);
+            return { severity: 'N/A', color: '#999' };
+          }
+
+          // try exact match
+          const match = ranges.find((r) => roundedValue >= r.min && roundedValue <= r.max);
+          console.log('🔎 exact match:', match);
+
+          const toTitle = (s) =>
+            typeof s === 'string' ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : s;
+
+          if (match) {
+            console.log('✅ Found match:', match.severity, match.color);
+            return { severity: toTitle(match.severity), color: match.color };
+          }
+
+          // sort for gap/overflow logic
+          const sorted = [...ranges].sort((a, b) => a.min - b.min);
+          console.log('📊 sorted ranges:', sorted);
+
+          const minRange = sorted[0];
+          const maxRange = sorted[sorted.length - 1];
+
+          // if (roundedValue < minRange.min) {
+          //   console.log('⬇️ below all ranges, take lowest:', minRange);
+          //   return { severity: toTitle(minRange.severity), color: minRange.color };
+          // }
+
+          // if (roundedValue > maxRange.max) {
+          //   console.log('⬆️ above all ranges, take highest:', maxRange);
+          //   return { severity: toTitle(maxRange.severity), color: maxRange.color };
+          // }
+
+          if (roundedValue < minRange.min) {
+            console.log('⬇️ below all ranges → force LOW severity');
+            const low = sorted.find((r) => r.severity?.toLowerCase() === 'low') || minRange;
+            return { severity: toTitle(low.severity), color: low.color };
+          }
+
+          if (roundedValue > maxRange.max) {
+            console.log('⬆️ above all ranges → force HIGH severity');
+            const high = sorted.find((r) => r.severity?.toLowerCase() === 'high') || maxRange;
+            return { severity: toTitle(high.severity), color: high.color };
+          }
+
+          // gap handling
+          for (let i = 0; i < sorted.length - 1; i++) {
+            if (roundedValue > sorted[i].max && roundedValue < sorted[i + 1].min) {
+              console.log(`🌀 value in gap between`, sorted[i], 'and', sorted[i + 1]);
+              const distToPrev = roundedValue - sorted[i].max;
+              const distToNext = sorted[i + 1].min - roundedValue;
+              const nearest = distToPrev < distToNext ? sorted[i] : sorted[i + 1];
+              console.log('📌 snapping to nearest:', nearest);
+              return { severity: toTitle(nearest.severity), color: nearest.color };
+            }
+          }
+
+          console.log('❓ fell through all conditions, return N/A');
+          return { severity: 'N/A', color: '#999' };
         };
 
         // --- PASS 1: draw all shapes ---
@@ -1096,12 +767,12 @@ const ShowCanvasData = ({ image, polygons, view, heatmap = false, data = [] }) =
 
           if (polygon.sensorAttached?.latestValues?.length) {
             for (const param of priority) {
-              const match = polygon.sensorAttached.latestValues.find(
-                (val) => val.parameter.toLowerCase() === param
+              const found = polygon.sensorAttached.latestValues.find(
+                (val) => val.parameter?.toLowerCase() === param
               );
-              if (match) {
+              if (found) {
                 selectedParam = param;
-                selectedValue = match.value;
+                selectedValue = found.value;
                 break;
               }
             }
@@ -1110,17 +781,23 @@ const ShowCanvasData = ({ image, polygons, view, heatmap = false, data = [] }) =
           if (!selectedParam) return;
 
           const randomShape = generateRandomShape(polygon);
-          const level = classifyLevel(selectedParam, selectedValue);
-          console.log('selectedValue', selectedValue);
 
-          // pass polygon.color as base for Medium level gradient
-          drawIrregularShape(ctx, randomShape, level, polygon.color || '#22c55e');
+          const { severity, color } = classifyLevel(
+            selectedParam,
+            selectedValue,
+            polygon?.sensorAttached?.parameterValues || parameterValues // fallback to global
+          );
+
+          console.log('selectedValue', selectedValue, '→', severity, color);
+
+          // Use backend color to build gradient (100% → 5% opacity)
+          drawIrregularShape(ctx, randomShape, severity, color);
 
           // save label info for pass 2
           labels.push({
             x: randomShape.centerX,
             y: randomShape.centerY - 20,
-            text: `${polygon.id} (${selectedParam}: ${selectedValue ?? 'N/A'}) - ${level}`,
+            text: `${polygon.id} (${selectedParam}: ${selectedValue ?? 'N/A'}) - ${severity}`,
           });
 
           // click detection
@@ -1234,7 +911,6 @@ const ShowCanvasData = ({ image, polygons, view, heatmap = false, data = [] }) =
         ref={canvasRef}
         className="border border-primary-lightBlue border-dashed bg-[#03a5e010] rounded-lg"
       />
-      {/* Render RingMeter at the center of each heatmap polygon */}
 
       {selectedPolygon && (
         <div
@@ -1330,7 +1006,6 @@ const ShowCanvasData = ({ image, polygons, view, heatmap = false, data = [] }) =
                 <div className="flex pb-3 items-center justify-center">
                   <button
                     className="bg-white  border-2 border-[#03A5E0] hover:bg-[#a5a5a5] hover:text-white px-4 py-1 rounded-md text-primary-lightBlue font-semibold transition-all "
-                    // onClick={() => setSelectedPolygon(null)}
                     onClick={() =>
                       navigate(
                         `/dashboard/sensors/sensor-detail/${selectedPolygon?.sensorAttached?._id}`
