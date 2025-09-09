@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import getEnv from '../../config/config.js';
+import { TAGS } from '../tags/tagTypes.js';
 
 const sensorApis = createApi({
   reducerPath: 'sensorApis',
@@ -7,7 +8,7 @@ const sensorApis = createApi({
     baseUrl: `${getEnv('SERVER_URL')}/api/sensor`,
     credentials: 'include',
   }),
-  tagTypes: ['sensor'],
+  tagTypes: [TAGS.SENSOR],
   endpoints: (builder) => ({
     // create sensor
     // -------------
@@ -17,7 +18,7 @@ const sensorApis = createApi({
         method: 'POST',
         body: data,
       }),
-      invalidatesTags: ['sensor'],
+      invalidatesTags: [TAGS.SENSOR],
     }),
 
     // get all sensors
@@ -27,7 +28,7 @@ const sensorApis = createApi({
         url: '/all',
         method: 'GET',
       }),
-      providesTags: ['sensor'],
+      providesTags: [TAGS.SENSOR],
     }),
 
     // get single sensors
@@ -37,14 +38,15 @@ const sensorApis = createApi({
         url: `/single/${sensorId}`,
         method: 'GET',
       }),
-      providesTags: ['sensor'],
+      providesTags: [TAGS.SENSOR],
     }),
+
     getSingleSensorSql: builder.query({
       query: (sensorId) => ({
         url: `/humidity/${sensorId}`,
         method: 'GET',
       }),
-      providesTags: ['sensor'],
+      providesTags: [TAGS.SENSOR],
     }),
 
     // update sensor
@@ -55,7 +57,7 @@ const sensorApis = createApi({
         method: 'PUT',
         body: data,
       }),
-      invalidatesTags: ['sensor'],
+      invalidatesTags: [TAGS.SENSOR],
     }),
 
     // delete sensor
@@ -65,7 +67,7 @@ const sensorApis = createApi({
         url: `/single/${sensorId}`,
         method: 'DELETE',
       }),
-      invalidatesTags: ['sensor'],
+      invalidatesTags: [TAGS.SENSOR],
     }),
   }),
 });

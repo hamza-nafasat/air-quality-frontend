@@ -1,13 +1,14 @@
-// src/redux/services/alertApi.js
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import getEnv from '../../config/config.js';
+import { TAGS } from '../tags/tagTypes.js';
+
 export const alertApi = createApi({
   reducerPath: 'alertApi',
   baseQuery: fetchBaseQuery({
     baseUrl: `${getEnv('SERVER_URL')}/api/alert`,
     credentials: 'include',
   }),
-  tagTypes: ['Alert'],
+  tagTypes: [TAGS.ALERT],
   endpoints: (builder) => ({
     // Create alert
     createAlert: builder.mutation({
@@ -16,13 +17,13 @@ export const alertApi = createApi({
         method: 'POST',
         body,
       }),
-      invalidatesTags: ['Alert'],
+      invalidatesTags: [TAGS.ALERT],
     }),
 
     // Get all alerts
     getAlerts: builder.query({
       query: () => '/all',
-      providesTags: ['Alert'],
+      providesTags: [TAGS.ALERT],
     }),
 
     // Update alert
@@ -32,7 +33,7 @@ export const alertApi = createApi({
         method: 'PUT',
         body,
       }),
-      invalidatesTags: ['Alert'],
+      invalidatesTags: [TAGS.ALERT],
     }),
 
     // Delete alert
@@ -41,7 +42,7 @@ export const alertApi = createApi({
         url: `/single/${alertId}`,
         method: 'DELETE',
       }),
-      invalidatesTags: ['Alert'],
+      invalidatesTags: [TAGS.ALERT],
     }),
   }),
 });

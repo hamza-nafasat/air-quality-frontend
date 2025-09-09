@@ -1,13 +1,14 @@
-// src/redux/services/ruleEngineApi.js
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import getEnv from '../../config/config.js';
+import { TAGS } from '../tags/tagTypes.js';
+
 export const ruleEngineApi = createApi({
   reducerPath: 'ruleEngineApi',
   baseQuery: fetchBaseQuery({
     baseUrl: `${getEnv('SERVER_URL')}/api/rule-engine`,
     credentials: 'include',
   }),
-  tagTypes: ['Rule-Engine'],
+  tagTypes: [TAGS.RULE_ENGINE],
   endpoints: (builder) => ({
     // Create alert
     createRule: builder.mutation({
@@ -16,13 +17,13 @@ export const ruleEngineApi = createApi({
         method: 'POST',
         body,
       }),
-      invalidatesTags: ['Rule-Engine'],
+      invalidatesTags: [TAGS.RULE_ENGINE],
     }),
 
     // Get all alerts
     getRules: builder.query({
       query: () => '/all',
-      providesTags: ['Rule-Engine'],
+      providesTags: [TAGS.RULE_ENGINE],
     }),
 
     // Update alert
@@ -32,7 +33,7 @@ export const ruleEngineApi = createApi({
         method: 'PUT',
         body,
       }),
-      invalidatesTags: ['Rule-Engine'],
+      invalidatesTags: [TAGS.RULE_ENGINE],
     }),
 
     // Delete alert
@@ -41,7 +42,7 @@ export const ruleEngineApi = createApi({
         url: `/single/${ruleId}`,
         method: 'DELETE',
       }),
-      invalidatesTags: ['Rule-Engine'],
+      invalidatesTags: [TAGS.RULE_ENGINE],
     }),
   }),
 });

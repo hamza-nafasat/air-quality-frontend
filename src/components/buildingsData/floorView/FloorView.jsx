@@ -40,7 +40,7 @@ const FloorView = () => {
   const { id } = useParams();
   const [image, setImage] = useState('');
   const [polygons, setPolygons] = useState([]);
-  const { data: floor, isLoading } = useGetSingleFloorQuery(id);
+  const { data: floor, isLoading, isFetching } = useGetSingleFloorQuery(id);
   const [deleteFloor] = useDeleteSingleFloorMutation();
   // console.log('full data of floor', floor);
 
@@ -80,6 +80,8 @@ const FloorView = () => {
   };
   const enrichedResponse = enrichResponseData(floor);
   // console.log('new', enrichedResponse);
+  console.log('isLoading', isLoading);
+  console.log('isFetching', isFetching);
 
   const handleOpenDeleteModal = () => {
     confirmAlert({
@@ -122,7 +124,10 @@ const FloorView = () => {
       setPolygons(singleFloor?.twoDModelCanvasData ? singleFloor?.twoDModelCanvasData : []);
     }
   }, [floor?.data]);
-  return isLoading ? (
+  const loading = isLoading || isFetching;
+  console.log('comaire', loading);
+
+  return isLoading || isFetching ? (
     <Loader />
   ) : (
     <div>

@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import getEnv from '../../config/config.js';
+import { TAGS } from '../tags/tagTypes.js';
 
 const notificationApis = createApi({
   reducerPath: 'notificationApi',
@@ -7,9 +8,7 @@ const notificationApis = createApi({
     baseUrl: `${getEnv('SERVER_URL')}/api/notification`,
     credentials: 'include',
   }),
-
-  tagTypes: ['notification'],
-
+  tagTypes: [TAGS.NOTIFICATION],
   endpoints: (builder) => ({
     // ✅ Get all notifications
     getAllNotifications: builder.query({
@@ -17,7 +16,7 @@ const notificationApis = createApi({
         url: '/all',
         method: 'GET',
       }),
-      providesTags: ['notification'],
+      providesTags: [TAGS.NOTIFICATION],
     }),
 
     // ✅ Get notifications by userId
@@ -26,7 +25,7 @@ const notificationApis = createApi({
         url: `/user/${userId}`,
         method: 'GET',
       }),
-      providesTags: ['notification'],
+      providesTags: [TAGS.NOTIFICATION],
     }),
 
     // ✅ Update notification (e.g., mark as read/unread)
@@ -36,7 +35,7 @@ const notificationApis = createApi({
         method: 'PUT',
         body: data,
       }),
-      invalidatesTags: ['notification'],
+      invalidatesTags: [TAGS.NOTIFICATION],
     }),
 
     // ✅ Delete notification
@@ -45,7 +44,7 @@ const notificationApis = createApi({
         url: `/${id}`,
         method: 'DELETE',
       }),
-      invalidatesTags: ['notification'],
+      invalidatesTags: [TAGS.NOTIFICATION],
     }),
   }),
 });
@@ -56,5 +55,4 @@ export const {
   useUpdateNotificationMutation,
   useDeleteNotificationMutation,
 } = notificationApis;
-
 export default notificationApis;

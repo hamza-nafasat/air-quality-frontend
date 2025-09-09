@@ -6,10 +6,14 @@ import { Link, useLocation, useNavigate, useRoutes } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import profilePic from '../../../assets/images/header/profilepic.png';
 import NotificationIcon from '../../../assets/svgs/pages/NotificationIcon';
-import { useLogoutMutation, useUpdateMyProfileMutation } from '../../../redux/apis/authApis';
+import {
+  useGetMyProfileQuery,
+  useLogoutMutation,
+  useUpdateMyProfileMutation,
+} from '../../../redux/apis/authApis';
 import Aside from '../aside/Aside';
 import { useDispatch, useSelector } from 'react-redux';
-import { userNotExist } from '../../../redux/slices/authSlice';
+import { userExist, userNotExist } from '../../../redux/slices/authSlice';
 import Button from '../../shared/small/Button';
 import { useGetNotificationsByUserQuery } from '../../../redux/apis/notificationApis';
 import { BiSolidError } from 'react-icons/bi';
@@ -32,8 +36,14 @@ const Header = () => {
   const path = pathname[pathname.length - 1].replaceAll('-', ' ');
   const [logout, { isLoading }] = useLogoutMutation();
   const [updateProfile, { isLoading: updating }] = useUpdateMyProfileMutation();
+  const { data: profile, isLoading: getProfileLoading } = useGetMyProfileQuery();
   const { user } = useSelector((state) => state.auth);
   // console.log('user', user.headerImage.url);
+  useEffect(() => {
+    if (profile?.success) {
+      dispatch(userExist(profile.data));
+    }
+  }, [profile, dispatch]);
 
   const count = useSelector((state) => state.notification.count);
   const displayCount = count > 9 ? '9+' : count;

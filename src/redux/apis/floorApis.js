@@ -1,20 +1,24 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import getEnv from "../../config/config.js";
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import getEnv from '../../config/config.js';
+import { TAGS } from '../tags/tagTypes.js';
 
 const floorApis = createApi({
-  reducerPath: "floorApi",
-  baseQuery: fetchBaseQuery({ baseUrl: `${getEnv("SERVER_URL")}/api/floor`, credentials: "include" }),
-
+  reducerPath: 'floorApi',
+  baseQuery: fetchBaseQuery({
+    baseUrl: `${getEnv('SERVER_URL')}/api/floor`,
+    credentials: 'include',
+  }),
+  tagTypes: [TAGS.FLOOR],
   endpoints: (builder) => ({
     // create floor
     // --------------
     createFloor: builder.mutation({
       query: (data) => ({
-        url: "/create",
-        method: "POST",
+        url: '/create',
+        method: 'POST',
         body: data,
       }),
-      invalidatesTags: ["floor"],
+      invalidatesTags: [TAGS.FLOOR, TAGS.SENSOR],
     }),
 
     // get all floors
@@ -22,9 +26,9 @@ const floorApis = createApi({
     getAllFloor: builder.query({
       query: (buildingId) => ({
         url: `/all?buildingId=${buildingId}`,
-        method: "GET",
+        method: 'GET',
       }),
-      providesTags: ["floor"],
+      providesTags: [TAGS.FLOOR],
     }),
 
     // get single floor
@@ -32,9 +36,9 @@ const floorApis = createApi({
     getSingleFloor: builder.query({
       query: (floorId) => ({
         url: `/single/${floorId}`,
-        method: "GET",
+        method: 'GET',
       }),
-      providesTags: ["floor"],
+      providesTags: [TAGS.FLOOR],
     }),
 
     // update single floor
@@ -42,10 +46,10 @@ const floorApis = createApi({
     updateSingleFloor: builder.mutation({
       query: ({ floorId, data }) => ({
         url: `/single/${floorId}`,
-        method: "PUT",
+        method: 'PUT',
         body: data,
       }),
-      invalidatesTags: ["floor"],
+      invalidatesTags: [TAGS.FLOOR, TAGS.SENSOR],
     }),
 
     // delete single floor
@@ -53,9 +57,9 @@ const floorApis = createApi({
     deleteSingleFloor: builder.mutation({
       query: (floorId) => ({
         url: `/single/${floorId}`,
-        method: "DELETE",
+        method: 'DELETE',
       }),
-      invalidatesTags: ["floor"],
+      invalidatesTags: [TAGS.FLOOR, TAGS.SENSOR],
     }),
   }),
 });

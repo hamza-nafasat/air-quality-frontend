@@ -17,8 +17,15 @@ const reportsApi = createApi({
       }),
       //   providesTags: ['floor'],
     }),
+    getFilteredReports: builder.query({
+      query: (params) => ({
+        url: `/`,
+        method: 'GET',
+        params,
+      }),
+    }),
   }),
 });
 
-export const { useGetReportsQuery, useLazyGetReportsQuery } = reportsApi;
+export const { useGetReportsQuery, useLazyGetReportsQuery, useLazyGetFilteredReportsQuery, useGetFilteredReportsQuery } = reportsApi;
 export default reportsApi;

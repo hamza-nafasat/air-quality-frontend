@@ -1,30 +1,34 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import getEnv from "../../config/config.js";
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import getEnv from '../../config/config.js';
+import { TAGS } from '../tags/tagTypes.js';
 
 const buildingApis = createApi({
-  reducerPath: "buildingApi",
-  baseQuery: fetchBaseQuery({ baseUrl: `${getEnv("SERVER_URL")}/api/building`, credentials: "include" }),
-
+  reducerPath: 'buildingApi',
+  baseQuery: fetchBaseQuery({
+    baseUrl: `${getEnv('SERVER_URL')}/api/building`,
+    credentials: 'include',
+  }),
+  tagTypes: [TAGS.BUILDING],
   endpoints: (builder) => ({
     // create building
     // --------------
     createBuilding: builder.mutation({
       query: (data) => ({
-        url: "/create",
-        method: "POST",
+        url: '/create',
+        method: 'POST',
         body: data,
       }),
-      invalidatesTags: ["building"],
+      invalidatesTags: [TAGS.BUILDING],
     }),
 
     // get all buildings
     // ----------------
     getAllBuildings: builder.query({
       query: () => ({
-        url: "/all",
-        method: "GET",
+        url: '/all',
+        method: 'GET',
       }),
-      providesTags: ["building"],
+      providesTags: [TAGS.BUILDING],
     }),
 
     // get single building
@@ -32,9 +36,18 @@ const buildingApis = createApi({
     getSingleBuilding: builder.query({
       query: (buildingId) => ({
         url: `/single/${buildingId}`,
-        method: "GET",
+        method: 'GET',
       }),
-      providesTags: ["building"],
+      providesTags: [TAGS.BUILDING],
+    }),
+    // get single building
+    // -------------------
+    getallBuildingsHierarchy: builder.query({
+      query: () => ({
+        url: `/all-with-hierarchy`,
+        method: 'GET',
+      }),
+      providesTags: [TAGS.BUILDING],
     }),
 
     // update single building
@@ -42,10 +55,10 @@ const buildingApis = createApi({
     updateSingleBuilding: builder.mutation({
       query: ({ buildingId, data }) => ({
         url: `/single/${buildingId}`,
-        method: "PUT",
+        method: 'PUT',
         body: data,
       }),
-      invalidatesTags: ["building"],
+      invalidatesTags: [TAGS.BUILDING, TAGS.FLOOR, TAGS.SENSOR],
     }),
 
     // delete single building
@@ -53,9 +66,9 @@ const buildingApis = createApi({
     deleteSingleBuilding: builder.mutation({
       query: (buildingId) => ({
         url: `/single/${buildingId}`,
-        method: "DELETE",
+        method: 'DELETE',
       }),
-      invalidatesTags: ["building"],
+      invalidatesTags: [TAGS.BUILDING, TAGS.FLOOR, TAGS.SENSOR],
     }),
   }),
 });
@@ -66,5 +79,6 @@ export const {
   useGetSingleBuildingQuery,
   useUpdateSingleBuildingMutation,
   useDeleteSingleBuildingMutation,
+  useGetallBuildingsHierarchyQuery,
 } = buildingApis;
 export default buildingApis;
