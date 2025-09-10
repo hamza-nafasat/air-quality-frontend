@@ -38,7 +38,7 @@ const Header = () => {
   const [updateProfile, { isLoading: updating }] = useUpdateMyProfileMutation();
   const { data: profile, isLoading: getProfileLoading } = useGetMyProfileQuery();
   const { user } = useSelector((state) => state.auth);
-  // console.log('user', user.headerImage.url);
+  console.log('user', user);
   useEffect(() => {
     if (profile?.success) {
       dispatch(userExist(profile.data));
@@ -197,7 +197,8 @@ const Header = () => {
                   className="flex items-center gap-2 text-base text-white cursor-pointer"
                   onClick={() => handleProfile()}
                 >
-                  Hello, <span className="font-semibold">MKS</span>
+                  {user?.firstName}
+                  <span className="font-semibold">{user?.lastName}</span>
                   <FaChevronDown size={10} rotate={profileActive ? 180 : 90} />
                 </p>
                 {profileActive && (
@@ -223,7 +224,7 @@ const Header = () => {
                 )}
               </div>
               <img
-                src={profilePic}
+                src={user?.image?.url}
                 alt="profile-pic"
                 className="w-[38px] h-[38px] rounded-full object-cover hidden md:inline-block border-2 border-primary-lightBlue"
               />

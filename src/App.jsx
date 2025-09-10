@@ -27,6 +27,7 @@ import Notifications from './pages/dashboard/notifications/Notifications';
 import { socket } from './sockets/socket';
 import { toast } from 'react-toastify';
 import { setCount } from './redux/slices/notificationSlice';
+import Users from './pages/dashboard/users/Users';
 
 const Dashboard = lazy(() => import('./pages/dashboard/index'));
 const Buildings = lazy(() => import('./pages/dashboard/buildings/Buildings'));
@@ -46,6 +47,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [getUserProfile] = useGetMyProfileFirstTimeMutation();
   const { user } = useSelector((state) => state.auth);
+  console.log('user', user);
 
   useEffect(() => {
     getUserProfile()
@@ -168,6 +170,7 @@ function App() {
             <Route path="change-password" element={<ChangePassword />} />
             <Route path="profile" element={<Profile />} />
             <Route path="notifications" element={<Notifications />} />
+            <Route path="users" element={<Users />} />
           </Route>
         </Routes>
       </BrowserRouter>

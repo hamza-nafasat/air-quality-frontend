@@ -1,5 +1,6 @@
 export const TAGS = {
   AUTH: 'Auth',
+  USER: 'user',
   PROFILE: 'Profile',
   BUILDING: 'Building',
   FLOOR: 'Floor',

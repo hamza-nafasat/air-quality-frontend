@@ -8,6 +8,8 @@ import Co2Icon from '../../../assets/svgs/reports/Co2Icon';
 import HumidityIcon from '../../../assets/svgs/reports/HumidityIcon';
 import CoIcon from '../../../assets/svgs/reports/CoIcon';
 import Ch4Icon from '../../../assets/svgs/reports/Ch4Icon';
+import { useEffect, useState } from 'react';
+import { FaSpinner } from 'react-icons/fa';
 
 const columns = [
   {
@@ -103,8 +105,75 @@ Ratings.propTypes = {
   title: PropTypes.string.isRequired,
 };
 
+const CHUNK_SIZE = 200; // adjust as needed
+
 const FloorCard = ({ floor, filterLoading }) => {
-  console.log('floor', floor);
+  const [visibleData, setVisibleData] = useState([]);
+  const [chunkIndex, setChunkIndex] = useState(0);
+  const [loadingMore, setLoadingMore] = useState(false);
+
+  useEffect(() => {
+    if (floor?.sensorData?.length > 0) {
+      console.log('🔄 New floor data received:', {
+        floorId: floor.floorId,
+        totalRows: floor.sensorData.length,
+      });
+
+      setVisibleData([]);
+      setChunkIndex(0);
+
+      // Start loading first chunk immediately
+      loadNextChunk(0);
+    }
+  }, [floor?.sensorData]);
+
+  const loadNextChunk = (index) => {
+    const start = index * CHUNK_SIZE;
+    const end = start + CHUNK_SIZE;
+    const chunk = floor.sensorData.slice(start, end);
+
+    if (chunk.length > 0) {
+      console.log(`⏳ Loading chunk ${index + 1}`, {
+        start,
+        end,
+        rowsInChunk: chunk.length,
+      });
+
+      setLoadingMore(true);
+
+      setTimeout(() => {
+        setVisibleData((prev) => {
+          const newData = [...prev, ...chunk];
+          console.log(`✅ Painted chunk ${index + 1}`, {
+            totalVisibleRows: newData.length,
+          });
+          return newData;
+        });
+
+        setChunkIndex(index + 1);
+        setLoadingMore(false);
+      }, 100); // delay lets browser paint
+    } else {
+      console.log('🎉 All chunks painted for floor:', floor.floorId);
+    }
+  };
+
+  // Auto-load next chunk until all rows loaded
+  useEffect(() => {
+    if (!loadingMore && chunkIndex * CHUNK_SIZE < (floor?.sensorData?.length || 0)) {
+      loadNextChunk(chunkIndex);
+    }
+  }, [chunkIndex, loadingMore]);
+
+  useEffect(() => {
+    console.log('📊 Debug state', {
+      floorId: floor.floorId,
+      visibleRows: visibleData.length,
+      totalRows: floor?.sensorData?.length || 0,
+      chunkIndex,
+      loadingMore,
+    });
+  }, [visibleData, chunkIndex, loadingMore]);
 
   return (
     <div className="bg-white rounded-[20px] border-[2px] border-[#00000012] p-4 mb-4">
@@ -177,17 +246,23 @@ const FloorCard = ({ floor, filterLoading }) => {
       <div className="mt-4">
         <DataTable
           columns={columns}
-          data={floor.sensorData || []}
+          data={visibleData}
           customStyles={tableStyles}
-          progressPending={!!filterLoading}
+          progressPending={!!filterLoading && visibleData.length === 0}
           progressComponent={
-            <div className="w-full flex flex-col gap-2">
-              {Array.from({ length: 8 }).map((_, idx) => (
-                <Skeleton key={idx} height={40} />
-              ))}
+            <div className="flex justify-center items-center gap-2 py-6 text-gray-600">
+              <FaSpinner className="animate-spin text-blue-500 w-6 h-6" />
+              Loading data…
             </div>
           }
         />
+
+        {loadingMore && visibleData.length > 0 && (
+          <div className="flex justify-center items-center gap-2 py-4 text-gray-600">
+            <FaSpinner className="animate-spin text-blue-500 w-5 h-5" />
+            Rendering more rows…
+          </div>
+        )}
       </div>
     </div>
   );

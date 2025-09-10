@@ -141,6 +141,7 @@ import SensorsIcon from '../../../assets/svgs/pages/SensorsIcon';
 import SettingsIcon from '../../../assets/svgs/pages/SettingsIcon';
 import ArrowbackIcon from '../../../assets/svgs/pages/ArrowbackIcon';
 import SubscriptionIcon from '../../../assets/svgs/pages/SubscriptionIcon';
+import { PiUsers } from 'react-icons/pi';
 
 const Aside = () => {
   const navigate = useNavigate();
@@ -158,6 +159,13 @@ const Aside = () => {
       link: '/dashboard',
       isActive: url === 'dashboard',
       icon: <HomeIcon activeLink={url === 'dashboard'} />,
+    },
+
+    {
+      title: 'Users',
+      link: '/dashboard/users',
+      isActive: url.startsWith('dashboard/users'),
+      icon: <PiUsers activeLink={url.startsWith('dashboard/users')} />,
     },
     {
       title: url.includes('add-building') ? 'add-building' : 'buildings',
