@@ -118,6 +118,14 @@ const subscriptionsApis = createApi({
       }),
       providesTags: ['Subscription'],
     }),
+
+    getUserSubscriptionHistory: builder.query({
+      query: (userId) => ({
+        url: `/history/${userId}`,
+        method: 'GET',
+      }),
+      providesTags: ['Subscription'],
+    }),
   }),
 });
 
@@ -131,6 +139,7 @@ export const {
   useGetSubscriptionHistoryQuery,
   useUpdateSubscriptionMutation,
   useCheckSubscriptionStatusQuery,
+  useGetUserSubscriptionHistoryQuery,
 } = subscriptionsApis;
 
 export default subscriptionsApis;

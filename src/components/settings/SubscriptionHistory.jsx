@@ -4,10 +4,18 @@ import DataTable from 'react-data-table-component';
 
 import { AiOutlineDownload } from 'react-icons/ai';
 import { subscriptionHistoryData } from '../../data/data';
-import { useGetAllSubscriptionsQuery } from '../../redux/apis/subscriptionApis';
+import {
+  useGetAllSubscriptionsQuery,
+  useGetUserSubscriptionHistoryQuery,
+} from '../../redux/apis/subscriptionApis';
+import { useSelector } from 'react-redux';
 
 const SubscriptionHistory = () => {
-  const { data, isLoading, refetch } = useGetAllSubscriptionsQuery();
+  const { user } = useSelector((state) => state.auth);
+
+  // const { data, isLoading, refetch } = useGetAllSubscriptionsQuery();
+  const { data } = useGetUserSubscriptionHistoryQuery(user._id);
+  // console.log('newsdsd', newsdsd);
 
   const [activeButton, setActiveButton] = useState('profile');
 
@@ -17,47 +25,52 @@ const SubscriptionHistory = () => {
 
   const columns = [
     {
-      name: 'Name',
-      selector: (row) => row?.user?.firstName + ' ' + row?.user?.lastName,
+      name: 'User ID',
+      selector: (row) => row?.user,
     },
     {
       name: 'Plan',
       selector: (row) => row?.plan,
+      sortable: true,
     },
     {
-      name: 'Status',
-      cell: (row) =>
-        row.subscriptionStatus === 'active' || row.subscriptionStatus === 'trialing' ? (
-          <div className="bg-[#B2FFB0] rounded-[6px] text-sm w-[90px] h-8 grid place-items-center capitalize">
-            {row.subscriptionStatus}
-          </div>
-        ) : row.subscriptionStatus === 'expired' ? (
-          <div className="bg-[#D3D3D3] rounded-[6px] text-sm w-[90px] h-8 grid place-items-center  capitalize">
-            {row.subscriptionStatus}
-          </div>
-        ) : (
-          <div className="bg-[#FF7A7F] rounded-[6px] text-sm w-[90px] h-8 grid place-items-center capitalize">
-            {row.subscriptionStatus}
-          </div>
-        ),
+      name: 'Action',
+      cell: (row) => (
+        <div
+          className={`rounded-[6px] text-sm w-[90px] h-8 grid place-items-center capitalize
+          ${
+            row.action === 'created'
+              ? 'bg-[#B2FFB0]'
+              : row.action === 'updated'
+              ? 'bg-[#FFD580]'
+              : row.action === 'canceled'
+              ? 'bg-[#FF7A7F]'
+              : row.action === 'deleted'
+              ? 'bg-[#D3D3D3]'
+              : 'bg-gray-200'
+          }`}
+        >
+          {row.action}
+        </div>
+      ),
+      sortable: true,
     },
     {
-      name: 'Last Updated',
-      selector: (row) =>
-        row?.updatedAt?.split('T')[0]?.split('-')[1] +
-        '/' +
-        row?.updatedAt?.split('T')[0]?.split('-')[2] +
-        '/' +
-        row?.updatedAt?.split('T')[0]?.split('-')[0],
+      name: 'Created At',
+      selector: (row) => {
+        if (!row?.createdAt) return '';
+        const date = new Date(row.createdAt);
+        return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+      },
+      sortable: true,
     },
     {
-      name: 'CreatedAt',
-      selector: (row) =>
-        row?.createdAt?.split('T')[0]?.split('-')[1] +
-        '/' +
-        row?.createdAt?.split('T')[0]?.split('-')[2] +
-        '/' +
-        row?.createdAt?.split('T')[0]?.split('-')[0],
+      name: 'Stripe Customer',
+      selector: (row) => row?.stripeCustomerId,
+    },
+    {
+      name: 'Stripe Subscription',
+      selector: (row) => row?.stripeSubscriptionId,
     },
   ];
 

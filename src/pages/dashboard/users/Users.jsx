@@ -14,6 +14,7 @@ import Dropdown from '../../../components/shared/small/Dropdown';
 import { FaRegEyeSlash } from 'react-icons/fa';
 import { IoEyeOutline } from 'react-icons/io5';
 import Modal from '../../../components/shared/large/modal/Modal';
+import Button from '../../../components/shared/small/Button';
 
 function Users() {
   const { data, isLoading } = useGetUsersByCreatorQuery();
@@ -178,17 +179,19 @@ function Users() {
 
   return (
     <div className="p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-bold">Users</h2>
-        <button
-          onClick={() => {
-            resetForm();
-            setIsModalOpen(true);
-          }}
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg"
-        >
-          Add User
-        </button>
+      <div className="flex w-full justify-between items-center mb-4">
+        <div>
+          <h2 className="text-lg font-bold">Users</h2>
+        </div>
+        <div>
+          <Button
+            text={' Add User'}
+            onClick={() => {
+              resetForm();
+              setIsModalOpen(true);
+            }}
+          />
+        </div>
       </div>
 
       <DataTable
@@ -236,7 +239,7 @@ function Users() {
                 { option: 'Subscription_Manager' },
                 { option: 'Inspection_manager' },
               ]}
-              defaultText="Select Role"
+              defaultText={formData.role || 'Select Role'}
               onSelect={(opt) => handleChange('role', opt.option)}
               value={formData.role}
             />
@@ -269,12 +272,15 @@ function Users() {
               }
             />
           </div>
-          <button
+          <div className="mt-4">
+            <Button onClick={handleSubmit} text={editingUser ? 'Update User' : 'Create User'} />
+          </div>
+          {/* <button
             onClick={handleSubmit}
             className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg w-full"
           >
             {editingUser ? 'Update User' : 'Create User'}
-          </button>
+          </button> */}
         </Modal>
       )}
     </div>
