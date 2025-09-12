@@ -7,13 +7,19 @@ import { useGetAllBuildingsQuery } from '../../../redux/apis/buildingApis';
 import Loader from '../../../components/shared/small/Loader';
 import RingMeter from '../../../components/buildings/utils/RingMeter';
 import BuildingCards from '../../../components/buildings/BuildingCards';
+import { useSelector } from 'react-redux';
 
 /* ─────────────────────────────────────────────────────────────────── */
 /*  Main page                                                          */
 /* ─────────────────────────────────────────────────────────────────── */
 const Buildings = () => {
   const { data, isLoading, isSuccess } = useGetAllBuildingsQuery('');
+  const { user } = useSelector((state) => state.auth);
+  const isAdmin = user.role === 'user';
+  const isAdminORSubscription = ['user', 'Inspection_manager'].includes(user.role);
 
+  // const isAdmin = true;
+  console.log('isAdmin', isAdminORSubscription);
   /* raw list fetched from API */
   const [buildings, setBuildings] = useState([]);
 
@@ -117,11 +123,13 @@ const Buildings = () => {
             sortOrder={sortOrder}
             onSortChange={setSortOrder}
           />
-          <button>
-            <Link to="/dashboard/add-building">
-              <AddIcon />
-            </Link>
-          </button>
+          {isAdmin && (
+            <button>
+              <Link to="/dashboard/add-building">
+                <AddIcon />
+              </Link>
+            </button>
+          )}
         </div>
       </section>
 

@@ -17,11 +17,37 @@ import { useGetallBuildingsHierarchyQuery } from '../../../redux/apis/buildingAp
 import Dropdown from '../../../components/shared/small/Dropdown';
 import TextField from '../../../components/shared/small/TextField';
 import FilteredReports from './FilteredReports';
+import { useSelector } from 'react-redux';
+import { useGetProfileByIdQuery } from '../../../redux/apis/authApis';
 
 const Reports = () => {
   const [file, setFile] = useState(null);
   const [modal, setModal] = useState(false);
-  const { data, isFetching, error } = useGetReportsQuery({ interval: 4 });
+  const { user } = useSelector((state) => state.auth);
+
+  // Step 1: check if user has creatorId
+  const userId = user?.creatorId;
+
+  // Step 2: fetch creator profile only if userId exists
+  const { data: creatorData, isLoading: isCreatorLoading } = useGetProfileByIdQuery({ userId });
+
+  // Step 3: compute interval
+  let minutes = 4;
+
+  // If user has creator → use creator’s interval
+  if (userId && creatorData?.data?.interval) {
+    minutes = parseInt(creatorData.data.interval, 10) / 1000 / 60;
+  }
+  // Else → use user’s own interval
+  else if (user?.interval) {
+    minutes = parseInt(user.interval, 10) / 1000 / 60;
+  }
+
+  // Step 4: call reports API
+  const { data, isFetching, error } = useGetReportsQuery({ interval: minutes });
+
+  console.log('Final Interval (minutes)', minutes);
+
   const { data: getHierarchy } = useGetallBuildingsHierarchyQuery();
   const [trigger] = useLazyGetReportsQuery();
   const [triggerFiltered, { isFetching: filterLoading }] = useLazyGetFilteredReportsQuery();

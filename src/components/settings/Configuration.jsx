@@ -121,7 +121,7 @@ const Configuration = () => {
     }
   }, [user]);
   return (
-    <div className="parentContainer min-h-screen">
+    <div className="parentContainer ">
       <div className="piechart p-4 md:p-5">
         <div className="grid grid-cols-12 xl:grid-cols-12 gap-5">
           {/* Sidebar */}

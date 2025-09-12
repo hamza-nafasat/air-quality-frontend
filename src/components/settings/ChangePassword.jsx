@@ -1,14 +1,14 @@
-import { useState } from "react";
-import Aside from "./Aside";
-import TextField from "../shared/small/TextField";
-import { toast } from "react-toastify";
-import { useUpdateMyProfileMutation } from "../../redux/apis/authApis";
+import { useState } from 'react';
+import Aside from './Aside';
+import TextField from '../shared/small/TextField';
+import { toast } from 'react-toastify';
+import { useUpdateMyProfileMutation } from '../../redux/apis/authApis';
 
 const ChangePassword = () => {
-  const [activeButton, setActiveButton] = useState("profile");
-  const [oldPassword, setOldPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [activeButton, setActiveButton] = useState('profile');
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [updateProfile, { isLoading }] = useUpdateMyProfileMutation();
 
   const handleButtonClick = (buttonName) => {
@@ -18,26 +18,27 @@ const ChangePassword = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      if (!oldPassword || !newPassword || !confirmPassword) return toast.error("Please fill all the fields");
-      if (newPassword !== confirmPassword) return toast.error("Passwords do not match");
+      if (!oldPassword || !newPassword || !confirmPassword)
+        return toast.error('Please fill all the fields');
+      if (newPassword !== confirmPassword) return toast.error('Passwords do not match');
       const formData = new FormData();
-      formData.append("oldPassword", oldPassword);
-      formData.append("newPassword", newPassword);
+      formData.append('oldPassword', oldPassword);
+      formData.append('newPassword', newPassword);
       const response = await updateProfile(formData).unwrap();
       if (response?.success) {
         toast.success(response?.message);
-        setOldPassword("");
-        setNewPassword("");
-        setConfirmPassword("");
+        setOldPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
       }
     } catch (error) {
-      toast.error(error?.data?.message || "Error while changing password");
-      console.log("Error while changing password", error);
+      toast.error(error?.data?.message || 'Error while changing password');
+      console.log('Error while changing password', error);
     }
   };
 
   return (
-    <div className="parentContainer min-h-screen">
+    <div className="parentContainer ">
       <div className="piechart p-4 md:p-5">
         <div className="grid grid-cols-12 xl:grid-cols-12 gap-5">
           {/* Sidebar */}
@@ -50,7 +51,7 @@ const ChangePassword = () => {
               onSubmit={handleSubmit}
               className="bg-white rounded-[15px] mt-4 p-4 gap-4"
               style={{
-                boxShadow: "-1px 1px 2px rgba(0, 0, 0, 0.1), 2px 1px 2px rgba(0, 0, 0, 0.1)",
+                boxShadow: '-1px 1px 2px rgba(0, 0, 0, 0.1), 2px 1px 2px rgba(0, 0, 0, 0.1)',
               }}
             >
               <div className="grid grid-cols-1 gap-3 ">

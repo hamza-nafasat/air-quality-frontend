@@ -107,6 +107,13 @@ const authApis = createApi({
       }),
       providesTags: [TAGS.PROFILE],
     }),
+    getProfileById: builder.query({
+      query: ({ userId }) => ({
+        url: `/get-user/${userId}`,
+        method: 'GET',
+      }),
+      providesTags: [TAGS.PROFILE],
+    }),
 
     // updateMyProfile
     // ---------------
@@ -169,5 +176,6 @@ export const {
   useForgetPasswordMutation,
   useResetPasswordMutation,
   useGetMyProfileFirstTimeMutation,
+  useGetProfileByIdQuery,
 } = authApis;
 export default authApis;

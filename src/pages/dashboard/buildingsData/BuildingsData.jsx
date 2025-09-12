@@ -11,12 +11,17 @@ import BuildingFloors from '../../../components/buildingsData/buildingView/compo
 import dashboardApis from '../../../redux/apis/dashboardApis';
 import { getDailyAverageAirQuality } from '../../../utils/functions';
 import DashboardBuildings from '../../../components/buildingsData/DashboardBuildings';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import WeatherForecast from '../../../components/buildings/utils/WeatherForecast';
 
 const BuildingsData = () => {
   // const { data, isLoading, error } = useAdminDashboardQuery();
+  const { user } = useSelector((state) => state.auth);
+  const isAdmin = user.role === 'user';
+  const isAdminORSubscription = ['user', 'Inspection_manager'].includes(user.role);
 
+  // const isAdmin = true;
+  console.log('isAdmin', isAdminORSubscription);
   const dispatch = useDispatch();
 
   const [result, setResult] = useState({
@@ -24,10 +29,21 @@ const BuildingsData = () => {
     isLoading: true,
     error: null,
   });
+  let userId;
 
+  if (user?.creatorId && user?.role === 'Subscription_Manager') {
+    // If user was created by someone else → use that creator as userId
+    userId = user.creatorId;
+  } else {
+    // Otherwise → user is the userId
+    userId = user._id;
+  }
+  console.log('userId', userId);
   useEffect(() => {
+    if (!user) return; // skip if no userId
     // Start fetching manually
-    const promise = dispatch(dashboardApis.endpoints.adminDashboard.initiate());
+    // const promise = dispatch(dashboardApis.endpoints.adminDashboard.initiate());
+    const promise = dispatch(dashboardApis.endpoints.adminDashboardById.initiate({ userId }));
 
     // Handle response
     promise
@@ -106,9 +122,11 @@ const BuildingsData = () => {
           <WeatherChart data={data} loading={isLoading} />
         </div>
       </div>
-      <div className="lg:col-span-12">
-        <DashboardBuildings title="Buildings" data={data} />
-      </div>
+      {isAdminORSubscription && (
+        <div className="lg:col-span-12">
+          <DashboardBuildings title="Buildings" data={data} />
+        </div>
+      )}
     </div>
   );
 };

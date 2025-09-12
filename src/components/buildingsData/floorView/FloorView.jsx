@@ -23,6 +23,7 @@ import CurrentHumidityChart from './components/CurrentHumidityChart';
 import FloorDetails from './components/FloorDetails';
 import FloorSensorDetails from './components/FloorSensorDetails';
 import Loader from '../../shared/small/Loader';
+import { useSelector } from 'react-redux';
 
 const icons = [
   <AlarmsIcon />,
@@ -40,8 +41,14 @@ const FloorView = () => {
   const { id } = useParams();
   const [image, setImage] = useState('');
   const [polygons, setPolygons] = useState([]);
+
   const { data: floor, isLoading, isFetching } = useGetSingleFloorQuery(id);
   const [deleteFloor] = useDeleteSingleFloorMutation();
+  const { user } = useSelector((state) => state.auth);
+  const isAdmin = user.role === 'user';
+  // const isAdmin = true;
+  console.log('isAdmin', isAdmin);
+
   // console.log('full data of floor', floor);
 
   // const twoDModelCanvasData = floor?.data?.twoDModelCanvasData ?? [];
@@ -145,9 +152,9 @@ const FloorView = () => {
           <div className="col-span-full text-center py-6 text-gray-500">No sensor data yet</div>
         )}
       </section>
-      <section className="grid grid-cols-12 gap-4 mt-4  ">
+      <section className="grid grid-cols-12 gap-4 mt-4 ">
         <div className="col-span-12 xl:col-span-8 flex flex-col">
-          <div className="my-5"></div>
+          {isAdmin && <div className="my-5"></div>}
           <div className="grid grid-cols-1 rounded-[16px] p-5 bg-white shadow-dashboard">
             <ShowCanvasData image={image} polygons={polygons} />
           </div>
@@ -164,16 +171,18 @@ const FloorView = () => {
         </div>
 
         <div className="col-span-12 xl:col-span-4 flex flex-col">
-          <section className="p-2 flex justify-end">
-            <div className="flex items-center gap-4 ">
-              <Link title="Edit Floor" to={`/dashboard/edit-floor/${id}`}>
-                <EditIcon />
-              </Link>
-              <button title="Delete Floor" onClick={handleOpenDeleteModal}>
-                <DeleteIcon />
-              </button>
-            </div>
-          </section>
+          {isAdmin && (
+            <section className="p-2 flex justify-end">
+              <div className="flex items-center gap-4 ">
+                <Link title="Edit Floor" to={`/dashboard/edit-floor/${id}`}>
+                  <EditIcon />
+                </Link>
+                <button title="Delete Floor" onClick={handleOpenDeleteModal}>
+                  <DeleteIcon />
+                </button>
+              </div>
+            </section>
+          )}
 
           <div className="grid grid-cols-1">
             <FloorDetails floorDetails={floorDetails} />

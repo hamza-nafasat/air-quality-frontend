@@ -12,9 +12,18 @@ import { useSelector } from 'react-redux';
 
 const SubscriptionHistory = () => {
   const { user } = useSelector((state) => state.auth);
+  let owner;
 
+  if (user?.creatorId && user?.role === 'Subscription_Manager') {
+    // If user was created by someone else → use that creator as owner
+    owner = user.creatorId;
+  } else {
+    // Otherwise → user is the owner
+    owner = user._id;
+  }
+  console.log('owner', owner);
   // const { data, isLoading, refetch } = useGetAllSubscriptionsQuery();
-  const { data } = useGetUserSubscriptionHistoryQuery(user._id);
+  const { data } = useGetUserSubscriptionHistoryQuery(owner);
   // console.log('newsdsd', newsdsd);
 
   const [activeButton, setActiveButton] = useState('profile');
@@ -75,7 +84,7 @@ const SubscriptionHistory = () => {
   ];
 
   return (
-    <div className="parentContainer min-h-screen">
+    <div className="parentContainer ">
       <div className="piechart p-4 md:p-5">
         <div className="grid grid-cols-12 xl:grid-cols-12 gap-5">
           {/* Sidebar */}
@@ -86,7 +95,7 @@ const SubscriptionHistory = () => {
           <div className="col-span-12 xl:col-span-10 2xl:col-span-10">
             <h3 className="text-base lg:text-lg font-[500] mb-4 xl:mb-0">Subscription Plan</h3>
 
-            <div className="bg-white rounded-[15px] mt-4 p-4 lg:p-6 h-[calc(100vh-80px)] overflow-hidden">
+            <div className="bg-white rounded-[15px] mt-4 p-4 lg:p-6  ">
               <div className="flex items-center justify-between">
                 <div>
                   <h3>Subscription History</h3>
@@ -96,11 +105,11 @@ const SubscriptionHistory = () => {
                 <DataTable
                   columns={columns}
                   data={data?.data}
-                  selectableRows
-                  selectableRowsHighlight
+                  // selectableRows
+                  // selectableRowsHighlight
                   customStyles={tableStyles}
                   fixedHeader
-                  fixedHeaderScrollHeight="70vh"
+                  fixedHeaderScrollHeight="55vh"
                 />
               </div>
             </div>

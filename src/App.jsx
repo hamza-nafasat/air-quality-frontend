@@ -28,6 +28,7 @@ import { socket } from './sockets/socket';
 import { toast } from 'react-toastify';
 import { setCount } from './redux/slices/notificationSlice';
 import Users from './pages/dashboard/users/Users';
+import { ROLES } from './components/roles';
 
 const Dashboard = lazy(() => import('./pages/dashboard/index'));
 const Buildings = lazy(() => import('./pages/dashboard/buildings/Buildings'));
@@ -128,6 +129,7 @@ function App() {
     <Suspense fallback={<Loader />}>
       <BrowserRouter>
         <ScrollToTop />
+
         <Routes>
           <Route path="/" element={<Navigate to="/login" />} />
           <Route
@@ -141,8 +143,9 @@ function App() {
           <Route path="/forget-password" element={<AuthBg Form={ForgetPassword} />} />
           <Route path="/reset-password" element={<AuthBg Form={ResetPassword} />} />
           <Route path="/signup" element={<AuthBg Form={SignUp} />} />
+          {/* <Route path="/unauthorized" element={<Unauthorized />} /> */}
 
-          {/* Protecting dashboard-related routes */}
+          {/* Protected Dashboard */}
           <Route
             path="/dashboard/*"
             element={
@@ -151,26 +154,199 @@ function App() {
               </ProtectedRoute>
             }
           >
-            <Route path="building-view/:id" element={<BuildingView />} />
-            <Route path="edit-building/:id" element={<EditBuilding />} />
-            <Route path="edit-floor/:id" element={<FloorEdit />} />
-            <Route path="floor-view/:id" element={<FloorView />} />
-            <Route path="add-floor/:id" element={<AddFloor />} />
-            <Route path="buildings" element={<Buildings />} />
-            <Route path="devices" element={<Devices />} />
-            <Route path="reports" element={<Reports />} />
-            <Route path="sensors" element={<Sensors />} />
-            <Route path="alerts" element={<AlertType />} />
-            <Route path="sensors/sensor-detail/:id" element={<SensorDetail />} />
-            <Route path="settings" element={<Settings />} />
-            <Route path="add-building" element={<BuildingStepper />} />
-            <Route path="subscription" element={<Subscription />} />
-            <Route path="subscription-history" element={<SubscriptionHistory />} />
-            <Route path="configuration" element={<Configuration />} />
-            <Route path="change-password" element={<ChangePassword />} />
-            <Route path="profile" element={<Profile />} />
-            <Route path="notifications" element={<Notifications />} />
-            <Route path="users" element={<Users />} />
+            {/* Inspection user pages */}
+            <Route
+              path="building-view/:id"
+              element={
+                <ProtectedRoute user={user} allowedRoles={[ROLES.INSPECTION, ROLES.ADMIN]}>
+                  <BuildingView />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="edit-building/:id"
+              element={
+                <ProtectedRoute user={user} allowedRoles={[, ROLES.ADMIN]}>
+                  <EditBuilding />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="edit-floor/:id"
+              element={
+                <ProtectedRoute user={user} allowedRoles={[, ROLES.ADMIN]}>
+                  <FloorEdit />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="floor-view/:id"
+              element={
+                <ProtectedRoute user={user} allowedRoles={[ROLES.INSPECTION, ROLES.ADMIN]}>
+                  <FloorView />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="add-floor/:id"
+              element={
+                <ProtectedRoute user={user} allowedRoles={[, ROLES.ADMIN]}>
+                  <AddFloor />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="buildings"
+              element={
+                <ProtectedRoute user={user} allowedRoles={[ROLES.INSPECTION, ROLES.ADMIN]}>
+                  <Buildings />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Reportor pages */}
+            <Route
+              path="reports"
+              element={
+                <ProtectedRoute user={user} allowedRoles={[ROLES.REPORTER, ROLES.ADMIN]}>
+                  <Reports />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Subscriptions user pages */}
+            <Route
+              path="subscription"
+              element={
+                <ProtectedRoute user={user} allowedRoles={[ROLES.SUBSCRIPTIONS, ROLES.ADMIN]}>
+                  <Subscription />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="subscription-history"
+              element={
+                <ProtectedRoute user={user} allowedRoles={[ROLES.SUBSCRIPTIONS, ROLES.ADMIN]}>
+                  <SubscriptionHistory />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Shared pages (all roles can use settings) */}
+            <Route
+              path="settings"
+              element={
+                <ProtectedRoute
+                  user={user}
+                  allowedRoles={[
+                    ROLES.ADMIN,
+                    ROLES.REPORTER,
+                    ROLES.INSPECTION,
+                    ROLES.SUBSCRIPTIONS,
+                  ]}
+                >
+                  <Settings />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Admin-only pages */}
+            <Route
+              path="devices"
+              element={
+                <ProtectedRoute user={user} allowedRoles={[ROLES.ADMIN]}>
+                  <Devices />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="sensors"
+              element={
+                <ProtectedRoute user={user} allowedRoles={[ROLES.ADMIN]}>
+                  <Sensors />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="alerts"
+              element={
+                <ProtectedRoute user={user} allowedRoles={[ROLES.ADMIN]}>
+                  <AlertType />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="sensors/sensor-detail/:id"
+              element={
+                <ProtectedRoute user={user} allowedRoles={[ROLES.ADMIN]}>
+                  <SensorDetail />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="add-building"
+              element={
+                <ProtectedRoute user={user} allowedRoles={[ROLES.ADMIN]}>
+                  <BuildingStepper />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="configuration"
+              element={
+                <ProtectedRoute user={user} allowedRoles={[ROLES.ADMIN]}>
+                  <Configuration />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="change-password"
+              element={
+                <ProtectedRoute
+                  user={user}
+                  allowedRoles={[
+                    ROLES.ADMIN,
+                    ROLES.REPORTER,
+                    ROLES.INSPECTION,
+                    ROLES.SUBSCRIPTIONS,
+                  ]}
+                >
+                  <ChangePassword />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="profile"
+              element={
+                <ProtectedRoute
+                  user={user}
+                  allowedRoles={[
+                    ROLES.ADMIN,
+                    ROLES.REPORTER,
+                    ROLES.INSPECTION,
+                    ROLES.SUBSCRIPTIONS,
+                  ]}
+                >
+                  <Profile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="notifications"
+              element={
+                <ProtectedRoute user={user} allowedRoles={[ROLES.ADMIN]}>
+                  <Notifications />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="users"
+              element={
+                <ProtectedRoute user={user} allowedRoles={[ROLES.ADMIN]}>
+                  <Users />
+                </ProtectedRoute>
+              }
+            />
           </Route>
         </Routes>
       </BrowserRouter>

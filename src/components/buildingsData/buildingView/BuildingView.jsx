@@ -28,6 +28,7 @@ import Alerts from './components/Alerts';
 import BuildingDetails from './components/BuildingDetails';
 import BuildingHumidityChart from './components/BuildingHumidityChart';
 import SensorDetails from './components/SensorDetails';
+import { useSelector } from 'react-redux';
 const icons = [
   <AlarmsIcon />,
   <TemperatureIcon />,
@@ -46,6 +47,10 @@ const BuildingView = () => {
   const [deleteModal, setDeleteModal] = useState(false);
   const [deleteBuilding] = useDeleteSingleBuildingMutation('');
   // console.log('complet building data', data);
+  const { user } = useSelector((state) => state.auth);
+  const isAdmin = user.role === 'user';
+  // const isAdmin = true;
+  console.log('isAdmin', isAdmin);
 
   useEffect(() => {
     if (isSuccess) {
@@ -109,23 +114,26 @@ const BuildingView = () => {
           />
         ))}
       </section>
-      <section className="mt-4 flex justify-end ">
-        <div className="flex items-center gap-4">
-          <Link
-            className="flex items-center justify-center text-primary-lightBlue mt-[0.5px]"
-            title="Add New Floor"
-            to={`/dashboard/add-floor/${id}`}
-          >
-            <AddIcon />
-          </Link>
-          <Link to={`/dashboard/edit-building/${id}`}>
-            <EditIcon />
-          </Link>
-          <button onClick={handleOpenDeleteModal}>
-            <DeleteIcon />
-          </button>
-        </div>
-      </section>
+      {isAdmin && (
+        <section className="mt-4 flex justify-end ">
+          <div className="flex items-center gap-4">
+            <Link
+              className="flex items-center justify-center text-primary-lightBlue mt-[0.5px]"
+              title="Add New Floor"
+              to={`/dashboard/add-floor/${id}`}
+            >
+              <AddIcon />
+            </Link>
+            <Link to={`/dashboard/edit-building/${id}`}>
+              <EditIcon />
+            </Link>
+            <button onClick={handleOpenDeleteModal}>
+              <DeleteIcon />
+            </button>
+          </div>
+        </section>
+      )}
+
       {deleteModal && (
         <Modal onClose={() => setDeleteModal(false)} title="Confirmation">
           <BuildingDeleteWithId

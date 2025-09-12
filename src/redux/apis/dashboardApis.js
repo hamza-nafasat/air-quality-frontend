@@ -16,8 +16,14 @@ const dashboardApis = createApi({
       }),
       //   providesTags: ['floor'],
     }),
+    adminDashboardById: builder.query({
+      query: ({ userId }) => ({
+        url: `/dashboard/stats/${userId}`,
+        method: 'GET',
+      }),
+    }),
   }),
 });
 
-export const { useAdminDashboardQuery } = dashboardApis;
+export const { useAdminDashboardQuery, useAdminDashboardByIdQuery } = dashboardApis;
 export default dashboardApis;
