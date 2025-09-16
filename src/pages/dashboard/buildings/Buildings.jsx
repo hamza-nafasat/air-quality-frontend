@@ -15,8 +15,8 @@ import { useSelector } from 'react-redux';
 const Buildings = () => {
   const { data, isLoading, isSuccess } = useGetAllBuildingsQuery('');
   const { user } = useSelector((state) => state.auth);
-  const isAdmin = user.role === 'user';
-  const isAdminORSubscription = ['user', 'Inspection_manager'].includes(user.role);
+  const isAdmin = user.role === 'sub_admin';
+  const isAdminORSubscription = ['sub_admin', 'Inspection_manager'].includes(user.role);
 
   // const isAdmin = true;
   console.log('isAdmin', isAdminORSubscription);

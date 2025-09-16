@@ -17,8 +17,8 @@ import WeatherForecast from '../../../components/buildings/utils/WeatherForecast
 const BuildingsData = () => {
   // const { data, isLoading, error } = useAdminDashboardQuery();
   const { user } = useSelector((state) => state.auth);
-  const isAdmin = user.role === 'user';
-  const isAdminORSubscription = ['user', 'Inspection_manager'].includes(user.role);
+  const isAdmin = user.role === 'sub_admin';
+  const isAdminORSubscription = ['sub_admin', 'Inspection_manager'].includes(user.role);
 
   // const isAdmin = true;
   console.log('isAdmin', isAdminORSubscription);
@@ -29,34 +29,46 @@ const BuildingsData = () => {
     isLoading: true,
     error: null,
   });
-  let userId;
-
-  if (user?.creatorId && user?.role === 'Subscription_Manager') {
-    // If user was created by someone else → use that creator as userId
-    userId = user.creatorId;
-  } else {
-    // Otherwise → user is the userId
-    userId = user._id;
-  }
-  console.log('userId', userId);
   useEffect(() => {
-    if (!user) return; // skip if no userId
-    // Start fetching manually
-    // const promise = dispatch(dashboardApis.endpoints.adminDashboard.initiate());
-    const promise = dispatch(dashboardApis.endpoints.adminDashboardById.initiate({ userId }));
+    if (!user) return;
 
-    // Handle response
+    let userId;
+
+    if (user?.role === 'super_admin') {
+      // super_admin → no userId
+      userId = undefined;
+    } else if (user?.role === 'sub_admin') {
+      // sub_admin → use own id
+      userId = user._id;
+    } else if (
+      user?.role === 'Inspection_manager' ||
+      user?.role === 'Report_Manager' ||
+      user?.role === 'Subscription_Manager'
+    ) {
+      // Special roles → use creatorId
+      userId = user.creatorId;
+    } else {
+      // fallback → use own id
+      userId = user._id;
+    }
+
+    console.log('userId', userId);
+
+    const promise =
+      user?.role === 'super_admin'
+        ? dispatch(dashboardApis.endpoints.adminDashboard.initiate())
+        : dispatch(dashboardApis.endpoints.adminDashboardById.initiate({ userId }));
+
     promise
       .unwrap()
       .then((data) => {
         setResult({ data, isLoading: false, error: null });
       })
       .catch((err) => {
-        if (err.name === 'AbortError') return; // Swallow abort
+        if (err.name === 'AbortError') return;
         setResult({ data: null, isLoading: false, error: err });
       });
 
-    // Cancel API on unmount (e.g., user navigates away)
     return () => {
       promise.abort();
     };
@@ -94,7 +106,7 @@ const BuildingsData = () => {
       <div className="lg:col-span-8 flex flex-col">
         <Welcome data={data} loading={isLoading} />
         <div className="mt-4">
-          <StatusCards data={data} />
+          <StatusCards data={data} isLoading={isLoading} />
         </div>
         <div className="mt-4">
           <BuildingMap data={data} loading={isLoading} />

@@ -162,7 +162,7 @@
 //     },
 
 //     {
-//       title: 'Users',
+//       title: 'Managers',
 //       link: '/dashboard/users',
 //       isActive: url.startsWith('dashboard/users'),
 //       icon: <PiUsers activeLink={url.startsWith('dashboard/users')} />,
@@ -308,6 +308,12 @@ const Aside = () => {
       icon: <HomeIcon activeLink={url === 'dashboard'} />,
     },
     {
+      title: 'Managers',
+      link: '/dashboard/manager',
+      isActive: url.startsWith('dashboard/manager'),
+      icon: <PiUsers activeLink={url.startsWith('dashboard/manager')} />,
+    },
+    {
       title: 'Users',
       link: '/dashboard/users',
       isActive: url.startsWith('dashboard/users'),
@@ -367,12 +373,18 @@ const Aside = () => {
   // ✅ Filter pages based on role
   const filteredPages = useMemo(() => {
     if (!user) return [];
+    if (user.role === 'sub_admin') {
+      // Show all pages except "users"
+      return allPages.filter((p) => p.title !== 'Users');
+    }
 
     switch (user.role) {
-      case 'user':
-        return allPages; // full access
       case 'Report_Manager':
         return allPages.filter((p) => ['dashboard', 'reports', 'settings'].includes(p.title));
+      case 'super_admin':
+        return allPages.filter((p) =>
+          ['dashboard', 'buildings', 'Users', 'settings'].includes(p.title)
+        );
       case 'Inspection_manager':
         return allPages.filter((p) => ['dashboard', 'buildings', 'settings'].includes(p.title));
       case 'Subscription_Manager':

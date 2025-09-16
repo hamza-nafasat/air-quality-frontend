@@ -3,8 +3,8 @@ import { NavLink } from 'react-router-dom';
 
 const Aside = () => {
   const { user } = useSelector((state) => state.auth);
-  const isAdmin = user.role === 'user';
-  const isAdminORSubscription = ['user', 'Subscription_Manager'].includes(user.role);
+  const isAdmin = user.role === 'sub_admin';
+  const isAdminORSubscription = ['sub_admin', 'Subscription_Manager'].includes(user.role);
 
   // const isAdmin = true;
   console.log('isAdmin', isAdminORSubscription);

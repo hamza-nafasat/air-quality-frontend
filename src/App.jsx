@@ -27,8 +27,9 @@ import Notifications from './pages/dashboard/notifications/Notifications';
 import { socket } from './sockets/socket';
 import { toast } from 'react-toastify';
 import { setCount } from './redux/slices/notificationSlice';
-import Users from './pages/dashboard/users/Users';
+import Managers from './pages/dashboard/Manager/Managers';
 import { ROLES } from './components/roles';
+import Users from './pages/dashboard/users/Users';
 
 const Dashboard = lazy(() => import('./pages/dashboard/index'));
 const Buildings = lazy(() => import('./pages/dashboard/buildings/Buildings'));
@@ -158,7 +159,10 @@ function App() {
             <Route
               path="building-view/:id"
               element={
-                <ProtectedRoute user={user} allowedRoles={[ROLES.INSPECTION, ROLES.ADMIN]}>
+                <ProtectedRoute
+                  user={user}
+                  allowedRoles={[ROLES.INSPECTION, ROLES.ADMIN, ROLES.SUPER_ADMIN]}
+                >
                   <BuildingView />
                 </ProtectedRoute>
               }
@@ -166,7 +170,7 @@ function App() {
             <Route
               path="edit-building/:id"
               element={
-                <ProtectedRoute user={user} allowedRoles={[, ROLES.ADMIN]}>
+                <ProtectedRoute user={user} allowedRoles={[, ROLES.ADMIN, ROLES.SUPER_ADMIN]}>
                   <EditBuilding />
                 </ProtectedRoute>
               }
@@ -182,7 +186,10 @@ function App() {
             <Route
               path="floor-view/:id"
               element={
-                <ProtectedRoute user={user} allowedRoles={[ROLES.INSPECTION, ROLES.ADMIN]}>
+                <ProtectedRoute
+                  user={user}
+                  allowedRoles={[ROLES.INSPECTION, ROLES.ADMIN, ROLES.SUPER_ADMIN]}
+                >
                   <FloorView />
                 </ProtectedRoute>
               }
@@ -198,7 +205,10 @@ function App() {
             <Route
               path="buildings"
               element={
-                <ProtectedRoute user={user} allowedRoles={[ROLES.INSPECTION, ROLES.ADMIN]}>
+                <ProtectedRoute
+                  user={user}
+                  allowedRoles={[ROLES.INSPECTION, ROLES.ADMIN, ROLES.SUPER_ADMIN]}
+                >
                   <Buildings />
                 </ProtectedRoute>
               }
@@ -243,6 +253,7 @@ function App() {
                     ROLES.REPORTER,
                     ROLES.INSPECTION,
                     ROLES.SUBSCRIPTIONS,
+                    ROLES.SUPER_ADMIN,
                   ]}
                 >
                   <Settings />
@@ -309,6 +320,7 @@ function App() {
                     ROLES.REPORTER,
                     ROLES.INSPECTION,
                     ROLES.SUBSCRIPTIONS,
+                    ROLES.SUPER_ADMIN,
                   ]}
                 >
                   <ChangePassword />
@@ -325,6 +337,7 @@ function App() {
                     ROLES.REPORTER,
                     ROLES.INSPECTION,
                     ROLES.SUBSCRIPTIONS,
+                    ROLES.SUPER_ADMIN,
                   ]}
                 >
                   <Profile />
@@ -340,9 +353,17 @@ function App() {
               }
             />
             <Route
-              path="users"
+              path="manager"
               element={
                 <ProtectedRoute user={user} allowedRoles={[ROLES.ADMIN]}>
+                  <Managers />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="users"
+              element={
+                <ProtectedRoute user={user} allowedRoles={[ROLES.SUPER_ADMIN]}>
                   <Users />
                 </ProtectedRoute>
               }

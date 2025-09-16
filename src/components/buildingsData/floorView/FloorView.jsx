@@ -45,7 +45,7 @@ const FloorView = () => {
   const { data: floor, isLoading, isFetching } = useGetSingleFloorQuery(id);
   const [deleteFloor] = useDeleteSingleFloorMutation();
   const { user } = useSelector((state) => state.auth);
-  const isAdmin = user.role === 'user';
+  const isAdmin = user.role === 'sub_admin';
   // const isAdmin = true;
   console.log('isAdmin', isAdmin);
 

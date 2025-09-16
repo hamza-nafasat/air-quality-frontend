@@ -48,7 +48,7 @@ const BuildingView = () => {
   const [deleteBuilding] = useDeleteSingleBuildingMutation('');
   // console.log('complet building data', data);
   const { user } = useSelector((state) => state.auth);
-  const isAdmin = user.role === 'user';
+  const isAdmin = user.role === 'sub_admin';
   // const isAdmin = true;
   console.log('isAdmin', isAdmin);
 

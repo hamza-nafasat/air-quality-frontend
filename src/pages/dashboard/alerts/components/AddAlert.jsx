@@ -30,9 +30,11 @@ const AddAlert = ({ onClose }) => {
     alertName: '',
     alertType: '',
     severityType: '',
+    value: '',
     email: '',
     platform: '',
   });
+  console.log('formData', formData);
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -42,9 +44,9 @@ const AddAlert = ({ onClose }) => {
   };
 
   const handleSave = async () => {
-    const { alertName, alertType, severityType, platform, email } = formData;
+    const { alertName, alertType, severityType, platform, email, value } = formData;
 
-    if (!alertName || !alertType || !severityType || !platform) {
+    if (!alertName || !alertType || !severityType || !platform || !value) {
       return toast.error('All required fields must be filled.');
     }
 
@@ -52,6 +54,7 @@ const AddAlert = ({ onClose }) => {
       name: alertName,
       type: alertType,
       severity: severityType,
+      value: value,
       platform,
     };
 
@@ -95,7 +98,14 @@ const AddAlert = ({ onClose }) => {
             value={formData.severityType}
             onSelect={(option) => setFormData({ ...formData, severityType: option.option })}
           />
-
+          <TextField
+            name="value"
+            type="text"
+            value={formData.alterValue}
+            onChange={handleChange}
+            placeholder="Enter value"
+            label="value"
+          />
           {inputEmail && (
             <TextField
               name="email"
