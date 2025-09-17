@@ -30,6 +30,7 @@ import { setCount } from './redux/slices/notificationSlice';
 import Managers from './pages/dashboard/Manager/Managers';
 import { ROLES } from './components/roles';
 import Users from './pages/dashboard/users/Users';
+import Unauthorized from './pages/dashboard/unauthorized/Unauthorized';
 
 const Dashboard = lazy(() => import('./pages/dashboard/index'));
 const Buildings = lazy(() => import('./pages/dashboard/buildings/Buildings'));
@@ -144,7 +145,7 @@ function App() {
           <Route path="/forget-password" element={<AuthBg Form={ForgetPassword} />} />
           <Route path="/reset-password" element={<AuthBg Form={ResetPassword} />} />
           <Route path="/signup" element={<AuthBg Form={SignUp} />} />
-          {/* <Route path="/unauthorized" element={<Unauthorized />} /> */}
+          <Route path="/unauthorized" element={<Unauthorized />} />
 
           {/* Protected Dashboard */}
           <Route
