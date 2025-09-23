@@ -96,74 +96,6 @@ export const drawCanvas = ({ canvasRef, isDrawingEnabled, image, polygons, curre
   }
 };
 
-// Add point to current polygon
-// export const handleCanvasClick = ({
-//   event,
-//   canvasRef,
-//   isDeleteMode,
-//   handleDeletePolygon,
-//   isCopyMode,
-//   draggedPolygon,
-//   polygonCount,
-//   polygons,
-//   setPolygons,
-//   setPolygonCount,
-//   setDraggedPolygon,
-//   isEditMode,
-//   currentPolygon,
-//   setCurrentPolygon,
-//   openSensorPopup,
-//   isUpdateMode,
-//   handleReEditPolygon,
-//   handlePolygonClick,
-//   selectedColor, // Pass selected color here
-// }) => {
-//   const canvas = canvasRef.current;
-//   const rect = canvas.getBoundingClientRect();
-//   const x = event.clientX - rect.left;
-//   const y = event.clientY - rect.top;
-
-//   if (isUpdateMode) {
-//     handleReEditPolygon({ x, y, canvasRef, polygons, handlePolygonClick });
-//   }
-
-//   if (isDeleteMode) {
-//     handleDeletePolygon(x, y, polygons, setPolygons, canvasRef);
-//   } else if (isCopyMode && draggedPolygon) {
-//     // Handle copy-pasting of polygons
-//     const newPolygon = {
-//       ...draggedPolygon,
-//       id: `F1-PS${polygonCount}`,
-//       points: draggedPolygon.points.map((point) => ({
-//         x: point.x + (x - draggedPolygon.points[0].x),
-//         y: point.y + (y - draggedPolygon.points[0].y),
-//       })),
-//       fillColor: draggedPolygon.fillColor, // Copy the color as well
-//     };
-//     setPolygons([...polygons, newPolygon]);
-//     setPolygonCount(polygonCount + 1);
-//     setDraggedPolygon(null);
-//   } else if (isEditMode) {
-//     // Handle creating a new polygon
-//     const newPolygon = [...currentPolygon, { x, y }];
-//     setCurrentPolygon(newPolygon);
-
-//     if (newPolygon.length === 4) {
-//       const polygonWithId = {
-//         points: newPolygon,
-//         id: `F1-PS${polygonCount}`,
-//         color: selectedColor,
-//         fillColor: selectedColor,
-//       };
-//       setPolygons([...polygons, polygonWithId]);
-//       setPolygonCount(polygonCount + 1);
-//       setCurrentPolygon([]);
-//       openSensorPopup(polygonWithId);
-//     }
-//   }
-// };
-
-// Add points until user closes polygon (click near the first point)
 export const handleCanvasClick = ({
   event,
   canvasRef,
@@ -191,6 +123,8 @@ export const handleCanvasClick = ({
   setSelectedSensor,
   availableSensors,
   setAvailableSensors,
+  updateRestRoomHandler,
+  restroomIndex,
 }) => {
   const canvas = canvasRef.current;
   const rect = canvas.getBoundingClientRect();
@@ -209,6 +143,8 @@ export const handleCanvasClick = ({
       polygons,
       setPolygons,
       canvasRef,
+      updateRestRoomHandler, // ✅ sync Redux/restrooms
+      restroomIndex, // ✅ which restroom we update
       selectedSensor,
       setSelectedSensor,
       availableSensors,
@@ -472,42 +408,45 @@ export const handleDeletePolygon = (
   polygons,
   setPolygons,
   canvasRef,
+  updateRestRoomHandler,
+  restroomIndex,
   selectedSensor,
   setSelectedSensor,
   availableSensors,
   setAvailableSensors
 ) => {
   const canvas = canvasRef.current;
-  const updatedPolygons = [];
-  const freedSensors = [];
+  const context = canvas.getContext('2d');
 
-  polygons.forEach((polygon) => {
+  let deletedPolygon = null;
+
+  const filteredPolygons = polygons.filter((polygon) => {
     const path = new Path2D();
     path.moveTo(polygon.points[0].x, polygon.points[0].y);
     polygon.points.forEach((point) => path.lineTo(point.x, point.y));
     path.closePath();
 
-    if (!canvas.getContext('2d').isPointInPath(path, x, y)) {
-      // keep this polygon
-      updatedPolygons.push(polygon);
-    } else {
-      // polygon is deleted, free its sensor
-      if (polygon.sensorAttached) {
-        freedSensors.push({
-          option: polygon.sensorName, // now this exists
-          value: polygon.sensorAttached,
-        });
-      }
+    if (context.isPointInPath(path, x, y)) {
+      deletedPolygon = polygon;
+      return false;
     }
+    return true;
   });
 
-  setPolygons(updatedPolygons);
+  setPolygons(filteredPolygons);
 
-  // Remove deleted sensors from selectedSensor
-  if (freedSensors.length) {
-    setSelectedSensor(selectedSensor.filter((s) => !freedSensors.some((f) => f.value === s)));
-    setAvailableSensors([...availableSensors, ...freedSensors]);
+  // ✅ update Redux
+  if (typeof updateRestRoomHandler === 'function') {
+    updateRestRoomHandler(restroomIndex, 'restroomCoordinates', filteredPolygons);
   }
+
+  // ✅ free up sensor if polygon had one
+  if (deletedPolygon?.sensor) {
+    setAvailableSensors([...availableSensors, deletedPolygon.sensor]);
+    setSelectedSensor(null);
+  }
+
+  console.log('Deleted polygon:', deletedPolygon);
 };
 
 // Polygon Label Position
