@@ -22,9 +22,12 @@ import { useGetProfileByIdQuery } from '../../../redux/apis/authApis';
 
 const Reports = () => {
   const [file, setFile] = useState(null);
+  const [previewValue, setPreviewValue] = useState(null);
+
   const [modal, setModal] = useState(false);
   const { user } = useSelector((state) => state.auth);
-
+  console.log('file', file);
+  console.log('previewValue', previewValue);
   // Step 1: check if user has creatorId
   const userId = user?.creatorId;
 
@@ -54,12 +57,14 @@ const Reports = () => {
   const [buildingReports, setBuildingReports] = useState({});
   const [filteredView, setFilteredView] = useState(null); // { mode, data, pagination, params }
   const [searchTerm, setSearchTerm] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const filteredReports = Object.values(buildingReports).filter((building) => {
     const query = searchTerm.toLowerCase();
     return building.buildingName?.toLowerCase().includes(query);
   });
   // console.log('searchTerm', filteredReports);
   console.log('dtaaaaa', getHierarchy);
+  console.log('isLoadingisLoading', isLoading);
 
   // On initial load, store all buildings' data
   useEffect(() => {
@@ -173,42 +178,58 @@ const Reports = () => {
 
   const generatePDF = async () => {
     try {
+      setIsLoading(true);
       setModal(false);
       const doc = new jsPDF();
       const pageHeight = doc.internal.pageSize.height;
       const pageWidth = doc.internal.pageSize.width;
 
-      let yPos = 10;
+      // === Header Bar ===
+      const headerHeight = 15;
+      doc.setFillColor(0, 123, 194); // blue background
+      doc.rect(0, 0, pageWidth, headerHeight, 'F');
 
-      // Header with date/time
+      // "Air Quality" left side
+      doc.setFontSize(12);
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Air Quality', 10, 10);
+
+      // Date right side
       const currentDate = new Date().toLocaleDateString();
       const currentTime = new Date().toLocaleTimeString();
       doc.setFontSize(10);
-      doc.text(`Date: ${currentDate} Time: ${currentTime}`, 15, 6);
+      doc.text(`Date: ${currentDate}`, pageWidth - 45, 10);
 
-      // Logo
+      // === Below Header: Reports + Logo ===
+      let yPos = headerHeight + 10;
+
+      // Left: Report description
+      doc.setTextColor(0, 0, 0);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(14);
+      doc.text('Reports:', 14, yPos);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      yPos += 6;
+      doc.text('Following Are The Reports Of All Sensors On All Buildings.', 14, yPos);
+      yPos += 6;
+      doc.text(
+        "Beneath This, There's A Small Floor Plan Image Representing The Monitored Area",
+        14,
+        yPos
+      );
+
+      // Right: Logo
       try {
-        const logoBase64 = await getBase64ImageFromURL(file || fullLogo);
-        if (logoBase64) {
-          const img = new Image();
-          img.src = logoBase64;
-          await new Promise((resolve, reject) => {
-            img.onload = () => resolve();
-            img.onerror = (e) => reject(e);
-          });
-
-          const desiredWidth = 50;
-          const aspectRatio = img.width / img.height;
-          const desiredHeight = desiredWidth / aspectRatio;
-          const logoX = (pageWidth - desiredWidth) / 2;
-
-          doc.addImage(logoBase64, 'PNG', logoX, yPos, desiredWidth, desiredHeight);
-          yPos += desiredHeight + 15;
-
-          doc.setFontSize(10);
-          doc.text('Reports: Following are the reports of all sensors on all buildings', 14, yPos);
-          yPos += 10;
-        }
+        const logoBase64 = await getBase64ImageFromURL(previewValue || fullLogo);
+        const imgWidth = 25;
+        const imgHeight = 25;
+        const imgX = pageWidth - imgWidth - 20;
+        const imgY = headerHeight + 5;
+        doc.addImage(logoBase64, 'PNG', imgX, imgY, imgWidth, imgHeight);
+        yPos += 6;
       } catch (err) {
         console.warn('⚠️ Failed to load logo image:', err);
       }
@@ -484,6 +505,9 @@ const Reports = () => {
       }
 
       doc.save('reports.pdf');
+      setPreviewValue(null);
+      setFile(null);
+      setIsLoading(false);
     } catch (err) {
       console.error('❌ PDF generation failed:', err);
       alert('Failed to generate PDF. Check console for details.');
@@ -900,11 +924,23 @@ const Reports = () => {
             height="h-[25px]"
           /> */}
           <Button
-            text="Export"
+            text={
+              isLoading ? (
+                <div className="flex items-center justify-center gap-2">
+                  {/* Tailwind spinner */}
+                  <div className="h-4 w-4 border-2 border-t-transparent border-red-400 rounded-full animate-spin"></div>
+                  <span>Exporting...</span>
+                </div>
+              ) : (
+                'Export'
+              )
+            }
             height="h-[25px]"
             borderColor="#03a5e0"
             onClick={openModalHandler}
+            disabled={isLoading} // 👈 disables the button when loading
           />
+
           <Button
             text="Add Filter"
             height="h-[25px]"
@@ -940,7 +976,17 @@ const Reports = () => {
               <p className="text-sm">
                 If no logo is uploaded, the Air Quality logo will be used by default.
               </p>
-              <BrowseFile setFile={setFile} />
+              <BrowseFile
+                file={file}
+                setFile={setFile}
+                previewValue={previewValue}
+                setPreviewValue={setPreviewValue}
+              />
+              {file && (
+                <p className="mt-3 text-sm text-gray-600">
+                  Selected file: <span className="font-medium">{file.name}</span>
+                </p>
+              )}
               <div className="mt-4">
                 <Button text="Generate" onClick={generatePDF} />
               </div>

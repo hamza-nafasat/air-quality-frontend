@@ -1,11 +1,12 @@
 /* eslint-disable react/prop-types */
-import { useState, useRef } from "react";
-import ImageIcon from "../../../assets/svgs/stepper/ImageIcon";
+import { useState, useRef } from 'react';
+import ImageIcon from '../../../assets/svgs/stepper/ImageIcon';
 
-const BrowseFile = ({ setFile, previewValue, setPreviewValue }) => {
+const BrowseFile = ({ setFile, file, previewValue, setPreviewValue }) => {
   const [dragActive, setDragActive] = useState(false);
-  const inputRef = useRef(null); // Create a reference for the file input
+  const inputRef = useRef(null);
 
+  // 🔹 Handle drag events
   const handleDragOver = (event) => {
     event.preventDefault();
     setDragActive(true);
@@ -15,48 +16,43 @@ const BrowseFile = ({ setFile, previewValue, setPreviewValue }) => {
     event.preventDefault();
     setDragActive(false);
     const droppedFile = event.dataTransfer.files[0];
-    if (droppedFile) {
-      convertToBase64(droppedFile, setPreviewValue);
-      previewImage(droppedFile);
-    }
+    if (droppedFile) handleFileSelect(droppedFile);
   };
 
+  // 🔹 Handle file input change
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];
-    setFile(selectedFile);
-    if (selectedFile) {
-      convertToBase64(selectedFile, setPreviewValue);
-      previewImage(selectedFile);
-    }
+    if (selectedFile) handleFileSelect(selectedFile);
   };
 
-  const convertToBase64 = (file, setPreviewValue) => {
+  // 🔹 Convert image to base64 and show preview
+  const handleFileSelect = (file) => {
+    setFile(file);
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onloadend = () => setPreviewValue(reader.result);
   };
 
-  const previewImage = (file) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onloadend = () => {
-      setPreviewValue(reader.result);
-    };
+  // 🔹 Open file selector when div is clicked
+  const handleDivClick = () => {
+    inputRef.current.click();
   };
 
-  // Simulate clicking the hidden file input when the div is clicked
-  const handleDivClick = () => {
-    inputRef.current.click(); // Trigger the file input click
+  // 🔹 Remove selected image
+  const handleRemoveImage = (e) => {
+    e.stopPropagation();
+    setFile(null);
+    setPreviewValue(null);
   };
 
   return (
     <div
-      className={`mt-3 border border-dashed rounded-lg p-4 h-[200px] md:h-[290px] grid place-items-center relative ${
+      className={`mt-3 border border-dashed rounded-lg p-4 h-[200px] md:h-[290px] grid place-items-center relative transition-all duration-200 ${
         dragActive
-          ? "border-primary-lightBlue bg-[rgba(200,240,255)]"
-          : "border-primary-lightBlue bg-[rgba(235,250,255)]"
+          ? 'border-primary-lightBlue bg-[rgba(200,240,255)]'
+          : 'border-primary-lightBlue bg-[rgba(235,250,255)]'
       }`}
-      onClick={handleDivClick} // Trigger file input click when div is clicked
+      onClick={handleDivClick}
       onDragOver={handleDragOver}
       onDragLeave={() => setDragActive(false)}
       onDrop={handleDrop}
@@ -64,17 +60,27 @@ const BrowseFile = ({ setFile, previewValue, setPreviewValue }) => {
       <input
         type="file"
         id="fileInput"
-        ref={inputRef} // Set reference to the file input
-        className="hidden" // Keep the file input hidden
+        ref={inputRef}
+        className="hidden"
+        accept="image/*"
         onChange={handleFileChange}
       />
-      <div className="flex flex-col items-center gap-2">
+
+      <div className="flex flex-col items-center gap-2 w-full h-full justify-center">
         {previewValue ? (
-          <img
-            src={previewValue}
-            alt="Uploaded preview"
-            className="w-full h-[165px] md:h-[250px] object-cover rounded-lg"
-          />
+          <div className="relative w-full md:h-[255px] ">
+            <img
+              src={previewValue}
+              alt="Uploaded preview"
+              className="w-full h-full object-contain rounded-lg"
+            />
+            <button
+              onClick={handleRemoveImage}
+              className="absolute top-2 right-2 bg-white text-red-500 px-2 py-1 rounded-full shadow-md text-xs hover:bg-red-500 hover:text-white transition-all"
+            >
+              ✕
+            </button>
+          </div>
         ) : (
           <>
             <ImageIcon />
@@ -92,9 +98,10 @@ const BrowseFile = ({ setFile, previewValue, setPreviewValue }) => {
 
 export default BrowseFile;
 
+// 🔹 Browse button component
 const BrowseFileBtn = () => {
   return (
-    <button className="relative px-4 py-2 cursor-pointer rounded-lg bg-primary-lightBlue text-white font-semibold">
+    <button className="relative px-4 py-2 cursor-pointer rounded-lg bg-primary-lightBlue text-white font-semibold hover:bg-primary-darkBlue transition-all">
       Browse File
     </button>
   );
