@@ -46,6 +46,33 @@ const notificationApis = createApi({
       }),
       invalidatesTags: [TAGS.NOTIFICATION],
     }),
+
+    // 🏢 Get notifications by Building ID
+    getNotificationsByBuilding: builder.query({
+      query: (buildingId) => ({
+        url: `/building/${buildingId}`,
+        method: 'GET',
+      }),
+      providesTags: [TAGS.NOTIFICATION],
+    }),
+
+    // 🏢 Get notifications by Floor ID
+    getNotificationsByFloor: builder.query({
+      query: (floorId) => ({
+        url: `/floor/${floorId}`,
+        method: 'GET',
+      }),
+      providesTags: [TAGS.NOTIFICATION],
+    }),
+
+    // 🏢 Get notifications by Sensor ID
+    getNotificationsBySensor: builder.query({
+      query: (sensorId) => ({
+        url: `/sensor/${sensorId}`,
+        method: 'GET',
+      }),
+      providesTags: [TAGS.NOTIFICATION],
+    }),
   }),
 });
 
@@ -54,5 +81,9 @@ export const {
   useGetNotificationsByUserQuery,
   useUpdateNotificationMutation,
   useDeleteNotificationMutation,
+  useGetNotificationsByBuildingQuery,
+  useGetNotificationsByFloorQuery,
+  useGetNotificationsBySensorQuery,
 } = notificationApis;
+
 export default notificationApis;

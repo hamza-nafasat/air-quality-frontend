@@ -24,6 +24,7 @@ import FloorDetails from './components/FloorDetails';
 import FloorSensorDetails from './components/FloorSensorDetails';
 import Loader from '../../shared/small/Loader';
 import { useSelector } from 'react-redux';
+import { useGetNotificationsByFloorQuery } from '../../../redux/apis/notificationApis';
 
 const icons = [
   <AlarmsIcon />,
@@ -43,6 +44,8 @@ const FloorView = () => {
   const [polygons, setPolygons] = useState([]);
 
   const { data: floor, isLoading, isFetching } = useGetSingleFloorQuery(id);
+  const { data: floorNotifications } = useGetNotificationsByFloorQuery(id);
+
   const [deleteFloor] = useDeleteSingleFloorMutation();
   const { user } = useSelector((state) => state.auth);
   const isAdmin = user.role === 'sub_admin';
@@ -191,7 +194,7 @@ const FloorView = () => {
             <CurrentHumidityChart floorData={floor?.data?.sensorsData ?? []} />
           </div>
           <div className="grid grid-cols-1 mt-4 flex-1">
-            <Alerts />
+            <Alerts floorNotifications={floorNotifications.data} />
           </div>
         </div>
       </section>

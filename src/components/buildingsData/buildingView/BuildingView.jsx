@@ -29,6 +29,7 @@ import BuildingDetails from './components/BuildingDetails';
 import BuildingHumidityChart from './components/BuildingHumidityChart';
 import SensorDetails from './components/SensorDetails';
 import { useSelector } from 'react-redux';
+import { useGetNotificationsByBuildingQuery } from '../../../redux/apis/notificationApis';
 const icons = [
   <AlarmsIcon />,
   <TemperatureIcon />,
@@ -46,6 +47,8 @@ const BuildingView = () => {
   const { data: floors } = useGetAllFloorQuery(id);
   const [deleteModal, setDeleteModal] = useState(false);
   const [deleteBuilding] = useDeleteSingleBuildingMutation('');
+  const { data: buildingNotifications } = useGetNotificationsByBuildingQuery(id);
+  console.log('buildingNotifications', buildingNotifications);
   // console.log('complet building data', data);
   const { user } = useSelector((state) => state.auth);
   const isAdmin = user.role === 'sub_admin';
@@ -169,7 +172,7 @@ const BuildingView = () => {
             <BuildingHumidityChart chartData={buildingData?.avgSensorData} />
           </div>
           <div className="grid grid-cols-1 mt-4 flex-1">
-            <Alerts />
+            <Alerts buildingNotifications={buildingNotifications.data} />
           </div>
         </div>
       </section>

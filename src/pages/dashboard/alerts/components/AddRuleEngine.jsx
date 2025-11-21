@@ -160,7 +160,7 @@ const AddRuleEngine = ({ onClose, isLoading, data = [] }) => {
 
           <div>
             <Dropdown
-              label="Building"
+              label="Sensor"
               options={data.map((b) => ({ option: b.name, value: b._id }))} // 👈 format correctly
               onSelect={
                 (option) => setFormData({ ...formData, building: option.value }) // 👈 store building _id
