@@ -158,15 +158,16 @@ const EditRuleEngine = ({ isLoading, onClose, data, editData }) => {
             required
           />
 
-          <MultipleSelector
-            label="Buildings"
-            options={data}
-            value={selectedBuildings} // pre-selected will now work
-            onSelect={(selected) => setSelectedBuildings(selected)}
+          {/* <div> */}
+          <Dropdown
+            label="Severity Type"
+            options={severityType}
+            onSelect={(option) => setFormData({ ...formData, severityType: option.option })}
           />
+          {/* </div> */}
 
           <MultipleSelector
-            label="Buildings"
+            label="Sensor"
             options={data}
             // defaultText={selectedBuildings?.map((item) => item.name)}
             value={selectedBuildings}

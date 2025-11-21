@@ -9,12 +9,16 @@ import BarChart from '../../../components/charts/barChart/BarChart';
 import SingleAreaChart from '../../../components/charts/areaChart/SingleAreaChart';
 import { useGetSingleSensorQuery } from '../../../redux/apis/sensorApis';
 import { useParams } from 'react-router-dom';
+import { useGetNotificationsBySensorQuery } from '../../../redux/apis/notificationApis';
+import Alerts from '../../../components/buildingsData/floorView/components/Alerts';
 
 const SensorDetail = () => {
   const { id } = useParams();
   // console.log('hjjhhjjhhj', id);
 
   const { data } = useGetSingleSensorQuery(id);
+  const { data: sensorNotifications } = useGetNotificationsBySensorQuery(id);
+
   // console.log('hjj?.hhjjadfefeqwfwehhj', data);
   const [modal, setModal] = useState(false);
 
@@ -83,8 +87,8 @@ const SensorDetail = () => {
           </section>
         </div>
         <div className="col-span-12 xl:col-span-4">
-          <section className="bg-white p-4 rounded-[16px] shadow-dashboard h-full">
-            <div className="flex justify-between items-center">
+          {/* <section className="bg-white p-4 rounded-[16px] shadow-dashboard h-full"> */}
+          {/* <div className="flex justify-between items-center">
               <h1>Alerts</h1>
               <Button
                 text="View All"
@@ -95,28 +99,24 @@ const SensorDetail = () => {
                 onClick={() => handleModalOpen()}
               />
             </div>
-            <hr />
-            {alerts.length === 0 ? (
-              <h2 className="  text-[#00000090] my-3 text-sm xl:text-lg">No Alert Found!</h2>
-            ) : (
-              <>
-                {alerts.slice(0, 3).map((alert, i) => (
-                  <Alert key={i} type={alert.type} message={alert.message} />
-                ))}
-              </>
-            )}
-            {modal && (
-              <Modal title="All Alerts" onClose={handleModalClose}>
-                <div>
-                  <div className="modal-content overflow-y-auto max-h-64">
-                    {alerts.map((alert, i) => (
-                      <Alert key={i} type={alert.type} message={alert.message} />
-                    ))}
-                  </div>
+            <hr /> */}
+
+          {/* <Alert key={i} type={alert.type} message={alert.message} />
+           */}
+          <Alerts floorNotifications={sensorNotifications?.data} />
+
+          {modal && (
+            <Modal title="All Alerts" onClose={handleModalClose}>
+              <div>
+                <div className="modal-content overflow-y-auto max-h-64">
+                  {alerts.map((alert, i) => (
+                    <Alert key={i} type={alert.type} message={alert.message} />
+                  ))}
                 </div>
-              </Modal>
-            )}
-          </section>
+              </div>
+            </Modal>
+          )}
+          {/* </section> */}
         </div>
       </div>
     </div>
