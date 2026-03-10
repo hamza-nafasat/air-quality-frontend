@@ -1,5 +1,7 @@
 import 'leaflet-draw/dist/leaflet.draw.css';
 import 'leaflet/dist/leaflet.css';
+// import 'leaflet-draw/dist/leaflet.draw.css';
+import 'leaflet-draw';
 import { lazy, Suspense, useEffect, useState } from 'react';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import { useDispatch, useSelector } from 'react-redux';

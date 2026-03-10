@@ -8,7 +8,7 @@ const Alerts = ({ buildingNotifications }) => {
       <div className="h-[400px] overflow-y-auto pr-4">
         <div className="p-5">
           {buildingNotifications && buildingNotifications.length > 0 ? (
-            buildingNotifications.map((notification) => (
+            buildingNotifications?.map((notification) => (
               <Alert
                 type={notification.type}
                 message={notification.message}

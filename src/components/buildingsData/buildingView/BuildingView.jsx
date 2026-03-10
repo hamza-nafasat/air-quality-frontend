@@ -172,7 +172,7 @@ const BuildingView = () => {
             <BuildingHumidityChart chartData={buildingData?.avgSensorData} />
           </div>
           <div className="grid grid-cols-1 mt-4 flex-1">
-            <Alerts buildingNotifications={buildingNotifications.data} />
+            <Alerts buildingNotifications={buildingNotifications?.data} />
           </div>
         </div>
       </section>
