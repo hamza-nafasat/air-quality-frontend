@@ -1,7 +1,10 @@
-import 'leaflet-draw/dist/leaflet.draw.css';
-import 'leaflet/dist/leaflet.css';
-// import 'leaflet-draw/dist/leaflet.draw.css';
-import 'leaflet-draw';
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+
+window.L = L;
+
+import "leaflet-draw/dist/leaflet.draw.css";
+import "leaflet-draw";
 import { lazy, Suspense, useEffect, useState } from 'react';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import { useDispatch, useSelector } from 'react-redux';
@@ -173,7 +176,7 @@ function App() {
             <Route
               path="edit-building/:id"
               element={
-                <ProtectedRoute user={user} allowedRoles={[, ROLES.ADMIN, ROLES.SUPER_ADMIN]}>
+                <ProtectedRoute user={user} allowedRoles={[ROLES.ADMIN, ROLES.SUPER_ADMIN]}>
                   <EditBuilding />
                 </ProtectedRoute>
               }
@@ -181,7 +184,7 @@ function App() {
             <Route
               path="edit-floor/:id"
               element={
-                <ProtectedRoute user={user} allowedRoles={[, ROLES.ADMIN]}>
+                <ProtectedRoute user={user} allowedRoles={[ROLES.ADMIN]}>
                   <FloorEdit />
                 </ProtectedRoute>
               }
@@ -200,7 +203,7 @@ function App() {
             <Route
               path="add-floor/:id"
               element={
-                <ProtectedRoute user={user} allowedRoles={[, ROLES.ADMIN]}>
+                <ProtectedRoute user={user} allowedRoles={[ROLES.ADMIN]}>
                   <AddFloor />
                 </ProtectedRoute>
               }
